@@ -1,134 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>LIFF Minimal｜ホーム</title>
-<meta name="theme-color" content="#F6F3EE">
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<style>
-  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","BIZ UDPGothic","Noto Sans JP",sans-serif;line-height:1.6;overflow-x:hidden;}
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px}
-  .sub{font-size:12px;color:var(--muted)}
-  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
-  .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .small{font-size:14px}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
-  .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
-  .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
-  .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
-  .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <title>ホーム</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header>
-  <div class="hrow">
-    <div class="ttl">ホーム</div>
-    <div class="sub" id="siteSub"></div>
-    <span class="pill" id="envPill">—</span>
+<header class="appbar"><h1 class="appbar__title">ホーム</h1></header>
+
+<main>
+  <div class="card">
+    <div class="card__header">お知らせ</div>
+    <div class="card__body">ここにホームの内容が入ります。</div>
   </div>
-</header>
-
-<main class="wrap">
-  <section>
-    <div class="card" id="progressCard" style="cursor:pointer">
-      <div class="hrow" style="justify-content:space-between">
-        <div>
-          <div class="ttl" style="font-size:17px">進捗</div>
-          <div class="sub">同意 → 決済 → 抽選</div>
-        </div>
-        <span class="pill" id="stepPill">未開始</span>
-      </div>
-      <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
-      <div class="sub">タップして申込みに進む（別ページ）</div>
-    </div>
-
-    <div class="card">
-      <div class="ttl" style="font-size:17px">招待URL & 期限</div>
-      <div class="urlbox" id="inviteUrl">— 未発行 —</div>
-      <div class="hrow" style="justify-content:space-between;margin-top:10px">
-        <div class="sub">残り <span id="remain">—</span></div>
-        <div class="hrow" style="gap:8px">
-          <button class="btn small" id="shareBtn" disabled>共有</button>
-          <button class="btn primary small" id="copyBtn" disabled>URLをコピー</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <div class="ttl" style="font-size:17px">クレジット残高</div>
-        <div style="font-size:32px;font-weight:800"><span id="credit">0</span></div>
-        <div class="hrow" style="gap:8px;margin-top:8px">
-          <button class="btn primary small" id="expandBtn">距離 +3km</button>
-          <button class="btn small" id="chargeBtn">チャージ</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ttl" style="font-size:17px">通報ステータス</div>
-        <div class="sub" id="report">—</div>
-        <div class="sub" style="margin-top:6px">※ ノーショー蓄積で停止措置の可能性あり</div>
-      </div>
-    </div>
-
-    <!-- 管理者だけ表示（?admin=1） -->
-    <div class="card" id="adminSettings" style="display:none">
-      <div class="ttl" style="font-size:17px">（管理者）接続設定</div>
-      <label>LIFF ID<input id="adminLiffId"></label>
-      <label>APIエンドポイント<input id="adminApi"></label>
-      <div class="hrow" style="gap:8px"><button class="btn" id="adminReset">初期化</button><button class="btn primary" id="adminSave">保存</button></div>
-      <div class="sub">※ 一般ユーザーには表示されません（URLに ?admin=1 で表示）。</div>
-    </div>
-  </section>
+  <div class="card">
+    <div class="card__header">使い方</div>
+    <div class="card__body">下部のタブからページを移動できます。見た目は全ページで統一されています。</div>
+  </div>
 </main>
 
-<nav class="tabbar">
-  <a class="active" href="index.html"><span class="tabicon"></span>ホーム</a>
-  <a href="apply.html"><span class="tabicon"></span>申込み</a>
-  <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
-</nav>
 
-<script>
-  const APP = { LIFF_ID: "2008178197-ELrxabO9", API: "https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const ADMIN_ON = new URLSearchParams(location.search).get("admin")==="1";
-  const STATE = {
-    step:Number(localStorage.getItem("state.step")||"0"),
-    credit:Number(localStorage.getItem("credit")||"0"),
-    report:localStorage.getItem("report")||"問題なし"
-  };
-  const $=s=>document.querySelector(s);
-  function setProgress(step){const labels=["未開始","同意","決済","抽選"];$("#stepPill").textContent=labels[step]||"未開始";[1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
-
-  document.addEventListener("DOMContentLoaded", async ()=>{
-    document.getElementById("siteSub").textContent = location.hostname.replace(/^www\\./,'');
-    setProgress(STATE.step||0);
-    $("#credit").textContent = STATE.credit; $("#report").textContent = STATE.report || "—";
-    document.getElementById("progressCard").addEventListener("click", ()=> location.href="apply.html");
-
-    try{
-      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
-      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-      $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
-    }catch(e){ console.warn(e); }
-
-    if(ADMIN_ON){
-      $("#adminSettings").style.display="block";
-      $("#adminLiffId").value=APP.LIFF_ID; $("#adminApi").value=APP.API;
-      $("#adminSave").addEventListener("click", ()=>{ APP.LIFF_ID=$("#adminLiffId").value.trim()||APP.LIFF_ID; APP.API=$("#adminApi").value.trim()||APP.API; alert("保存しました。"); });
-      $("#adminReset").addEventListener("click", ()=> location.reload());
-    }
-  });
-</script>
+    <nav class="tabbar" role="navigation" aria-label="Main tabs">
+      <a href="index.html"  class="tabbar__item" data-tab="home" aria-current="page">
+        <span class="tabbar__icon">🏠</span><span class="tabbar__label">ホーム</span>
+      </a>
+      <a href="apply.html"  class="tabbar__item" data-tab="apply" >
+        <span class="tabbar__icon">📝</span><span class="tabbar__label">申込み</span>
+      </a>
+      <a href="mypage.html" class="tabbar__item" data-tab="mypage" >
+        <span class="tabbar__icon">👤</span><span class="tabbar__label">マイページ</span>
+      </a>
+    </nav>
+    
+<script defer src="app.js"></script>
 </body>
 </html>
