@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIFF Minimal｜申込み</title>
+<meta name="theme-color" content="#F6F3EE">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
+  .hrow{display:flex;align-items:center;gap:10px}
+  .ttl{font-weight:800;font-size:18px}
+  .sub{font-size:12px;color:var(--muted)}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  label{display:block;font-size:14px;margin:10px 0 6px}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  textarea{min-height:88px;resize:vertical}
+  .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
+  .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
+  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="ttl">申込み</div>
+    <div class="sub">入力 → 同意 → 決済 → 抽選</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 入力 -->
+  <div class="card" id="stepInfo">
+    <div class="hrow" style="justify-content:space-between">
+      <div class="ttl" style="font-size:16px">申込み情報</div>
+      <button class="btn" onclick="location.href='index.html'">ホームに戻る</button>
+    </div>
+    <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
+
+    <div class="info" style="margin-bottom:10px">
+      <b>年齢確認の注意</b><br>
+      ・18歳未満の方はご利用いただけません。<br>
+      ・必要に応じて<strong>本人確認（身分証＋セルフィー）</strong>をお願いする場合があります。<br>
+      ・不一致が確認された場合、参加見送りやアカウント制限の対象となります。
+    </div>
+
+    <label>パーティ構成（人数）</label>
+    <div class="chips" id="chipsSize">
+      <span class="chip" data-v="2v2">2 : 2</span>
+      <span class="chip" data-v="3v3">3 : 3</span>
+    </div>
+
+    <label>エリア（自由入力）<input id="inArea" placeholder="例：渋谷・新宿・横浜 など"></label>
+
+    <label>相手の希望年齢層</label>
+    <div class="hrow" style="gap:10px">
+      <select id="ageMin" style="flex:1"><option value="">下限</option></select>
+      <span class="sub">〜</span>
+      <select id="ageMax" style="flex:1"><option value="">上限</option></select>
+    </div>
+
+    <label>自己評価スコア（総合）</label>
+    <div class="hrow" style="gap:10px;align-items:center">
+      <input id="inScore" type="range" min="1" max="5" step="1" value="3" oninput="document.getElementById('scoreVal').textContent=this.value">
+      <span id="scoreVal" class="chip" style="border-style:dashed">3</span>
+      <span class="sub">1=控えめ / 5=高め</span>
+    </div>
+
+    <label>友だちのLINE ID（改行で複数）<textarea id="inFriends" placeholder="例：friend_aaa
+friend_bbb"></textarea></label>
+    <label>メモ（任意）<textarea id="inNote" placeholder="連絡先や希望など"></textarea></label>
+
+    <div class="hrow" style="gap:8px;margin-top:6px">
+      <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
+    </div>
+  </div>
+
+  <!-- 同意 -->
+  <div class="card" id="stepConsent" style="display:none">
+    <div class="ttl" style="font-size:16px">同意</div>
+    <p class="sub">以下の利用規約を確認のうえ、同意してください。</p>
+    <div class="info" style="margin:8px 0">
+      <b>本人確認について</b>：必要に応じて身分証とセルフィーの提出をお願いする場合があります。年齢・なりすまし対策のためです。
+    </div>
+    <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
+    <label style="display:flex;align-items:center;gap:8px"><input id="agreeChk" type="checkbox"> 利用規約に同意する</label>
+    <div class="hrow" style="gap:8px;margin-top:6px">
+      <button class="btn" id="consentBack">戻る</button>
+      <button class="btn primary" id="consentNext" disabled>決済へ進む</button>
+    </div>
+  </div>
+
+  <!-- 決済 -->
+  <div class="card" id="stepPayment" style="display:none">
+    <div class="ttl" style="font-size:16px">決済</div>
+    <p class="sub">外部の決済ページへ遷移します。戻ってきたら抽選へ進めます。</p>
+    <div class="hrow" style="gap:8px;margin-top:6px">
+      <button class="btn" id="payBack">戻る</button>
+      <button class="btn primary" id="payGo">決済ページを開く</button>
+      <button class="btn" id="payMock">支払い済みとして進む（デモ）</button>
+    </div>
+  </div>
+
+  <!-- 抽選 -->
+  <div class="card" id="stepLottery" style="display:none">
+    <div class="ttl" style="font-size:16px">抽選</div>
+    <p class="sub">決済確認後に抽選を行います。</p>
+    <div class="hrow" style="gap:8px;margin-top:6px">
+      <button class="btn" id="lotBack">戻る</button>
+      <button class="btn primary" id="lotStart">抽選を開始</button>
+    </div>
+    <div id="lotResult" style="margin-top:10px;font-weight:800"></div>
+  </div>
+</main>
+
+<nav class="tabbar">
+  <a href="index.html"><span class="tabicon"></span>ホーム</a>
+  <a class="active" href="apply.html"><span class="tabicon"></span>申込み</a>
+  <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
+</nav>
+
+<script>
+  const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
+  const AUTH={ userId:"", idToken:"" };
+  const APPLY={ draft:null, paid:false };
+  const $=s=>document.querySelector(s);
+  const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
+  const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
+
+  // 年齢選択の選択肢を生成
+  (function(){
+    const minSel=document.getElementById('ageMin'); const maxSel=document.getElementById('ageMax');
+    for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); minSel.appendChild(o); }
+    for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); maxSel.appendChild(o); }
+  })();
+
+  // 人数チップ
+  const sizeSel = { value:null };
+  document.addEventListener("click",(e)=>{
+    if(e.target.classList.contains("chip")){
+      document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+      e.target.classList.add("active");
+      sizeSel.value = e.target.getAttribute("data-v");
+    }
+  });
+
+  async function postJSON(url, body){
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return await res.json();
+  }
+  async function sendAction(type,payload){
+    try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); }
+  }
+
+  document.getElementById("btnCreateApply").addEventListener("click", async ()=>{
+    const group = sizeSel.value || "2v2";
+    const area = document.getElementById("inArea").value.trim();
+    const ageMin = Number(document.getElementById("ageMin").value||0);
+    const ageMax = Number(document.getElementById("ageMax").value||0);
+    if(ageMin && ageMax && ageMin>ageMax){ alert("年齢の下限・上限が逆になっています。"); return; }
+    const score = Number(document.getElementById("inScore").value||3);
+    const friends = (document.getElementById("inFriends").value||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    const note = document.getElementById("inNote").value.trim();
+    APPLY.draft = { group, area, ageMin, ageMax, score, friends, note, ts: Date.now() };
+    await sendAction("apply_draft", APPLY.draft);
+    show("stepConsent"); mark(1);
+  });
+
+  // 同意
+  document.getElementById("agreeChk").addEventListener("change", (e)=> document.getElementById("consentNext").disabled = !e.target.checked);
+  document.getElementById("consentBack").addEventListener("click", ()=>{ show("stepInfo"); mark(0); });
+  document.getElementById("consentNext").addEventListener("click", async ()=>{
+    await sendAction("agree", { draft: APPLY.draft });
+    show("stepPayment"); mark(2);
+  });
+
+  // 決済
+  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  document.getElementById("payGo").addEventListener("click", async ()=>{
+    try{
+      const r = await postJSON(APP.API, { type:"create_payment", payload:{ draft: APPLY.draft }, auth: AUTH });
+      if(r && r.url) location.href = r.url; else alert("決済URLが取得できませんでした。");
+    }catch(e){ alert("決済ページを開けませんでした。モックをご利用ください。"); }
+  });
+  document.getElementById("payMock").addEventListener("click", async ()=>{
+    APPLY.paid = true; await sendAction("payment_done", { draft: APPLY.draft });
+    show("stepLottery"); mark(3);
+  });
+
+  // 抽選
+  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  document.getElementById("lotStart").addEventListener("click", async ()=>{
+    try{
+      const r = await postJSON(APP.API, { type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH });
+      const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
+      document.getElementById("lotResult").textContent = "結果：" + result;
+      const hist = JSON.parse(localStorage.getItem("history")||"[]");
+      hist.unshift({ ts: Date.now(), result, payment: APPLY.paid ? 1000 : 0 });
+      localStorage.setItem("history", JSON.stringify(hist));
+    }catch(e){ alert("抽選に失敗しました。"); }
+  });
+
+  // LIFF
+  document.addEventListener("DOMContentLoaded", async ()=>{
+    try{
+      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
+      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
+      const prof=await liff.getProfile(); AUTH.userId=prof.userId||"";
+    }catch(e){ console.warn(e); }
+    mark(Number(localStorage.getItem("state.step")||"0"));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>マイページ</title>
+  <link rel="stylesheet" href="./style.css?v=kyc3">
+</head>
+<body>
+
+  <!-- ヘッダー（ホーム/申込みと同デザイン） -->
+  <header>
+    <div class="hrow">
+      <div class="ttl">マイページ</div>
+      <div class="sub" id="siteSub"></div>
+      <span class="pill small" id="envPill" hidden></span>
+    </div>
+  </header>
+
+  <!-- 本文ラップ（下タブの分だけ余白を確保＋横スライド入場） -->
+  <main class="wrap page-enter">
+    <section id="myPage" class="container">
+      <!-- プロフィールヘッダー -->
+      <div class="card">
+        <div class="row between center">
+          <div>
+            <div class="nickname-line">
+              <span id="viewNickname" class="nickname">ニックネーム未設定</span>
+              <span id="verifiedBadge" class="badge badge-verified" hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2l2.09 4.24L18 7l-3 3 .71 4.24L12 12.9l-3.71 1.34L9 10 6 7l3.91-.76L12 2z" fill="currentColor" opacity=".2"/>
+                  <path d="M9.5 12.5l1.8 1.8 3.7-3.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                本人確認済み
+              </span>
+            </div>
+            <div class="subtext" id="kycStateText">本人確認：未確認</div>
+          </div>
+          <img id="avatar" class="avatar" src="" alt="">
+        </div>
+      </div>
+
+      <!-- 本人確認ブロック -->
+      <div class="card">
+        <h3>本人確認</h3>
+        <p class="hint">安全にご利用いただくため、本人確認にご協力ください。</p>
+        <div class="row gap8">
+          <span id="kycStatusPill" class="pill pill-gray">未確認</span>
+        </div>
+        <div class="row gap8 mt12">
+          <button id="btnStartKyc" class="btn primary">本人確認を始める</button>
+          <button id="btnRetakeKyc" class="btn ghost" hidden>再撮影</button>
+        </div>
+      </div>
+
+      <!-- プロフィール編集 -->
+      <div class="card">
+        <h3>プロフィール</h3>
+        <form id="profileForm" class="form">
+          <label class="label">ニックネーム
+            <input id="inputNickname" type="text" placeholder="例）ゆう＆みほ">
+          </label>
+          <div class="row gap8">
+            <label class="label flex1">年齢
+              <input id="inputAge" type="number" min="0" max="120" inputmode="numeric" placeholder="例）23">
+            </label>
+            <label class="label flex2">趣味
+              <input id="inputHobbies" type="text" placeholder="例）カフェ巡り・ドライブ・写真">
+            </label>
+          </div>
+          <div class="row gap8 mt12">
+            <button type="submit" class="btn primary">保存</button>
+            <button type="button" id="btnClearProfile" class="btn ghost">リセット</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- 下タブ（ホーム / 申込み / マイページ） -->
+  <nav class="tabbar">
+    <a href="index.html" class="tab">
+      <div class="tabicon">🏠</div><span>ホーム</span>
+    </a>
+    <a href="apply.html" class="tab">
+      <div class="tabicon">📝</div><span>申込み</span>
+    </a>
+    <a href="mypage.html" class="tab active">
+      <div class="tabicon">👤</div><span>マイページ</span>
+    </a>
+  </nav>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
