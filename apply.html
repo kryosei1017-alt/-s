@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <title>申込み</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="appbar"><h1 class="appbar__title">申込み</h1></header>
+
+<main>
+  <div class="card">
+    <div class="card__header">申込み</div>
+    <div class="card__body">
+      ここに申込みのフォームを配置します。<br/>
+      デザイン・タブはホーム/マイページと共通です。
+    </div>
+  </div>
+</main>
+
+
+    <nav class="tabbar" role="navigation" aria-label="Main tabs">
+      <a href="index.html"  class="tabbar__item" data-tab="home" >
+        <span class="tabbar__icon">🏠</span><span class="tabbar__label">ホーム</span>
+      </a>
+      <a href="apply.html"  class="tabbar__item" data-tab="apply" aria-current="page">
+        <span class="tabbar__icon">📝</span><span class="tabbar__label">申込み</span>
+      </a>
+      <a href="mypage.html" class="tabbar__item" data-tab="mypage" >
+        <span class="tabbar__icon">👤</span><span class="tabbar__label">マイページ</span>
+      </a>
+    </nav>
+    
+<script defer src="app.js"></script>
+</body>
+</html>
