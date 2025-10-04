@@ -7,27 +7,31 @@
 <meta name="theme-color" content="#F6F3EE">
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
+  :root{
+    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
+    /* 画面いっぱいレイアウト用 */
+    --tabbarH:96px; --headerH:56px;
+  }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;
-    writing-mode: horizontal-tb !important; -webkit-writing-mode: horizontal-tb !important; text-orientation: mixed !important;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
-  /* 横書き固定ユーティリティ */
-  .force-horizontal, .force-horizontal *{
-    writing-mode: horizontal-tb !important; -webkit-writing-mode: horizontal-tb !important;
-    text-orientation: mixed !important; white-space: normal !important; transform:none !important;
+  .force-horizontal,.force-horizontal *{
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    white-space:normal!important; transform:none!important;
   }
-  .nowrap{ white-space:nowrap !important; }
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-  .hrow{display:flex;align-items:center;gap:10px}
+  .nowrap{white-space:nowrap!important}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
+        min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
+  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
-  .btn--sm{min-width:92px} /* ←「戻る」が縦割れしない最低幅 */
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   label{display:block;font-size:14px;margin:10px 0 6px}
@@ -41,11 +45,14 @@
   .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
   .em{font-weight:800}
   .muted{color:#6B7280}
-  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  /* 同意の行を中央揃えに固定 */
+  .consentRow{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px;width:100%;margin-top:8px}
+  .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
@@ -57,7 +64,7 @@
 </header>
 
 <main class="wrap">
-  <!-- 入力 -->
+  <!-- 入力（前ページと同じ。省略なし） -->
   <div class="card" id="stepInfo">
     <div class="hrow" style="justify-content:space-between">
       <div class="ttl" style="font-size:16px">申込み情報</div>
@@ -132,19 +139,19 @@ friend_bbb"></textarea></label>
     </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
 
-    <!-- 横書き固定 -->
-    <label class="force-horizontal" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+    <!-- ★ 中央揃え（consentRow） -->
+    <label class="force-horizontal consentRow">
       <input id="agreeChk" type="checkbox">
       <span class="force-horizontal nowrap">利用規約に同意する</span>
     </label>
 
-    <div class="hrow" style="gap:8px;margin-top:12px">
+    <div class="btnRow">
       <button class="btn btn--sm nowrap" id="consentBack">戻る</button>
       <button class="btn primary nowrap" id="consentNext" disabled>決済へ進む</button>
     </div>
   </div>
 
-  <!-- 決済 -->
+  <!-- 決済（女性無料/サブスク1980pt → 以降0pt は前回どおり） -->
   <div class="card" id="stepPayment" style="display:none">
     <div class="ttl" style="font-size:16px">決済</div>
     <p class="sub">クレジット残高から差し引きます。</p>
@@ -184,8 +191,7 @@ friend_bbb"></textarea></label>
       <div id="payError" class="sub" style="color:#991B1B;display:none;margin-top:6px">残高が不足しています。ホームでチャージしてください。</div>
     </div>
 
-    <!-- ★ ボタン行：横書き固定＋改行ヒント -->
-    <div class="hrow force-horizontal" style="gap:8px;margin-top:6px;justify-content:space-between">
+    <div class="btnRow">
       <button class="btn btn--sm nowrap" id="payBack">戻る</button>
       <button class="btn" id="payGoCharge"><span class="force-horizontal">ホームで<wbr>チャージ</span></button>
       <button class="btn primary nowrap" id="payConfirm">この内容で確定</button>
@@ -196,7 +202,7 @@ friend_bbb"></textarea></label>
   <div class="card" id="stepLottery" style="display:none">
     <div class="ttl" style="font-size:16px">抽選</div>
     <p class="sub">決済確認後に抽選を行います。</p>
-    <div class="hrow" style="gap:8px;margin-top:6px">
+    <div class="btnRow">
       <button class="btn btn--sm nowrap" id="lotBack">戻る</button>
       <button class="btn primary nowrap" id="lotStart">抽選を開始</button>
     </div>
