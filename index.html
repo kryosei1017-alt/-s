@@ -35,7 +35,12 @@
   .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ★ ここを変更：デフォルト1列（全幅で縦積み）、広い画面のみ2列 */
+  .grid2{display:grid;grid-template-columns:1fr;gap:12px}
+  @media (min-width:960px){
+    .grid2{grid-template-columns:1fr 1fr}
+  }
 
   /* お知らせ */
   .notiList{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -98,6 +103,7 @@
       </div>
     </div>
 
+    <!-- ここは順番そのまま：上がクレジット、下がお知らせ -->
     <div class="grid2">
       <!-- クレジット -->
       <div class="card">
@@ -147,19 +153,13 @@
   const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0") };
   const $=s=>document.querySelector(s);
 
-  /* 進捗表示 */
   function setProgress(step){
     const labels=["未開始","同意","決済","抽選"];
     $("#stepPill").textContent=labels[step]||"未開始";
     [1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));
   }
-
-  /* 残高 */
   function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
   const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
-
-  /* サブスク */
-  const getSub = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
 
   /* お知らせ（ローカル＋配信） */
   const getNoti = ()=> JSON.parse(localStorage.getItem("notifications")||"[]");
@@ -205,9 +205,10 @@
     }catch(e){}
   }
   function ensureSubNoti(){
-    const sub = getSub(); if(!sub || !sub.active) return;
+    const sub = JSON.parse(localStorage.getItem("sub")||"{}");
+    if(!sub || !sub.active) return;
     const id = "sub_active_" + (sub.since || "").slice(0,10);
-    if(!hasNoti(id)){
+    if(!getNoti().some(n=>n.id===id)){
       const next = sub.nextRenewal ? new Date(sub.nextRenewal) : new Date(Date.now()+30*864e5);
       addNoti({ id, type:"sub", text:`サブスクに加入しました（${sub.plan||"プラン"}）。\n次回更新日：${next.toLocaleDateString()}` });
     }
