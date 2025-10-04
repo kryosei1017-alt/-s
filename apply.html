@@ -9,7 +9,7 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
-    --tabbarH:96px; --headerH:56px; --fs:13px; /* ← 非太字の統一フォントサイズ */
+    --tabbarH:96px; --headerH:56px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -19,65 +19,58 @@
     line-height:1.6;overflow-x:hidden;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
     touch-action: manipulation;
-    font-size:var(--fs); /* ← 基本サイズを統一 */
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px} /* ← 太字は従来通り */
-  .sub{color:var(--muted);font-size:var(--fs)} /* ← 非太字は統一 */
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;
-       padding:14px 16px;border-radius:14px;font-size:var(--fs);cursor:pointer;writing-mode:horizontal-tb!important}
+  .ttl{font-weight:800;font-size:18px}
+  .sub{font-size:12px;color:var(--muted)}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;
-        box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
-  label{display:block;margin:10px 0 6px;font-size:var(--fs)}
-  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:var(--fs)}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
+  label{display:block;font-size:14px;margin:10px 0 6px}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
   .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px}
+  .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
   .warn{background:#FEF2F2;border:1px solid #FCA5A5;color:#7F1D1D}
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:var(--fs);border:1px solid var(--border);background:#fff}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important;font-size:var(--fs)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* —— 決済ステップは全面横書き固定 —— */
+  /* 決済は横書き固定 */
   #stepPayment, #stepPayment *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px;overflow:hidden}
   .payopt{width:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin:0 0 10px 0}
   .payopt:last-child{margin-bottom:0}
   .payopt input[type="radio"]{width:22px;height:22px}
-  .labeltext{display:block;white-space:normal!important;overflow-wrap:anywhere;line-height:1.5;font-size:var(--fs)}
-
+  .labeltext{display:block;white-space:normal!important;overflow-wrap:anywhere;line-height:1.5;font-size:14px}
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
-  /* 同意チェック（白枠で横並び） */
   .consentBox{
     display:flex; align-items:center; gap:12px;
     border:1px solid var(--border); border-radius:12px;
     padding:12px 14px; background:#fff; margin-top:8px; max-width:100%;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-    font-size:var(--fs);
+    font-size:14px;
   }
   .consentBox input[type="checkbox"]{ width:22px; height:22px; flex:0 0 auto; }
-  .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:var(--fs); }
-
-  /* 「ホームでチャージ」も横書き固定 */
+  .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:14px; }
   #payGoCharge, #payGoCharge *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
 </style>
 </head>
@@ -98,7 +91,6 @@
     </div>
     <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
 
-    <!-- KYC 状態（マイページ連動） -->
     <div class="hrow" style="justify-content:space-between;align-items:center;margin:8px 0">
       <div class="badge" id="kycBadge">KYC確認状況: 取得中...</div>
       <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
@@ -107,7 +99,6 @@
       <b>本人確認が未完了です。</b> 申込み前に本人確認を済ませてください（デモでは「本人確認（デモ）」から設定できます）。
     </div>
 
-    <!-- プロフィール未完了の注意（必須3項目） -->
     <div class="info warn" id="profileWarn" style="display:none">
       <b>プロフィールが未完了です。</b> ニックネーム・エリア・年齢を<b>マイページ</b>で設定してください。
     </div>
@@ -156,7 +147,7 @@ friend_bbb"></textarea></label>
       <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
     </div>
 
-    <!-- ▼ デモ用：本人確認の簡易設定（マイページと連動） -->
+    <!-- KYCデモ（省略：前回同様） -->
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
       <p class="sub">外部eKYCが未決定のため、検証用にローカルで状態を切り替えます。</p>
@@ -165,34 +156,16 @@ friend_bbb"></textarea></label>
         <span class="chip" data-v="male">男性で確認済み</span>
         <span class="chip" data-v="female">女性で確認済み</span>
       </div>
-      <div class="info" style="margin-top:8px">
-        ・設定は端末のローカルに保存されます（本番APIとは連動しません）。<br>
-        ・性別は決済ロジックに反映されます（<b>女性は無料</b>）。<br>
-        ・未完了のままでは申込みできません。
-      </div>
-      <p class="sub">※ 同じアカウントで開いた <b>マイページ</b> でも同じ状態になります。</p>
     </div>
-    <!-- ▲ デモ用 -->
   </div>
 
   <!-- 同意 -->
   <div class="card" id="stepConsent" style="display:none">
     <div class="ttl" style="font-size:16px">同意</div>
     <p class="sub">以下の利用規約を確認のうえ、同意してください。</p>
-    <div class="info" style="margin:8px 0">
-      <b>本人確認について</b>：必要に応じて身分証とセルフィーの提出をお願いする場合があります。年齢・なりすまし対策のためです。
-    </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
-
-    <label class="consentBox" id="consentWrap">
-      <input id="agreeChk" type="checkbox" />
-      <span class="consentText">利用規約に同意する</span>
-    </label>
-
-    <div class="btnRow">
-      <button class="btn btn--sm" id="consentBack">戻る</button>
-      <button class="btn primary" id="consentNext" disabled>決済へ進む</button>
-    </div>
+    <label class="consentBox"><input id="agreeChk" type="checkbox" /><span class="consentText">利用規約に同意する</span></label>
+    <div class="btnRow"><button class="btn btn--sm" id="consentBack">戻る</button><button class="btn primary" id="consentNext" disabled>決済へ進む</button></div>
   </div>
 
   <!-- 決済 -->
@@ -200,38 +173,22 @@ friend_bbb"></textarea></label>
     <div class="ttl" style="font-size:16px">決済</div>
     <p class="sub">クレジット残高から差し引きます。</p>
 
-    <div id="femaleFreeWrap" style="display:none">
-      <div class="info"><b>女性は無料</b>：今回の支払いは <span class="em">0 pt</span> です。</div>
-    </div>
-    <div id="subActiveWrap" style="display:none">
-      <div class="info"><b>サブスク加入中</b>：今回の支払いは <span class="em">0 pt</span> です。</div>
-    </div>
+    <div id="femaleFreeWrap" style="display:none"><div class="info"><b>女性は無料</b>：今回の支払いは <span class="em">0 pt</span> です。</div></div>
+    <div id="subActiveWrap" style="display:none"><div class="info"><b>サブスク加入中</b>：今回の支払いは <span class="em">0 pt</span> です。</div></div>
 
     <div id="planChoiceWrap" style="display:none">
       <label style="margin-top:6px">お支払い方法</label>
       <div class="payCard">
-        <label class="payopt">
-          <input type="radio" name="payplan" value="oneoff" checked />
-          <span class="labeltext">単発で支払う <span class="muted mono" id="priceOneoff"></span></span>
-        </label>
-        <label class="payopt">
-          <input type="radio" name="payplan" value="sub" />
-          <span class="labeltext">サブスクに加入して支払う <span class="muted mono" id="priceSub"></span><span class="sub">（次回以降 0 pt）</span></span>
-        </label>
+        <label class="payopt"><input type="radio" name="payplan" value="oneoff" checked /><span class="labeltext">単発で支払う <span class="muted mono" id="priceOneoff"></span></span></label>
+        <label class="payopt"><input type="radio" name="payplan" value="sub" /><span class="labeltext">サブスクに加入して支払う <span class="muted mono" id="priceSub"></span><span class="sub">（次回以降 0 pt）</span></span></label>
       </div>
     </div>
 
     <div class="card" style="margin-top:10px">
-      <div class="hrow" style="justify-content:space-between">
-        <div>現在の残高</div><div class="mono"><span id="creditBefore">—</span> pt</div>
-      </div>
-      <div class="hrow" style="justify-content:space-between">
-        <div>今回の支払い</div><div class="mono">- <span id="payAmount">—</span> pt</div>
-      </div>
+      <div class="hrow" style="justify-content:space-between"><div>現在の残高</div><div class="mono"><span id="creditBefore">—</span> pt</div></div>
+      <div class="hrow" style="justify-content:space-between"><div>今回の支払い</div><div class="mono">- <span id="payAmount">—</span> pt</div></div>
       <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
-      <div class="hrow" style="justify-content:space-between;font-weight:800">
-        <div>決済後の残高</div><div class="mono"><span id="creditAfter">—</span> pt</div>
-      </div>
+      <div class="hrow" style="justify-content:space-between;font-weight:800"><div>決済後の残高</div><div class="mono"><span id="creditAfter">—</span> pt</div></div>
       <div id="payError" class="sub" style="color:#991B1B;display:none;margin-top:6px">残高が不足しています。ホームでチャージしてください。</div>
     </div>
 
@@ -246,10 +203,7 @@ friend_bbb"></textarea></label>
   <div class="card" id="stepLottery" style="display:none">
     <div class="ttl" style="font-size:16px">抽選</div>
     <p class="sub">決済確認後に抽選を行います。</p>
-    <div class="btnRow">
-      <button class="btn btn--sm" id="lotBack">戻る</button>
-      <button class="btn primary" id="lotStart">抽選を開始</button>
-    </div>
+    <div class="btnRow"><button class="btn btn--sm" id="lotBack">戻る</button><button class="btn primary" id="lotStart">抽選を開始</button></div>
     <div id="lotResult" style="margin-top:10px;font-weight:800"></div>
   </div>
 </main>
@@ -264,8 +218,7 @@ friend_bbb"></textarea></label>
   window.addEventListener('gesturestart', e => e.preventDefault());
 
   const PRICING = { ONE_OFF: 1000, SUB_JOIN_COST: 1980 };
-  const APP   = { LIFF_ID:"2008178197-ELrxabO9",
-                  API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
+  const APP   = { LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
   const AUTH  = { userId:"", idToken:"" };
   const APPLY = { draft:null, paid:false, selectedPlan:null, payAmount:0 };
 
@@ -273,31 +226,29 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
+  /* --- 通知（index のお知らせ枠と共有） --- */
+  const getNoti = ()=> JSON.parse(localStorage.getItem("notifications")||"[]");
+  const setNoti = list => localStorage.setItem("notifications", JSON.stringify(list));
+  const hasNoti = id => getNoti().some(n=>n.id===id);
+  function addNoti(n){
+    const list = getNoti();
+    if(n.id && hasNoti(n.id)) return;
+    list.unshift({ id: n.id || String(Date.now()), ts: n.ts || Date.now(), type: n.type || "system", text: n.text || "" });
+    setNoti(list);
+  }
+  const addDays = (d, n)=> { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+
+  /* --- KYC / Profile チェック類（前回同様） --- */
   const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
   const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
   const kycVerified = ()=> !!getKyc().verified;
   const kycGender   = ()=> getKyc().gender;
-
   function renderKycUI(){
-    const k = getKyc();
-    const badge = $("#kycBadge");
-    const warn  = $("#kycWarn");
-    if(k.verified){
-      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
-      badge.className = "badge ok";
-      badge.textContent = `KYC確認済み：${sex}`;
-      warn.style.display = "none";
-    }else{
-      badge.className = "badge ng";
-      badge.textContent = "KYC未完了";
-      warn.style.display = "block";
-    }
+    const k = getKyc(); const badge = $("#kycBadge"); const warn  = $("#kycWarn");
+    if(k.verified){ const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明'); badge.className = "badge ok"; badge.textContent = `KYC確認済み：${sex}`; warn.style.display = "none"; }
+    else{ badge.className = "badge ng"; badge.textContent = "KYC未完了"; warn.style.display = "block"; }
   }
-
-  $("#kycDemoBtn").addEventListener("click", ()=>{
-    const p = $("#kycDemoPanel");
-    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
-  });
+  $("#kycDemoBtn").addEventListener("click", ()=>{ const p = $("#kycDemoPanel"); p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none"; });
   (function setupKycChips(){
     const el = $("#chipsKyc"); if(!el) return;
     el.addEventListener("click",(e)=>{
@@ -320,21 +271,14 @@ friend_bbb"></textarea></label>
     const ageOK  = Number(p.age) > 0;
     return nameOK && areaOK && ageOK;
   }
-  function renderProfileWarn(){
-    const w = $("#profileWarn");
-    if(!w) return;
-    w.style.display = isProfileComplete() ? "none" : "block";
-  }
+  function renderProfileWarn(){ const w = $("#profileWarn"); if(!w) return; w.style.display = isProfileComplete() ? "none" : "block"; }
+
   window.addEventListener('storage', (e)=>{
     if(e.key==='kyc') renderKycUI();
     if(e.key==='profile') renderProfileWarn();
   });
 
-  (function(){
-    const minSel=$("#ageMin"), maxSel=$("#ageMax");
-    for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=i; minSel.appendChild(o); }
-    for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=i; maxSel.appendChild(o); }
-  })();
+  (function(){ const minSel=$("#ageMin"), maxSel=$("#ageMax"); for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=i; minSel.appendChild(o); } for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=i; maxSel.appendChild(o); } })();
 
   function makeChipGroup(id){
     const el = document.getElementById(id), sel = { value:null };
@@ -392,15 +336,14 @@ friend_bbb"></textarea></label>
 
     const sub       = getSub();
     const subActive = !!sub.active;
-
     const isFemale  = (kycGender() === "female");
 
-    document.getElementById("priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
-    document.getElementById("priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
+    $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
+    $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
 
-    document.getElementById("femaleFreeWrap").style.display = isFemale ? "block" : "none";
-    document.getElementById("subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
-    document.getElementById("planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
+    $("#femaleFreeWrap").style.display = isFemale ? "block" : "none";
+    $("#subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
+    $("#planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
 
     if(isFemale){ APPLY.selectedPlan="female_free"; APPLY.payAmount=0; }
     else if(subActive){ APPLY.selectedPlan="sub"; APPLY.payAmount=0; }
@@ -421,17 +364,19 @@ friend_bbb"></textarea></label>
 
   function renderPaymentNumbers(creditBefore, pay){
     const after = creditBefore - pay;
-    document.getElementById("creditBefore").textContent = creditBefore;
-    document.getElementById("payAmount").textContent    = pay;
-    document.getElementById("creditAfter").textContent  = after;
+    $("#creditBefore").textContent = creditBefore;
+    $("#payAmount").textContent    = pay;
+    $("#creditAfter").textContent  = after;
     const lack = after < 0;
-    document.getElementById("payError").style.display   = lack ? "block":"none";
-    document.getElementById("payConfirm").disabled      = lack;
+    $("#payError").style.display   = lack ? "block":"none";
+    $("#payConfirm").disabled      = lack;
   }
 
-  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
-  document.getElementById("payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
-  document.getElementById("payConfirm").addEventListener("click", async ()=>{
+  $("#payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  $("#payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
+
+  // ▼▼▼ 決済確定：サブスク加入時に「お知らせ」へ自動通知 ▼▼▼
+  $("#payConfirm").addEventListener("click", async ()=>{
     const credit = getCredit();
     const need   = APPLY.payAmount || 0;
     const after  = credit - need;
@@ -439,24 +384,31 @@ friend_bbb"></textarea></label>
 
     setCredit(after);
     if(APPLY.selectedPlan === "sub"){
-      const sub = getSub();
-      if(!sub.active){
-        const newSub = {active:true, plan:"ベーシック", since:new Date().toISOString()};
+      const existed = getSub().active;
+      if(!existed){
+        const since = new Date();
+        const next  = addDays(since, 30);
+        const newSub = {active:true, plan:"ベーシック", since: since.toISOString(), nextRenewal: next.toISOString()};
         setSub(newSub);
-        try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"subscribe", payload:newSub, auth:AUTH })}); }catch(e){}
+        // ローカル通知（ホームのお知らせ枠に表示）
+        addNoti({ id: "sub_"+since.toISOString(), type:"sub", ts: Date.now(),
+          text: `サブスクに加入しました（ベーシック）。\n次回更新日：${next.toLocaleDateString()}` });
+        // （任意）サーバにも通知。未設定でもエラー無視。
+        try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"notify", payload:{ kind:"sub_joined", nextRenewal:newSub.nextRenewal }, auth:AUTH })}); }catch(e){}
       }
     }
     APPLY.paid = true;
     try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"payment_done", payload:{ draft: APPLY.draft, plan: APPLY.selectedPlan, amount: need }, auth:AUTH })}); }catch(e){}
     show("stepLottery"); mark(3);
   });
+  // ▲▲▲ ここまで自動通知対応 ▲▲▲
 
-  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
-  document.getElementById("lotStart").addEventListener("click", async ()=>{
+  $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  $("#lotStart").addEventListener("click", async ()=>{
     try{
       const r = await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH })}).then(r=>r.json());
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
-      document.getElementById("lotResult").textContent = "結果：" + result;
+      $("#lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
       hist.unshift({ ts:Date.now(), result, payment: APPLY.payAmount, plan: APPLY.selectedPlan });
       localStorage.setItem("history", JSON.stringify(hist));
