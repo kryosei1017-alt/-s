@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜ホーム</title>
-<meta name="theme-color" content="#F6F3EE">
+<meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="api.js"></script>
 <style>
@@ -28,14 +28,12 @@
   .sub{color:var(--muted);font-size:var(--fs)}
   .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:var(--fs);cursor:pointer}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
-  /* モバイルは1列（全幅）・大画面のみ2列 */
   .grid2{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:960px){ .grid2{grid-template-columns:1fr 1fr} }
-  /* お知らせ */
   .notiList{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
   .notiItem{border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px 12px}
   .notiHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}
@@ -43,11 +41,11 @@
   .tag.sub{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .tag.alert{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
   .time{font-size:var(--fs);color:#6B7280}
-  /* タブバー */
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;font-size:var(--fs)}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  @media (min-width:960px){ .grid2{grid-template-columns:1fr 1fr} }
 </style>
 </head>
 <body>
@@ -61,7 +59,6 @@
 
 <main class="wrap">
   <section>
-    <!-- 進捗 -->
     <div class="card" id="progressCard" style="cursor:pointer">
       <div class="hrow" style="justify-content:space-between">
         <div>
@@ -74,20 +71,22 @@
       <div class="sub">タップして申込みに進む（別ページ）</div>
     </div>
 
-    <!-- 招待URL -->
     <div class="card">
       <div class="ttl" style="font-size:16px">招待URL & 期限</div>
       <div class="urlbox" id="inviteUrl">— 未発行 —</div>
       <div class="hrow" style="justify-content:space-between;margin-top:10px">
         <div class="sub">残り <span id="remain">—</span></div>
-        <div class="hrow" style="gap:8px">
+        <div class="hrow" style="gap:8px;flex-wrap:wrap">
           <button class="btn" id="shareBtn" disabled>共有</button>
           <button class="btn" id="copyBtn" disabled>URLをコピー</button>
+          <button class="btn" id="branchBtn" disabled>別トークで続ける</button>
         </div>
       </div>
+      <p class="sub" style="margin:8px 0 0">
+        ※「別トークで続ける」は、選んだ友だち／グループにこのLIFFのリンクを送信します。リンクをタップすると<b>そのトーク</b>で開きます。
+      </p>
     </div>
 
-    <!-- クレジット（上）／お知らせ（下） -->
     <div class="grid2">
       <div class="card">
         <div class="ttl" style="font-size:16px">クレジット残高</div>
@@ -128,25 +127,30 @@
 </nav>
 
 <script>
+  // ズーム無効（iOS）
   window.addEventListener('gesturestart', e => e.preventDefault());
-  const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0") };
+
+  const APP={ LIFF_ID:"2008178197-ELrxabO9",
+    API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
+  const STATE={ step:Number(localStorage.getItem("state.step")||"0"),
+    credit:Number(localStorage.getItem("credit")||"0") };
   const $=s=>document.querySelector(s);
 
-  // 個別ID生成
-  function makeUID(src){ let h=5381; for(let i=0;i<src.length;i++){ h=((h<<5)+h) ^ src.charCodeAt(i); } const n=(h>>>0).toString(36).toUpperCase().padStart(7,'0'); return "GX-"+n; }
-  function ensureAppUID(lineUserId){ if(lineUserId && !localStorage.getItem("appUID")) localStorage.setItem("appUID", makeUID(lineUserId)); }
+  /* 個別ID（GX-xxxxxx） */
+  function makeUID(src){ let h=5381; for(let i=0;i<src.length;i++){ h=((h<<5)+h) ^ src.charCodeAt(i); }
+    const n=(h>>>0).toString(36).toUpperCase().padStart(7,'0'); return "GX-"+n; }
+  function ensureAppUID(lineUserId){ if(lineUserId && !localStorage.getItem("appUID"))
+      localStorage.setItem("appUID", makeUID(lineUserId)); }
 
-  function setProgress(step){const labels=["未開始","同意","決済","抽選"];$("#stepPill").textContent=labels[step]||"未開始";[1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
-  function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
-  const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
+  function setProgress(step){ const labels=["未開始","同意","決済","抽選"]; $("#stepPill").textContent=labels[step]||"未開始";
+    [1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
+  function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent=v; }
+  const getCredit=()=>Number(localStorage.getItem("credit")||"0");
 
-  // 通知
-  const getNoti = ()=> JSON.parse(localStorage.getItem("notifications")||"[]");
-  const setNoti = list => localStorage.setItem("notifications", JSON.stringify(list));
-  const hasNoti = id => getNoti().some(n=>n.id===id);
-  function addNoti(n){ const list=getNoti(); if(n.id && hasNoti(n.id)) return; list.unshift({id:n.id||String(Date.now()),ts:n.ts||Date.now(),type:n.type||"system",text:n.text||""}); setNoti(list); renderNoti(); }
-  function mergeNoti(items){ if(!Array.isArray(items)) return; const map=new Map(getNoti().map(n=>[n.id,n])); for(const it of items){ if(it && it.id && !map.has(it.id)) map.set(it.id,it); } const merged=Array.from(map.values()).sort((a,b)=>(b.ts||0)-(a.ts||0)); setNoti(merged); renderNoti(); }
+  /* 通知 */
+  const getNoti=()=>JSON.parse(localStorage.getItem("notifications")||"[]");
+  const setNoti=l=>localStorage.setItem("notifications",JSON.stringify(l));
+  function addNoti(n){ const list=getNoti(); list.unshift({id:n.id||String(Date.now()),ts:n.ts||Date.now(),type:n.type||"system",text:n.text||""}); setNoti(list); renderNoti(); }
   function renderNoti(){
     const list=getNoti().sort((a,b)=>(b.ts||0)-(a.ts||0));
     const ul=$("#notiList"), empty=$("#notiEmpty");
@@ -154,43 +158,72 @@
     for(const n of list){
       const li=document.createElement("li"); li.className="notiItem";
       const tagClass=n.type==="sub"?"tag sub":(n.type==="alert"?"tag alert":"tag");
-      li.innerHTML=`<div class="notiHead"><span class="${tagClass}">${n.type==="sub"?"サブスク":n.type==="alert"?"お知らせ":"システム"}</span><span class="time">${new Date(n.ts||Date.now()).toLocaleString()}</span></div><div>${(n.text||"").replace(/\n/g,"<br>")}</div>`;
+      li.innerHTML=`<div class="notiHead"><span class="${tagClass}">${n.type==="sub"?"サブスク":n.type==="alert"?"お知らせ":"システム"}</span>
+        <span class="time">${new Date(n.ts||Date.now()).toLocaleString()}</span></div>
+        <div>${(n.text||"").replace(/\n/g,"<br>")}</div>`;
       ul.appendChild(li);
     }
   }
-  async function fetchRemoteNoti(){ try{ const res=await fetch(APP.API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"pull_notifications"})}); const json=await res.json().catch(()=>null); if(json && Array.isArray(json.items)) mergeNoti(json.items); }catch(e){} }
-  function ensureSubNoti(){ const sub=JSON.parse(localStorage.getItem("sub")||"{}"); if(!sub || !sub.active) return; const id="sub_active_"+(sub.since||"").slice(0,10); if(!getNoti().some(n=>n.id===id)){ const next=sub.nextRenewal?new Date(sub.nextRenewal):new Date(Date.now()+30*864e5); addNoti({id,type:"sub",text:`サブスクに加入しました（${sub.plan||"プラン"}）。\n次回更新日：${next.toLocaleDateString()}`}); } }
+  function ensureSubNoti(){
+    const sub=JSON.parse(localStorage.getItem("sub")||"{}"); if(!sub || !sub.active) return;
+    const id="sub_active_"+(sub.since||"").slice(0,10);
+    const list=getNoti(); if(list.some(n=>n.id===id)) return;
+    const next=sub.nextRenewal?new Date(sub.nextRenewal):new Date(Date.now()+30*864e5);
+    addNoti({id, ts:Date.now(), type:"sub", text:`サブスクに加入しました（${sub.plan||"プラン"}）。\n次回更新日：${next.toLocaleDateString()}`});
+  }
 
-  // 招待URL表示
   function renderInviteOnHome(){
     const inv=JSON.parse(localStorage.getItem("invites")||"[]")[0];
     const box=$("#inviteUrl"), remain=$("#remain"), copyBtn=$("#copyBtn"), shareBtn=$("#shareBtn");
-    if(!inv){ box.textContent="— 未発行 —"; remain.textContent="—"; copyBtn.disabled=shareBtn.disabled=true; return; }
+    const branchBtn=$("#branchBtn");
+    if(!inv){ box.textContent="— 未発行 —"; remain.textContent="—"; copyBtn.disabled=shareBtn.disabled=branchBtn.disabled=true; return; }
     box.textContent=inv.url; copyBtn.disabled=shareBtn.disabled=false;
-    const left=Math.max(0, inv.expiresAt - Date.now()); const h=Math.floor(left/36e5), m=Math.floor((left%36e5)/6e4);
+
+    const left=Math.max(0, inv.expiresAt - Date.now());
+    const h=Math.floor(left/36e5), m=Math.floor((left%36e5)/6e4);
     remain.textContent=`${h}時間 ${m}分`;
-    copyBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(inv.url); copyBtn.textContent="コピー済み"; setTimeout(()=>copyBtn.textContent="URLをコピー",1000);}catch(e){} };
+
+    copyBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(inv.url);
+      copyBtn.textContent="コピー済み"; setTimeout(()=>copyBtn.textContent="URLをコピー",1000);}catch(e){} };
     shareBtn.onclick=()=>{ if(navigator.share){ navigator.share({title:"招待URL", text:"こちらからどうぞ", url:inv.url}); } else { alert("共有に未対応のブラウザです"); } };
+
+    branchBtn.disabled = !(liff.isApiAvailable && liff.isApiAvailable('shareTargetPicker'));
+    branchBtn.onclick = async ()=>{
+      try{
+        liff.permanentLink.setExtraQueryParam("branch=1");
+        const link = liff.permanentLink.createUrl();
+        await liff.shareTargetPicker([{ type:"text", text:`このトークで続けます👇\n${link}` }]);
+        liff.permanentLink.setExtraQueryParam("");
+      }catch(err){ console.warn(err); alert("送信できませんでした"); }
+    };
   }
 
   document.addEventListener("DOMContentLoaded", async ()=>{
-    $("#siteSub").textContent = location.hostname.replace(/^www\./,'');
-    setProgress(STATE.step||0); $("#credit").textContent=STATE.credit;
-    $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
-    const panel=$("#chargePanel"); $("#chargeBtn").addEventListener("click", ()=> panel.style.display=(panel.style.display==="none"?"block":"none"));
-    $("#chargeDo").addEventListener("click", ()=>{ const add=Number($("#chargeAmount").value||0); const next=getCredit()+add; setCredit(next); addNoti({type:"system",text:`${add} ptをチャージしました。現在残高：${next} pt`}); });
+    $("#siteSub").textContent=location.hostname.replace(/^www\./,'');
+    setProgress(STATE.step||0);
+    $("#credit").textContent=STATE.credit;
 
-    $("#refreshNoti").addEventListener("click", fetchRemoteNoti);
-    renderNoti(); ensureSubNoti(); fetchRemoteNoti(); renderInviteOnHome();
-    window.addEventListener("storage", e=>{ if(["notifications","sub","invites"].includes(e.key)) { renderNoti(); ensureSubNoti(); renderInviteOnHome(); } });
+    $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
+
+    const panel=$("#chargePanel");
+    $("#chargeBtn").addEventListener("click", ()=> panel.style.display=(panel.style.display==="none"?"block":"none"));
+    $("#chargeDo").addEventListener("click", ()=>{
+      const add=Number($("#chargeAmount").value||0);
+      const next=getCredit()+add; setCredit(next);
+      addNoti({type:"system",text:`${add} ptをチャージしました。現在残高：${next} pt`});
+      SYNC.syncNow();
+    });
+
+    renderNoti(); ensureSubNoti(); renderInviteOnHome();
 
     try{
-      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
+      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
       $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
       const prof = await liff.getProfile();
       ensureAppUID(prof.userId||"");
-      SYNC.syncOnLogin(prof);   // ← 追加：ログイン時にスプレッドシートへ同期
+      SYNC.syncOnLogin(prof);   // ★ 追加：ログイン時に同期
+      renderInviteOnHome();
     }catch(e){ console.warn(e); }
   });
 </script>
