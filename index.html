@@ -2,50 +2,34 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport"
-  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <title>LIFF Minimal｜ホーム</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="api.js"></script>
 <style>
-  :root{
-    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59;
-    --border:#E5E7EB; --radius:16px; --fs:13px;
-  }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
-    line-height:1.6;overflow-x:hidden;font-size:var(--fs);
-    writing-mode:horizontal-tb!important;-webkit-writing-mode:horizontal-tb!important;text-orientation:mixed!important;
-    touch-action:manipulation;
-  }
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px}
-  .sub{color:var(--muted);font-size:var(--fs)}
-  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:var(--fs);cursor:pointer}
-  .btn[disabled]{opacity:.5;cursor:not-allowed}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
-  .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
-  .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
-  .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
-  .grid2{display:grid;grid-template-columns:1fr;gap:12px}
-  .notiList{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
-  .notiItem{border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px 12px}
-  .notiHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}
-  .tag{font-size:var(--fs);border:1px solid var(--border);border-radius:999px;padding:2px 8px;background:#fff}
-  .tag.sub{border-color:#86efac;background:#ecfdf5;color:#065f46}
-  .tag.alert{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
-  .time{font-size:var(--fs);color:#6B7280}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;font-size:var(--fs)}
-  .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
-  @media (min-width:960px){ .grid2{grid-template-columns:1fr 1fr} }
+:root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; --fs:13px; }
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;font-size:var(--fs);touch-action:manipulation;}
+.wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
+header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
+.hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ttl{font-weight:800;font-size:18px}
+.sub{color:var(--muted)}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
+.btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:14px;font-size:14px;cursor:pointer}
+.card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+.urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
+.stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
+.seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
+.grid1{display:grid;grid-template-columns:1fr;gap:12px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+.tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+.tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
+.tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+.notice-list{display:flex;flex-direction:column;gap:10px;max-height:260px;overflow:auto;padding-right:6px}
+.notice{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+.notice .note{font-weight:700;color:#0b5b42;margin-right:8px}
 </style>
 </head>
 <body>
@@ -58,64 +42,54 @@
 </header>
 
 <main class="wrap">
-  <section>
-    <div class="card" id="progressCard" style="cursor:pointer">
-      <div class="hrow" style="justify-content:space-between">
-        <div>
-          <div class="ttl" style="font-size:16px">進捗</div>
-          <div class="sub">同意 → 決済 → 抽選</div>
-        </div>
-        <span class="pill" id="stepPill">未開始</span>
+  <section class="card" id="progressCard" style="cursor:pointer">
+    <div class="hrow" style="justify-content:space-between">
+      <div>
+        <div class="ttl" style="font-size:17px">進捗</div>
+        <div class="sub">同意 → 決済 → 抽選</div>
       </div>
-      <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
-      <div class="sub">タップして申込みに進む（別ページ）</div>
+      <span class="pill" id="stepPill">未開始</span>
+    </div>
+    <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
+    <div class="sub">タップして申込みに進む（別ページ）</div>
+  </section>
+
+  <section class="card">
+    <div class="ttl" style="font-size:17px">招待URL & 期限</div>
+    <div class="urlbox" id="inviteUrl">— 未発行 —</div>
+    <div class="hrow" style="justify-content:space-between;margin-top:10px">
+      <div class="sub">残り <span id="remain">—</span></div>
+      <div class="hrow" style="gap:8px">
+        <button class="btn" id="shareBtn" disabled>共有</button>
+        <button class="btn" id="copyBtn" disabled>URLをコピー</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid1">
+    <div class="card">
+      <div class="ttl" style="font-size:17px">クレジット残高</div>
+      <div style="font-size:28px;font-weight:800"><span id="credit">0</span> <span class="sub">pt</span></div>
+      <div class="hrow" style="gap:8px;margin-top:8px">
+        <button class="btn" id="chargeBtn">チャージ</button>
+      </div>
+      <div id="chargePanel" class="sub" style="display:none;margin-top:10px">
+        <div class="hrow" style="gap:8px;align-items:center">
+          <select id="chargeAmount">
+            <option value="500">+500 pt</option>
+            <option value="1000" selected>+1,000 pt</option>
+            <option value="3000">+3,000 pt</option>
+          </select>
+          <button class="btn" id="chargeDo">チャージ実行</button>
+        </div>
+        <div class="sub" style="margin-top:6px">※ デモ：即時で残高に反映</div>
+      </div>
     </div>
 
     <div class="card">
-      <div class="ttl" style="font-size:16px">招待URL & 期限</div>
-      <div class="urlbox" id="inviteUrl">— 未発行 —</div>
-      <div class="hrow" style="justify-content:space-between;margin-top:10px">
-        <div class="sub">残り <span id="remain">—</span></div>
-        <div class="hrow" style="gap:8px;flex-wrap:wrap">
-          <button class="btn" id="shareBtn" disabled>共有</button>
-          <button class="btn" id="copyBtn" disabled>URLをコピー</button>
-          <button class="btn" id="branchBtn" disabled>別トークで続ける</button>
-        </div>
-      </div>
-      <p class="sub" style="margin:8px 0 0">
-        ※「別トークで続ける」は、選んだ友だち／グループにこのLIFFのリンクを送信します。リンクをタップすると<b>そのトーク</b>で開きます。
-      </p>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <div class="ttl" style="font-size:16px">クレジット残高</div>
-        <div style="font-size:32px;font-weight:800"><span id="credit">0</span> <span class="sub">pt</span></div>
-        <div class="hrow" style="gap:8px;margin-top:8px">
-          <button class="btn" id="chargeBtn">チャージ</button>
-        </div>
-        <div id="chargePanel" class="sub" style="display:none;margin-top:10px">
-          <div class="hrow" style="gap:8px;align-items:center">
-            <select id="chargeAmount">
-              <option value="500">+500 pt</option>
-              <option value="1000" selected>+1,000 pt</option>
-              <option value="3000">+3,000 pt</option>
-              <option value="5000">+5,000 pt</option>
-            </select>
-            <button class="btn" id="chargeDo">チャージ実行</button>
-          </div>
-          <div class="sub" style="margin-top:6px">※ デモ：即時で残高に反映します</div>
-        </div>
-      </div>
-
-      <div class="card" id="newsCard">
-        <div class="hrow" style="justify-content:space-between;align-items:center">
-          <div class="ttl" style="font-size:16px">お知らせ</div>
-          <button class="btn" id="refreshNoti">更新</button>
-        </div>
-        <ul id="notiList" class="notiList"></ul>
-        <p id="notiEmpty" class="sub" style="margin-top:6px">まだお知らせはありません。</p>
-      </div>
+      <div class="ttl" style="font-size:17px">お知らせ</div>
+      <div class="hrow" style="justify-content:flex-end"><button class="btn" id="notiReload">更新</button></div>
+      <div id="notices" class="notice-list"></div>
     </div>
   </section>
 </main>
@@ -127,105 +101,72 @@
 </nav>
 
 <script>
-  // ズーム無効（iOS）
-  window.addEventListener('gesturestart', e => e.preventDefault());
+const APP={ LIFF_ID:"2008178197-ELrxabO9" };
+const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0") };
+const $=s=>document.querySelector(s);
 
-  const APP={ LIFF_ID:"2008178197-ELrxabO9",
-    API:"https://script.google.com/macros/s/AKfycbzHp4U585kJEC1BZ5KYRr2V561XF5snofYBCXCJCbZtdfayQmlDu-yGOXxyaCVL7ai2/exec" };
-  const STATE={ step:Number(localStorage.getItem("state.step")||"0"),
-    credit:Number(localStorage.getItem("credit")||"0") };
-  const $=s=>document.querySelector(s);
-
-  /* 個別ID（GX-xxxxxx） */
-  function makeUID(src){ let h=5381; for(let i=0;i<src.length;i++){ h=((h<<5)+h) ^ src.charCodeAt(i); }
-    const n=(h>>>0).toString(36).toUpperCase().padStart(7,'0'); return "GX-"+n; }
-  function ensureAppUID(lineUserId){ if(lineUserId && !localStorage.getItem("appUID"))
-      localStorage.setItem("appUID", makeUID(lineUserId)); }
-
-  function setProgress(step){ const labels=["未開始","同意","決済","抽選"]; $("#stepPill").textContent=labels[step]||"未開始";
-    [1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
-  function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent=v; }
-  const getCredit=()=>Number(localStorage.getItem("credit")||"0");
-
-  /* 通知 */
-  const getNoti=()=>JSON.parse(localStorage.getItem("notifications")||"[]");
-  const setNoti=l=>localStorage.setItem("notifications",JSON.stringify(l));
-  function addNoti(n){ const list=getNoti(); list.unshift({id:n.id||String(Date.now()),ts:n.ts||Date.now(),type:n.type||"system",text:n.text||""}); setNoti(list); renderNoti(); }
-  function renderNoti(){
-    const list=getNoti().sort((a,b)=>(b.ts||0)-(a.ts||0));
-    const ul=$("#notiList"), empty=$("#notiEmpty");
-    ul.innerHTML=""; if(!list.length){ empty.style.display="block"; return; } empty.style.display="none";
-    for(const n of list){
-      const li=document.createElement("li"); li.className="notiItem";
-      const tagClass=n.type==="sub"?"tag sub":(n.type==="alert"?"tag alert":"tag");
-      li.innerHTML=`<div class="notiHead"><span class="${tagClass}">${n.type==="sub"?"サブスク":n.type==="alert"?"お知らせ":"システム"}</span>
-        <span class="time">${new Date(n.ts||Date.now()).toLocaleString()}</span></div>
-        <div>${(n.text||"").replace(/\n/g,"<br>")}</div>`;
-      ul.appendChild(li);
-    }
+function ensureUID(){
+  let uid = localStorage.getItem('appUID');
+  if(!uid){
+    uid = 'GX-' + Math.random().toString(36).slice(2,6).toUpperCase()
+            + '-' + Date.now().toString().slice(-6);
+    localStorage.setItem('appUID', uid);
   }
-  function ensureSubNoti(){
-    const sub=JSON.parse(localStorage.getItem("sub")||"{}"); if(!sub || !sub.active) return;
-    const id="sub_active_"+(sub.since||"").slice(0,10);
-    const list=getNoti(); if(list.some(n=>n.id===id)) return;
-    const next=sub.nextRenewal?new Date(sub.nextRenewal):new Date(Date.now()+30*864e5);
-    addNoti({id, ts:Date.now(), type:"sub", text:`サブスクに加入しました（${sub.plan||"プラン"}）。\n次回更新日：${next.toLocaleDateString()}`});
-  }
+}
 
-  function renderInviteOnHome(){
-    const inv=JSON.parse(localStorage.getItem("invites")||"[]")[0];
-    const box=$("#inviteUrl"), remain=$("#remain"), copyBtn=$("#copyBtn"), shareBtn=$("#shareBtn");
-    const branchBtn=$("#branchBtn");
-    if(!inv){ box.textContent="— 未発行 —"; remain.textContent="—"; copyBtn.disabled=shareBtn.disabled=branchBtn.disabled=true; return; }
-    box.textContent=inv.url; copyBtn.disabled=shareBtn.disabled=false;
+function setProgress(step){
+  const labels=["未開始","同意","決済","抽選"];
+  $("#stepPill").textContent=labels[step]||"未開始";
+  [1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));
+}
+function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
 
-    const left=Math.max(0, inv.expiresAt - Date.now());
-    const h=Math.floor(left/36e5), m=Math.floor((left%36e5)/6e4);
-    remain.textContent=`${h}時間 ${m}分`;
-
-    copyBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(inv.url);
-      copyBtn.textContent="コピー済み"; setTimeout(()=>copyBtn.textContent="URLをコピー",1000);}catch(e){} };
-    shareBtn.onclick=()=>{ if(navigator.share){ navigator.share({title:"招待URL", text:"こちらからどうぞ", url:inv.url}); } else { alert("共有に未対応のブラウザです"); } };
-
-    branchBtn.disabled = !(liff.isApiAvailable && liff.isApiAvailable('shareTargetPicker'));
-    branchBtn.onclick = async ()=>{
-      try{
-        liff.permanentLink.setExtraQueryParam("branch=1");
-        const link = liff.permanentLink.createUrl();
-        await liff.shareTargetPicker([{ type:"text", text:`このトークで続けます👇\n${link}` }]);
-        liff.permanentLink.setExtraQueryParam("");
-      }catch(err){ console.warn(err); alert("送信できませんでした"); }
-    };
-  }
-
-  document.addEventListener("DOMContentLoaded", async ()=>{
-    $("#siteSub").textContent=location.hostname.replace(/^www\./,'');
-    setProgress(STATE.step||0);
-    $("#credit").textContent=STATE.credit;
-
-    $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
-
-    const panel=$("#chargePanel");
-    $("#chargeBtn").addEventListener("click", ()=> panel.style.display=(panel.style.display==="none"?"block":"none"));
-    $("#chargeDo").addEventListener("click", ()=>{
-      const add=Number($("#chargeAmount").value||0);
-      const next=getCredit()+add; setCredit(next);
-      addNoti({type:"system",text:`${add} ptをチャージしました。現在残高：${next} pt`});
-      SYNC.syncNow();
-    });
-
-    renderNoti(); ensureSubNoti(); renderInviteOnHome();
-
-    try{
-      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-      $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
-      const prof = await liff.getProfile();
-      ensureAppUID(prof.userId||"");
-      SYNC.syncOnLogin(prof);   // ★ 追加：ログイン時に同期
-      renderInviteOnHome();
-    }catch(e){ console.warn(e); }
+function renderNoti(){
+  const box=$("#notices"); box.innerHTML="";
+  const list = JSON.parse(localStorage.getItem('notices')||'[]');
+  list.forEach(n=>{
+    const el=document.createElement('div');
+    el.className='notice';
+    el.innerHTML=`<div class="sub">${n.ts||''}</div><div><span class="note">${n.type||''}</span>${n.text||''}</div>`;
+    box.appendChild(el);
   });
+}
+function addNoti(obj){
+  const list = JSON.parse(localStorage.getItem('notices')||'[]');
+  list.unshift({ts:new Date().toLocaleString(), ...obj});
+  localStorage.setItem('notices', JSON.stringify(list.slice(0,30)));
+  renderNoti();
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+  $("#siteSub").textContent = location.hostname.replace(/^www\./,'');
+  setProgress(STATE.step||0);
+  $("#credit").textContent = STATE.credit;
+  renderNoti();
+
+  $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
+
+  const panel = $("#chargePanel");
+  $("#chargeBtn").addEventListener("click", ()=> panel.style.display = (panel.style.display==="none"?"block":"none"));
+  $("#chargeDo").addEventListener("click", ()=>{
+    const add = Number($("#chargeAmount").value||0);
+    const cur = Number(localStorage.getItem("credit")||"0");
+    const next = cur + add; setCredit(next);
+    addNoti({type:"system", text:`${add}pt チャージしました。現在残高: ${next}pt`});
+    SYNC.syncNow();
+  });
+  $("#notiReload").addEventListener("click", renderNoti);
+
+  try{
+    await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
+    if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
+    $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
+
+    ensureUID();
+    const profile = await liff.getProfile();
+    await SYNC.syncOnLogin(profile); // ←ここでUsersに反映
+  }catch(e){ console.warn(e); }
+});
 </script>
 </body>
 </html>
