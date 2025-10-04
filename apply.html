@@ -9,7 +9,6 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
-    /* 画面いっぱいレイアウト用 */
     --tabbarH:96px; --headerH:56px;
   }
   *{box-sizing:border-box}
@@ -19,21 +18,23 @@
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
+  /* 横書き固定ユーティリティ */
   .force-horizontal,.force-horizontal *{
-    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-    white-space:normal!important; transform:none!important;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important;
+    text-orientation:mixed!important; white-space:normal!important; transform:none!important;
   }
   .nowrap{white-space:nowrap!important}
+
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
   label{display:block;font-size:14px;margin:10px 0 6px}
   input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
@@ -47,12 +48,19 @@
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
-  /* 同意の行を中央揃えに固定 */
-  .consentRow{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px;width:100%;margin-top:8px}
+
+  /* 支払い方法の点線枠配下を完全横書きに */
+  .payCard, .payCard *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
+  .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px}
+  .payopt{display:flex;align-items:center;gap:10px;margin:0 0 10px 0;writing-mode:horizontal-tb!important}
+  .payopt:last-child{margin-bottom:0}
+  .payopt input[type="radio"]{flex:0 0 auto}
+  .labeltext{display:inline-block;flex:1 1 auto;min-width:0;writing-mode:horizontal-tb!important;white-space:normal!important;overflow-wrap:anywhere;}
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
+  .consentRow{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px;width:100%;margin-top:8px}
 </style>
 </head>
 <body>
@@ -64,7 +72,7 @@
 </header>
 
 <main class="wrap">
-  <!-- 入力（前ページと同じ。省略なし） -->
+  <!-- 入力 -->
   <div class="card" id="stepInfo">
     <div class="hrow" style="justify-content:space-between">
       <div class="ttl" style="font-size:16px">申込み情報</div>
@@ -139,7 +147,6 @@ friend_bbb"></textarea></label>
     </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
 
-    <!-- ★ 中央揃え（consentRow） -->
     <label class="force-horizontal consentRow">
       <input id="agreeChk" type="checkbox">
       <span class="force-horizontal nowrap">利用規約に同意する</span>
@@ -151,7 +158,7 @@ friend_bbb"></textarea></label>
     </div>
   </div>
 
-  <!-- 決済（女性無料/サブスク1980pt → 以降0pt は前回どおり） -->
+  <!-- 決済 -->
   <div class="card" id="stepPayment" style="display:none">
     <div class="ttl" style="font-size:16px">決済</div>
     <p class="sub">クレジット残高から差し引きます。</p>
@@ -162,17 +169,17 @@ friend_bbb"></textarea></label>
     <div id="subActiveWrap" style="display:none">
       <div class="info"><b>サブスク加入中</b>：今回の支払いは <span class="em">0 pt</span> です。</div>
     </div>
+
     <div id="planChoiceWrap" style="display:none">
       <label style="margin-top:6px">お支払い方法</label>
-      <div class="card" style="border-style:dashed">
-        <label class="force-horizontal" style="display:flex;gap:8px;align-items:center;margin:0 0 6px">
+      <div class="payCard">
+        <label class="payopt">
           <input type="radio" name="payplan" value="oneoff" checked>
-          単発で支払う <span class="muted mono" id="priceOneoff"></span>
+          <span class="labeltext">単発で支払う <span class="muted mono" id="priceOneoff"></span></span>
         </label>
-        <label class="force-horizontal" style="display:flex;gap:8px;align-items:center;margin:0">
+        <label class="payopt">
           <input type="radio" name="payplan" value="sub">
-          サブスクに加入して支払う <span class="muted mono" id="priceSub"></span>
-          <span class="sub" style="margin-left:6px">※ 次回以降は 0 pt</span>
+          <span class="labeltext">サブスクに加入して支払う <span class="muted mono" id="priceSub"></span><span class="sub">（次回以降 0 pt）</span></span>
         </label>
       </div>
     </div>
@@ -193,7 +200,7 @@ friend_bbb"></textarea></label>
 
     <div class="btnRow">
       <button class="btn btn--sm nowrap" id="payBack">戻る</button>
-      <button class="btn" id="payGoCharge"><span class="force-horizontal">ホームで<wbr>チャージ</span></button>
+      <button class="btn" id="payGoCharge"><span class="labeltext">ホームで<wbr>チャージ</span></button>
       <button class="btn primary nowrap" id="payConfirm">この内容で確定</button>
     </div>
   </div>
