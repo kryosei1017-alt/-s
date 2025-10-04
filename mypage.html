@@ -1,68 +1,264 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>マイページ</title>
-  <link rel="stylesheet" href="styles.css" />
-  <!-- LIFF SDK -->
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIFF Minimal｜マイページ</title>
+<meta name="theme-color" content="#F6F3EE">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
+  .hrow{display:flex;align-items:center;gap:10px}
+  .ttl{font-weight:800;font-size:18px}
+  .sub{font-size:12px;color:var(--muted)}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  label{display:block;font-size:14px;margin:10px 0 6px}
+  input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
+  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  .avatar{width:64px;height:64px;border-radius:50%;background:#D1D5DB;display:grid;place-items:center;font-weight:700;overflow:hidden}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid}
+  .b-gray{color:#374151;border-color:#D1D5DB;background:#F3F4F6}
+  .b-warn{color:#92400e;border-color:#FCD34D;background:#FFFBEB}
+  .b-ok{color:#065f46;border-color:#6EE7B7;background:#ECFDF5}
+  .b-ng{color:#991b1b;border-color:#FCA5A5;background:#FEF2F2}
+  .preview{display:flex;gap:10px;align-items:center;margin-top:8px}
+  .preview img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#fff}
+  .note{font-size:12px;color:#6B7280}
+</style>
 </head>
 <body>
-<header class="appbar"><h1 class="appbar__title">マイページ</h1></header>
-
-<main>
-  <!-- KYC -->
-  <div class="card">
-    <div class="card__header">本人確認にご協力ください。</div>
-    <div class="card__body">
-      <span class="badge">未確認</span>
-      <button class="btn btn--primary" id="start-kyc" type="button">本人確認を始める</button>
-    </div>
+<header>
+  <div class="hrow">
+    <div class="ttl">マイページ</div>
+    <div class="sub">プロフィール / サブスク / 本人確認</div>
   </div>
+</header>
 
-  <!-- Profile -->
-  <div class="card">
-    <div class="card__header">プロフィール</div>
-    <div class="card__body">
-      <form class="form" id="profile-form">
-        <label class="form__field">
-          <span class="form__label">ニックネーム</span>
-          <input type="text" name="nickname" placeholder="例）ゆう＆みほ" />
-        </label>
-
-        <label class="form__field">
-          <span class="form__label">年齢</span>
-          <input type="number" name="age" inputmode="numeric" placeholder="例）23" />
-        </label>
-
-        <label class="form__field">
-          <span class="form__label">趣味</span>
-          <input type="text" name="hobby" placeholder="例）カフェ巡り・ドライブ・写真" />
-        </label>
-
-        <div class="form__actions">
-          <button type="submit" class="btn btn--primary">保存</button>
-          <button type="reset" class="btn btn--ghost">リセット</button>
+<main class="wrap">
+  <section>
+    <div class="card">
+      <div class="hrow" style="justify-content:space-between;align-items:center">
+        <div class="hrow" style="gap:12px;align-items:center">
+          <div id="avatar" class="avatar">🙂</div>
+          <div>
+            <div class="ttl" id="uname">—</div>
+            <div class="sub" id="uid">—</div>
+          </div>
         </div>
-      </form>
+        <button class="btn" id="btnLogout">ログアウト</button>
+      </div>
     </div>
-  </div>
+
+    <div class="card">
+      <div class="ttl" style="font-size:16px">プロフィール</div>
+      <label>ニックネーム<input id="edNick" placeholder="ニックネーム"></label>
+      <div class="row">
+        <label style="flex:1">都道府県<input id="edPref" placeholder="例：東京都"></label>
+        <label style="flex:1">市区町村<input id="edCity" placeholder="例：渋谷区"></label>
+      </div>
+      <label>距離（km）<input id="edRadius" type="number" min="5" max="50" placeholder="15"></label>
+      <div class="row" style="margin-top:8px"><button class="btn primary" id="edSave">保存</button></div>
+    </div>
+
+    <div class="card">
+      <div class="ttl" style="font-size:16px">本人確認（KYC） <span id="badge" class="badge b-gray">未提出</span></div>
+      <div class="note">※ ピンぼけ・反射・マスク・加工は審査NGの原因になります。明るい場所で、四隅が入るよう撮影してください。</div>
+
+      <div class="row" style="margin-top:10px">
+        <select id="docType" style="flex:1">
+          <option value="license">運転免許証</option>
+          <option value="myNumber">マイナンバーカード</option>
+          <option value="passport">パスポート</option>
+        </select>
+
+        <label class="btn" style="flex:1;text-align:center">
+          身分証を選択<input id="docFile" type="file" accept="image/*" capture="environment" style="display:none">
+        </label>
+        <label class="btn" style="flex:1;text-align:center">
+          セルフィー<input id="selfieFile" type="file" accept="image/*" capture="user" style="display:none">
+        </label>
+      </div>
+
+      <!-- プレビュー & 再撮影 -->
+      <div class="preview" id="docPreview" style="display:none">
+        <img id="docImg" alt="">
+        <div class="note" style="flex:1">身分証プレビュー</div>
+        <button class="btn" id="docRetake">再撮影（身分証）</button>
+      </div>
+      <div class="preview" id="selfiePreview" style="display:none">
+        <img id="selfieImg" alt="">
+        <div class="note" style="flex:1">セルフィープレビュー</div>
+        <button class="btn" id="selfieRetake">再撮影（セルフィー）</button>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="kycReset">リセット</button>
+        <button class="btn primary" id="kycSubmit" disabled>提出する</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ttl" style="font-size:16px">サブスク</div>
+      <div id="subStatus">未加入</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" id="btnJoinSub">加入</button>
+        <button class="btn" id="btnCancelSub">解約</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ttl" style="font-size:16px">履歴</div>
+      <div id="mpHistory" class="sub">—</div>
+    </div>
+  </section>
 </main>
 
-<!-- ▼ 共通タブ（このページが選択状態） -->
-<nav class="tabbar" role="navigation" aria-label="Main tabs">
-  <a href="index.html"  class="tabbar__item" data-tab="home">
-    <span class="tabbar__icon">🏠</span><span class="tabbar__label">ホーム</span>
-  </a>
-  <a href="apply.html"  class="tabbar__item" data-tab="apply">
-    <span class="tabbar__icon">📝</span><span class="tabbar__label">申込み</span>
-  </a>
-  <a href="mypage.html" class="tabbar__item" data-tab="mypage" aria-current="page">
-    <span class="tabbar__icon">👤</span><span class="tabbar__label">マイページ</span>
-  </a>
+<nav class="tabbar">
+  <a href="index.html"><span class="tabicon"></span>ホーム</a>
+  <a href="apply.html"><span class="tabicon"></span>申込み</a>
+  <a class="active" href="mypage.html"><span class="tabicon"></span>マイページ</a>
 </nav>
 
-<script defer src="app.js"></script>
+<script>
+  const APP = { LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
+  const STATE = {
+    profile: JSON.parse(localStorage.getItem("profile")||"{}"),
+    sub: JSON.parse(localStorage.getItem("sub")||"{}"),
+    kyc: JSON.parse(localStorage.getItem("kyc")||"{}") // {status, doc:{...}, selfie:{...}}
+  };
+  const AUTH = { userId:"", idToken:"" };
+  const $=s=>document.querySelector(s);
+
+  function save(){
+    localStorage.setItem("profile", JSON.stringify(STATE.profile));
+    localStorage.setItem("sub", JSON.stringify(STATE.sub));
+    localStorage.setItem("kyc", JSON.stringify(STATE.kyc));
+  }
+
+  function setBadge(status){
+    const b = $("#badge");
+    b.className = "badge b-gray";
+    b.textContent = status || "未提出";
+    if(status==="審査中"){ b.className = "badge b-warn"; }
+    if(status==="承認済み"){ b.className = "badge b-ok"; }
+    if(status==="差し戻し"){ b.className = "badge b-ng"; }
+  }
+
+  function render(){
+    // プロフィール
+    $("#edNick").value = STATE.profile.nick || "";
+    $("#edPref").value = STATE.profile.pref || "";
+    $("#edCity").value = STATE.profile.city || "";
+    $("#edRadius").value = (STATE.profile.radius!=null? STATE.profile.radius : "");
+    // サブスク
+    $("#subStatus").textContent = STATE.sub.active ? `加入中（${STATE.sub.plan||'ベーシック'}）` : "未加入";
+    // 履歴
+    const h = JSON.parse(localStorage.getItem("history")||"[]");
+    $("#mpHistory").innerHTML = h.length ? `<ul>${h.slice(0,10).map(i=>`<li>${new Date(i.ts).toLocaleString('ja-JP')}：${i.result}${i.payment?` / ¥${i.payment}`:""}</li>`).join('')}</ul>` : "—";
+    // KYC
+    setBadge(STATE.kyc.status || "未提出");
+    $("#kycSubmit").disabled = !(STATE.kyc.doc && STATE.kyc.selfie);
+
+    if(STATE.kyc.doc && STATE.kyc.doc.preview){
+      $("#docPreview").style.display = "flex";
+      $("#docImg").src = STATE.kyc.doc.preview;
+    }else{ $("#docPreview").style.display = "none"; }
+
+    if(STATE.kyc.selfie && STATE.kyc.selfie.preview){
+      $("#selfiePreview").style.display = "flex";
+      $("#selfieImg").src = STATE.kyc.selfie.preview;
+    }else{ $("#selfiePreview").style.display = "none"; }
+  }
+
+  async function postJSON(url, body){
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return await res.json();
+  }
+  async function sendAction(type,payload){ try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); } }
+
+  // File -> b64 + previewURL
+  function fileToData(f){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        const dataUrl = reader.result; // data:image/...;base64,xxxx
+        const base64 = String(dataUrl).split(',')[1];
+        resolve({ name:f.name, type:f.type||"image/jpeg", data: base64, preview: URL.createObjectURL(f) });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(f);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", async ()=>{
+    // LIFFログイン
+    try{
+      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
+      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
+      const prof=await liff.getProfile();
+      AUTH.userId = prof.userId || "";
+      $("#uname").textContent = prof.displayName || "ユーザー";
+      $("#uid").textContent = AUTH.userId;
+      if(prof.pictureUrl){
+        $("#avatar").innerHTML = `<img src="${prof.pictureUrl}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+      }
+      if(!STATE.profile.nick){ STATE.profile.nick = prof.displayName || "ユーザー"; save(); }
+    }catch(e){ console.warn(e); }
+
+    // イベント
+    $("#edSave").addEventListener("click", ()=>{
+      STATE.profile = {
+        nick: $("#edNick").value.trim()||"ユーザー",
+        pref: $("#edPref").value.trim(),
+        city: $("#edCity").value.trim(),
+        radius: Number($("#edRadius").value||15)
+      };
+      save(); render(); sendAction("update_profile", STATE.profile); alert("保存しました");
+    });
+
+    $("#docFile").addEventListener("change", async (e)=>{
+      const f=e.target.files && e.target.files[0]; if(!f) return;
+      STATE.kyc.doc = await fileToData(f);
+      save(); render();
+    });
+    $("#selfieFile").addEventListener("change", async (e)=>{
+      const f=e.target.files && e.target.files[0]; if(!f) return;
+      STATE.kyc.selfie = await fileToData(f);
+      save(); render();
+    });
+
+    // 再撮影導線
+    $("#docRetake").addEventListener("click", ()=> $("#docFile").click());
+    $("#selfieRetake").addEventListener("click", ()=> $("#selfieFile").click());
+
+    $("#kycReset").addEventListener("click", ()=>{ STATE.kyc = {}; save(); render(); });
+
+    $("#kycSubmit").addEventListener("click", async ()=>{
+      if(!(STATE.kyc.doc && STATE.kyc.selfie)){ alert("身分証とセルフィーを選択してください。"); return; }
+      STATE.kyc.status = "審査中"; save(); render();
+      await sendAction("kyc_upload", { doc: STATE.kyc.doc, selfie: STATE.kyc.selfie });
+      alert("提出しました。審査中です。");
+      // 承認/差し戻しはサーバ側結果で setBadge を更新してください
+      // 例: STATE.kyc.status="承認済み"; save(); render();
+    });
+
+    $("#btnJoinSub").addEventListener("click", ()=>{ STATE.sub={active:true, plan:"ベーシック", since:new Date().toISOString()}; save(); render(); sendAction("subscribe", STATE.sub); });
+    $("#btnCancelSub").addEventListener("click", ()=>{ STATE.sub={active:false}; save(); render(); sendAction("unsubscribe", {}); });
+    $("#btnLogout").addEventListener("click", ()=>{ try{ if(window.liff && liff.isLoggedIn()) liff.logout(); }catch{} });
+
+    render();
+  });
+</script>
 </body>
 </html>
