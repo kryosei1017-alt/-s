@@ -66,11 +66,25 @@
     <div class="grid2">
       <div class="card">
         <div class="ttl" style="font-size:17px">クレジット残高</div>
-        <div style="font-size:32px;font-weight:800"><span id="credit">0</span></div>
+        <div style="font-size:32px;font-weight:800"><span id="credit">0</span> <span class="sub">pt</span></div>
         <div class="hrow" style="gap:8px;margin-top:8px">
           <button class="btn" id="chargeBtn">チャージ</button>
         </div>
+        <!-- 追加：簡易チャージUI -->
+        <div id="chargePanel" class="sub" style="display:none;margin-top:10px">
+          <div class="hrow" style="gap:8px;align-items:center">
+            <select id="chargeAmount">
+              <option value="500">+500 pt</option>
+              <option value="1000" selected>+1,000 pt</option>
+              <option value="3000">+3,000 pt</option>
+              <option value="5000">+5,000 pt</option>
+            </select>
+            <button class="btn" id="chargeDo">チャージ実行</button>
+          </div>
+          <div class="sub" style="margin-top:6px">※ デモ：即時で残高に反映します</div>
+        </div>
       </div>
+
       <div class="card">
         <div class="ttl" style="font-size:17px">通報ステータス</div>
         <div class="sub" id="report">—</div>
@@ -91,11 +105,29 @@
   const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0"), report:localStorage.getItem("report")||"問題なし" };
   const $=s=>document.querySelector(s);
   function setProgress(step){const labels=["未開始","同意","決済","抽選"];$("#stepPill").textContent=labels[step]||"未開始";[1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
+
+  function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
+
   document.addEventListener("DOMContentLoaded", async ()=>{
-    document.getElementById("siteSub").textContent = location.hostname.replace(/^www\\./,'');
+    $("#siteSub").textContent = location.hostname.replace(/^www\\./,'');
     setProgress(STATE.step||0);
-    $("#credit").textContent = STATE.credit; $("#report").textContent = STATE.report || "—";
-    document.getElementById("progressCard").addEventListener("click", ()=> location.href="apply.html");
+    $("#credit").textContent = STATE.credit;
+    $("#report").textContent = STATE.report || "—";
+
+    // 申込みへ
+    $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
+
+    // チャージUI
+    const panel = $("#chargePanel");
+    $("#chargeBtn").addEventListener("click", ()=> panel.style.display = (panel.style.display==="none"?"block":"none"));
+    $("#chargeDo").addEventListener("click", ()=>{
+      const add = Number($("#chargeAmount").value||0);
+      const cur = Number(localStorage.getItem("credit")||"0");
+      const next = cur + add;
+      setCredit(next);
+      alert(`+${add} pt チャージしました（残高：${next} pt）`);
+    });
+
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
