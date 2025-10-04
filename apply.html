@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>LIFF Minimal｜申込み</title>
-<meta name="theme-color" content="#F6F3EE">
+<meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
   :root{
@@ -15,28 +15,37 @@
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);
-    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.6;overflow-x:hidden;
+    /* Safari/LINE の縦書き化対策を全体に */
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
   .force-horizontal,.force-horizontal *{
-    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important;
-    text-orientation:mixed!important; transform:none!important;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    white-space:normal!important; transform:none!important;
   }
   .nowrap{white-space:nowrap!important}
 
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
-        min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
+  .wrap{
+    max-width:720px;margin:0 auto;
+    padding:12px 16px calc(var(--tabbarH) + 16px);
+    min-height:calc(100dvh - var(--headerH) - var(--tabbarH));
+    display:flex;flex-direction:column;
+  }
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
+
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
   label{display:block;font-size:14px;margin:10px 0 6px}
   input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
+
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
@@ -46,12 +55,13 @@
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* 支払い方法ブロック */
+  /* 決済の点線枠全体を横書き固定 */
   .payCard, .payCard *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px}
   .payopt{display:flex;align-items:center;gap:10px;margin:0 0 10px 0}
@@ -60,13 +70,16 @@
 
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
-  /* ★ 同意チェックの白枠ボックス（はみ出し防止・中央寄せ） */
+  /* ★ 同意チェック枠（横並び・はみ出し防止） */
   .consentBox{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    border:1px solid var(--border); border-radius:12px; padding:12px 14px;
-    max-width:100%; overflow:hidden; background:#fff; margin-top:8px;
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--border); border-radius:12px;
+    padding:12px 14px; background:#fff; margin-top:8px;
+    max-width:100%;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
-  .consentText{flex:1 1 auto; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .consentBox input[type="checkbox"]{ width:22px; height:22px; flex:0 0 auto; }
+  .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; }
 </style>
 </head>
 <body>
@@ -153,11 +166,11 @@ friend_bbb"></textarea></label>
     </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
 
-    <!-- ★ はみ出し防止・中央寄せの白枠 -->
-    <div class="consentBox force-horizontal">
-      <input id="agreeChk" type="checkbox">
-      <label for="agreeChk" class="consentText force-horizontal">利用規約に同意する</label>
-    </div>
+    <!-- ★ 同意チェック：白枠内で横並び -->
+    <label class="consentBox" id="consentWrap">
+      <input id="agreeChk" type="checkbox" />
+      <span class="consentText">利用規約に同意する</span>
+    </label>
 
     <div class="btnRow">
       <button class="btn btn--sm nowrap" id="consentBack">戻る</button>
@@ -181,11 +194,11 @@ friend_bbb"></textarea></label>
       <label style="margin-top:6px">お支払い方法</label>
       <div class="payCard">
         <label class="payopt">
-          <input type="radio" name="payplan" value="oneoff" checked>
+          <input type="radio" name="payplan" value="oneoff" checked />
           <span class="labeltext">単発で支払う <span class="muted mono" id="priceOneoff"></span></span>
         </label>
         <label class="payopt">
-          <input type="radio" name="payplan" value="sub">
+          <input type="radio" name="payplan" value="sub" />
           <span class="labeltext">サブスクに加入して支払う <span class="muted mono" id="priceSub"></span><span class="sub">（次回以降 0 pt）</span></span>
         </label>
       </div>
@@ -232,26 +245,29 @@ friend_bbb"></textarea></label>
 
 <script>
   const PRICING = { ONE_OFF: 1000, SUB_JOIN_COST: 1980 };
-  const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const AUTH={ userId:"", idToken:"" };
-  const APPLY={ draft:null, paid:false, selectedPlan:null, payAmount:0 };
+  const APP   = { LIFF_ID:"2008178197-ELrxabO9",
+                  API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
+  const AUTH  = { userId:"", idToken:"" };
+  const APPLY = { draft:null, paid:false, selectedPlan:null, payAmount:0 };
+
   const $=s=>document.querySelector(s);
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
+  // 年齢選択肢
   (function(){
-    const minSel=document.getElementById('ageMin'); const maxSel=document.getElementById('ageMax');
-    for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); minSel.appendChild(o); }
-    for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); maxSel.appendChild(o); }
+    const minSel=$("#ageMin"), maxSel=$("#ageMax");
+    for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=i; minSel.appendChild(o); }
+    for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=i; maxSel.appendChild(o); }
   })();
 
+  // チップ選択
   function makeChipGroup(id){
-    const el = document.getElementById(id);
-    const sel = { value:null };
+    const el = document.getElementById(id), sel = { value:null };
     el.addEventListener('click', (e)=>{
-      const t = e.target.closest('.chip'); if(!t) return;
-      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-      t.classList.add('active'); sel.value = t.dataset.v;
+      const t=e.target.closest('.chip'); if(!t) return;
+      el.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      t.classList.add('active'); sel.value=t.dataset.v;
     });
     return sel;
   }
@@ -259,6 +275,7 @@ friend_bbb"></textarea></label>
   const genderSel = makeChipGroup('chipsGender');
   const selfSel   = makeChipGroup('chipsSelfGender');
 
+  // LocalStorage helpers
   function getCredit(){ return Number(localStorage.getItem("credit")||"0"); }
   function setCredit(v){ localStorage.setItem("credit", String(v)); }
   function getSub(){ return JSON.parse(localStorage.getItem("sub")||"{}"); }
@@ -272,7 +289,7 @@ friend_bbb"></textarea></label>
   }
   async function sendAction(type,payload){ try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); } }
 
-  // 入力確定
+  // 入力確定 → 同意へ
   $("#btnCreateApply").addEventListener("click", async ()=>{
     const group = sizeSel.value || "2v2";
     const selfGender = selfSel.value; if(!selfGender){ alert("申込者グループの性別を選択してください。"); return; }
@@ -290,49 +307,39 @@ friend_bbb"></textarea></label>
   });
 
   // 同意
-  $("#agreeChk").addEventListener("change", (e)=> $("#consentNext").disabled = !e.target.checked );
+  $("#agreeChk").addEventListener("change", e => $("#consentNext").disabled = !e.target.checked );
   $("#consentBack").addEventListener("click", ()=>{ show("stepInfo"); mark(0); });
   $("#consentNext").addEventListener("click", async ()=>{
     await sendAction("agree", { draft: APPLY.draft });
     setupPaymentUI(); show("stepPayment"); mark(2);
   });
 
+  // 決済UI
   function setupPaymentUI(){
-    const profile = getProfile();
-    const sub = getSub();
+    const profile   = getProfile();
+    const sub       = getSub();
     const subActive = !!sub.active;
-    const isFemale = (APPLY.draft?.selfGender === "female") || (profile.gender === "female");
+    const isFemale  = (APPLY.draft?.selfGender === "female") || (profile.gender === "female");
 
-    document.getElementById("priceOneoff")?.remove(); // guard（無くてもOK）
+    $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
+    $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
 
-    // 価格表示（中に入れておく）
-    const one = document.querySelector('.payopt input[value="oneoff"]').parentElement.querySelector('.labeltext');
-    const subL= document.querySelector('.payopt input[value="sub"]').parentElement.querySelector('.labeltext');
-    if(one && !one.querySelector('#priceOneoff')){
-      const s=document.createElement('span'); s.id='priceOneoff'; s.className='muted mono'; one.append(' ', s);
-    }
-    if(subL && !subL.querySelector('#priceSub')){
-      const s=document.createElement('span'); s.id='priceSub'; s.className='muted mono'; subL.append(' ', s);
-    }
-    document.querySelector('#priceOneoff').textContent = `(−${PRICING.ONE_OFF} pt)`;
-    document.querySelector('#priceSub').textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
-
-    document.getElementById("femaleFreeWrap").style.display = isFemale ? "block" : "none";
-    document.getElementById("subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
-    document.getElementById("planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
+    $("#femaleFreeWrap").style.display = isFemale ? "block" : "none";
+    $("#subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
+    $("#planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
 
     if(isFemale){ APPLY.selectedPlan="female_free"; APPLY.payAmount=0; }
     else if(subActive){ APPLY.selectedPlan="sub"; APPLY.payAmount=0; }
     else{
       APPLY.selectedPlan = (document.querySelector('input[name="payplan"]:checked')?.value || "oneoff");
-      APPLY.payAmount = (APPLY.selectedPlan==="sub") ? PRICING.SUB_JOIN_COST : PRICING.ONE_OFF;
+      APPLY.payAmount    = (APPLY.selectedPlan==="sub") ? PRICING.SUB_JOIN_COST : PRICING.ONE_OFF;
     }
     renderPaymentNumbers(getCredit(), APPLY.payAmount);
 
     document.querySelectorAll('input[name="payplan"]').forEach(r=>{
       r.onclick = ()=>{
         APPLY.selectedPlan = r.value;
-        APPLY.payAmount = (r.value==="sub") ? PRICING.SUB_JOIN_COST : PRICING.ONE_OFF;
+        APPLY.payAmount    = (r.value==="sub") ? PRICING.SUB_JOIN_COST : PRICING.ONE_OFF;
         renderPaymentNumbers(getCredit(), APPLY.payAmount);
       };
     });
@@ -340,20 +347,20 @@ friend_bbb"></textarea></label>
 
   function renderPaymentNumbers(creditBefore, pay){
     const after = creditBefore - pay;
-    document.getElementById("creditBefore").textContent = creditBefore;
-    document.getElementById("payAmount").textContent = pay;
-    document.getElementById("creditAfter").textContent = after;
+    $("#creditBefore").textContent = creditBefore;
+    $("#payAmount").textContent    = pay;
+    $("#creditAfter").textContent  = after;
     const lack = after < 0;
-    document.getElementById("payError").style.display = lack ? "block":"none";
-    document.getElementById("payConfirm").disabled = lack;
+    $("#payError").style.display   = lack ? "block":"none";
+    $("#payConfirm").disabled      = lack;
   }
 
-  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
-  document.getElementById("payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
-  document.getElementById("payConfirm").addEventListener("click", async ()=>{
+  $("#payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  $("#payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
+  $("#payConfirm").addEventListener("click", async ()=>{
     const credit = getCredit();
-    const need = APPLY.payAmount || 0;
-    const after = credit - need;
+    const need   = APPLY.payAmount || 0;
+    const after  = credit - need;
     if(after < 0){ alert("残高が不足しています。ホームでチャージしてください。"); return; }
 
     setCredit(after);
@@ -369,12 +376,12 @@ friend_bbb"></textarea></label>
     show("stepLottery"); mark(3);
   });
 
-  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
-  document.getElementById("lotStart").addEventListener("click", async ()=>{
+  $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  $("#lotStart").addEventListener("click", async ()=>{
     try{
       const r = await postJSON(APP.API, { type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH });
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
-      document.getElementById("lotResult").textContent = "結果：" + result;
+      $("#lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
       hist.unshift({ ts:Date.now(), result, payment: APPLY.payAmount, plan: APPLY.selectedPlan });
       localStorage.setItem("history", JSON.stringify(hist));
@@ -389,13 +396,6 @@ friend_bbb"></textarea></label>
     }catch(e){ console.warn(e); }
     mark(Number(localStorage.getItem("state.step")||"0"));
   });
-
-  /* util: credit/sub/profile */
-  function getCredit(){ return Number(localStorage.getItem("credit")||"0"); }
-  function setCredit(v){ localStorage.setItem("credit", String(v)); }
-  function getSub(){ return JSON.parse(localStorage.getItem("sub")||"{}"); }
-  function setSub(s){ localStorage.setItem("sub", JSON.stringify(s)); }
-  function getProfile(){ return JSON.parse(localStorage.getItem("profile")||"{}"); }
 </script>
 </body>
 </html>
