@@ -3,60 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="color-scheme" content="light dark">
-  <title>マイページ</title>
+  <title>申込み</title>
   <link rel="stylesheet" href="styles.css" />
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-<header class="appbar"><h1 class="appbar__title">マイページ</h1></header>
+<header class="appbar"><h1 class="appbar__title">申込み</h1></header>
 
 <main>
   <div class="card">
-    <div class="card__header">本人確認にご協力ください。</div>
+    <div class="card__header">申込みフォーム</div>
     <div class="card__body">
-      <span class="badge">未確認</span>
-      <button class="btn btn--primary" id="start-kyc" type="button">本人確認を始める</button>
-    </div>
-  </div>
+      <form class="form" id="apply-form">
+        <label class="form__field">
+          <span class="form__label">参加人数</span>
+          <select name="members" required>
+            <option value="2">2人（基本）</option>
+            <option value="3">3人</option>
+            <option value="4">4人</option>
+          </select>
+        </label>
 
-  <div class="card">
-    <div class="card__header">プロフィール</div>
-    <div class="card__body">
-      <form class="form" id="profile-form">
         <label class="form__field">
-          <span class="form__label">ニックネーム</span>
-          <input type="text" name="nickname" placeholder="例）ゆう＆みほ" />
+          <span class="form__label">友だちのID（あれば）</span>
+          <input type="text" name="friendId" placeholder="例）abcd1234" />
         </label>
+
         <label class="form__field">
-          <span class="form__label">年齢</span>
-          <input type="number" name="age" inputmode="numeric" placeholder="例）23" />
+          <span class="form__label">希望メモ</span>
+          <textarea name="note" rows="3" placeholder="例）○曜日希望、静かなお店など"></textarea>
         </label>
+
         <label class="form__field">
-          <span class="form__label">趣味</span>
-          <input type="text" name="hobby" placeholder="例）カフェ巡り・ドライブ・写真" />
+          <input type="checkbox" name="agree" required />
+          利用規約に同意します
         </label>
+
         <div class="form__actions">
-          <button class="btn btn--primary" type="submit">保存</button>
-          <button class="btn btn--ghost" type="reset">リセット</button>
+          <button type="submit" class="btn btn--primary">同意して申込み</button>
+          <button type="reset" class="btn btn--ghost">リセット</button>
         </div>
       </form>
     </div>
   </div>
 </main>
 
+<!-- ▼ 共通タブ（このページが選択状態） -->
+<nav class="tabbar" role="navigation" aria-label="Main tabs">
+  <a href="index.html"  class="tabbar__item" data-tab="home">
+    <span class="tabbar__icon">🏠</span><span class="tabbar__label">ホーム</span>
+  </a>
+  <a href="apply.html"  class="tabbar__item" data-tab="apply" aria-current="page">
+    <span class="tabbar__icon">📝</span><span class="tabbar__label">申込み</span>
+  </a>
+  <a href="mypage.html" class="tabbar__item" data-tab="mypage">
+    <span class="tabbar__icon">👤</span><span class="tabbar__label">マイページ</span>
+  </a>
+</nav>
 
-    <nav class="tabbar" role="navigation" aria-label="Main tabs">
-      <a href="index.html"  class="tabbar__item" data-tab="home" >
-        <span class="tabbar__icon">🏠</span><span class="tabbar__label">ホーム</span>
-      </a>
-      <a href="apply.html"  class="tabbar__item" data-tab="apply" >
-        <span class="tabbar__icon">📝</span><span class="tabbar__label">申込み</span>
-      </a>
-      <a href="mypage.html" class="tabbar__item" data-tab="mypage" aria-current="page">
-        <span class="tabbar__icon">👤</span><span class="tabbar__label">マイページ</span>
-      </a>
-    </nav>
-    
 <script defer src="app.js"></script>
 </body>
 </html>
