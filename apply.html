@@ -13,31 +13,37 @@
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;
-    /* ← 文字が縦になる端末対策 */
-    writing-mode: horizontal-tb !important; text-orientation: mixed !important; white-space: normal !important;
+    writing-mode: horizontal-tb !important; -webkit-writing-mode: horizontal-tb !important; text-orientation: mixed !important;
   }
+  /* 横書き固定ユーティリティ */
+  .force-horizontal, .force-horizontal *{
+    writing-mode: horizontal-tb !important; -webkit-writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important; white-space: normal !important; transform:none !important;
+  }
+  .nowrap{ white-space:nowrap !important; }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
   .hrow{display:flex;align-items:center;gap:10px}
-  .ttl{font-weight:800;font-size:18px;writing-mode:horizontal-tb!important}
-  .sub{font-size:12px;color:var(--muted);writing-mode:horizontal-tb!important}
+  .ttl{font-weight:800;font-size:18px}
+  .sub{font-size:12px;color:var(--muted)}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
+  .btn--sm{min-width:92px} /* ←「戻る」が縦割れしない最低幅 */
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
-  label{display:block;font-size:14px;margin:10px 0 6px;writing-mode:horizontal-tb!important}
-  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px;writing-mode:horizontal-tb!important}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  label{display:block;font-size:14px;margin:10px 0 6px}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
-  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer;writing-mode:horizontal-tb!important}
+  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -66,28 +72,24 @@
       ・不一致が確認された場合、参加見送りやアカウント制限の対象となります。
     </div>
 
-    <!-- 人数 -->
     <label>パーティ構成（人数）</label>
     <div class="chips" id="chipsSize">
       <span class="chip" data-v="2v2">2 : 2</span>
       <span class="chip" data-v="3v3">3 : 3</span>
     </div>
 
-    <!-- 申込者（あなた側）グループの性別  -->
     <label>申込者グループの性別</label>
     <div class="chips" id="chipsSelfGender">
       <span class="chip" data-v="male">男性グループ</span>
       <span class="chip" data-v="female">女性グループ</span>
     </div>
 
-    <!-- 相手の性別 -->
     <label>希望相手グループの性別</label>
     <div class="chips" id="chipsGender">
       <span class="chip" data-v="male">男性グループ</span>
       <span class="chip" data-v="female">女性グループ</span>
     </div>
 
-    <!-- エリア -->
     <label>エリア</label>
     <select id="inArea">
       <option value="">選択してください</option>
@@ -100,7 +102,6 @@
       <option value="fukuoka">福岡</option>
     </select>
 
-    <!-- 希望年齢 -->
     <label>相手の希望年齢層</label>
     <div class="hrow" style="gap:10px">
       <select id="ageMin" style="flex:1"><option value="">下限</option></select>
@@ -108,14 +109,12 @@
       <select id="ageMax" style="flex:1"><option value="">上限</option></select>
     </div>
 
-    <!-- 自己評価 -->
     <label>自己評価スコア（0〜100）</label>
     <div class="hrow" style="gap:10px;align-items:center">
       <input id="inScore" type="range" min="0" max="100" step="1" value="50" oninput="document.getElementById('scoreVal').textContent=this.value">
       <span id="scoreVal" class="chip" style="border-style:dashed">50</span>
     </div>
 
-    <!-- 友だちID -->
     <label>友だちのLINE ID（改行で複数）<textarea id="inFriends" placeholder="例：friend_aaa
 friend_bbb"></textarea></label>
 
@@ -132,39 +131,38 @@ friend_bbb"></textarea></label>
       <b>本人確認について</b>：必要に応じて身分証とセルフィーの提出をお願いする場合があります。年齢・なりすまし対策のためです。
     </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
-    <label style="display:flex;align-items:center;gap:8px;writing-mode:horizontal-tb!important">
-      <input id="agreeChk" type="checkbox"> 利用規約に同意する
+
+    <!-- 横書き固定 -->
+    <label class="force-horizontal" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+      <input id="agreeChk" type="checkbox">
+      <span class="force-horizontal nowrap">利用規約に同意する</span>
     </label>
-    <div class="hrow" style="gap:8px;margin-top:6px">
-      <button class="btn" id="consentBack">戻る</button>
-      <button class="btn primary" id="consentNext" disabled>決済へ進む</button>
+
+    <div class="hrow" style="gap:8px;margin-top:12px">
+      <button class="btn btn--sm nowrap" id="consentBack">戻る</button>
+      <button class="btn primary nowrap" id="consentNext" disabled>決済へ進む</button>
     </div>
   </div>
 
-  <!-- 決済（クレジット差し引き） -->
+  <!-- 決済 -->
   <div class="card" id="stepPayment" style="display:none">
     <div class="ttl" style="font-size:16px">決済</div>
     <p class="sub">クレジット残高から差し引きます。</p>
 
-    <!-- 女性は常に0円 -->
     <div id="femaleFreeWrap" style="display:none">
       <div class="info"><b>女性は無料</b>：今回の支払いは <span class="em">0 pt</span> です。</div>
     </div>
-
-    <!-- サブスク加入中 -->
     <div id="subActiveWrap" style="display:none">
       <div class="info"><b>サブスク加入中</b>：今回の支払いは <span class="em">0 pt</span> です。</div>
     </div>
-
-    <!-- 未加入：単発 or 1980ptで加入して支払う -->
     <div id="planChoiceWrap" style="display:none">
       <label style="margin-top:6px">お支払い方法</label>
       <div class="card" style="border-style:dashed">
-        <label style="display:flex;gap:8px;align-items:center;margin:0 0 6px;writing-mode:horizontal-tb!important">
+        <label class="force-horizontal" style="display:flex;gap:8px;align-items:center;margin:0 0 6px">
           <input type="radio" name="payplan" value="oneoff" checked>
           単発で支払う <span class="muted mono" id="priceOneoff"></span>
         </label>
-        <label style="display:flex;gap:8px;align-items:center;margin:0;writing-mode:horizontal-tb!important">
+        <label class="force-horizontal" style="display:flex;gap:8px;align-items:center;margin:0">
           <input type="radio" name="payplan" value="sub">
           サブスクに加入して支払う <span class="muted mono" id="priceSub"></span>
           <span class="sub" style="margin-left:6px">※ 次回以降は 0 pt</span>
@@ -186,10 +184,11 @@ friend_bbb"></textarea></label>
       <div id="payError" class="sub" style="color:#991B1B;display:none;margin-top:6px">残高が不足しています。ホームでチャージしてください。</div>
     </div>
 
-    <div class="hrow" style="gap:8px;margin-top:6px">
-      <button class="btn" id="payBack">戻る</button>
-      <button class="btn" id="payGoCharge">ホームでチャージ</button>
-      <button class="btn primary" id="payConfirm">この内容で確定</button>
+    <!-- ★ ボタン行：横書き固定＋改行ヒント -->
+    <div class="hrow force-horizontal" style="gap:8px;margin-top:6px;justify-content:space-between">
+      <button class="btn btn--sm nowrap" id="payBack">戻る</button>
+      <button class="btn" id="payGoCharge"><span class="force-horizontal">ホームで<wbr>チャージ</span></button>
+      <button class="btn primary nowrap" id="payConfirm">この内容で確定</button>
     </div>
   </div>
 
@@ -198,8 +197,8 @@ friend_bbb"></textarea></label>
     <div class="ttl" style="font-size:16px">抽選</div>
     <p class="sub">決済確認後に抽選を行います。</p>
     <div class="hrow" style="gap:8px;margin-top:6px">
-      <button class="btn" id="lotBack">戻る</button>
-      <button class="btn primary" id="lotStart">抽選を開始</button>
+      <button class="btn btn--sm nowrap" id="lotBack">戻る</button>
+      <button class="btn primary nowrap" id="lotStart">抽選を開始</button>
     </div>
     <div id="lotResult" style="margin-top:10px;font-weight:800"></div>
   </div>
@@ -212,9 +211,7 @@ friend_bbb"></textarea></label>
 </nav>
 
 <script>
-  // 価格（pt）: 1pt = 1円相当の想定
   const PRICING = { ONE_OFF: 1000, SUB_JOIN_COST: 1980 };
-
   const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
   const AUTH={ userId:"", idToken:"" };
   const APPLY={ draft:null, paid:false, selectedPlan:null, payAmount:0 };
@@ -222,30 +219,26 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
-  // 年齢選択の選択肢
   (function(){
     const minSel=document.getElementById('ageMin'); const maxSel=document.getElementById('ageMax');
     for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); minSel.appendChild(o); }
     for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); maxSel.appendChild(o); }
   })();
 
-  // チップ
-  function makeChipGroup(containerId){
-    const el = document.getElementById(containerId);
+  function makeChipGroup(id){
+    const el = document.getElementById(id);
     const sel = { value:null };
     el.addEventListener('click', (e)=>{
       const t = e.target.closest('.chip'); if(!t) return;
       [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-      t.classList.add('active');
-      sel.value = t.dataset.v;
+      t.classList.add('active'); sel.value = t.dataset.v;
     });
     return sel;
   }
-  const sizeSel   = makeChipGroup('chipsSize');      // 2v2 / 3v3
-  const genderSel = makeChipGroup('chipsGender');    // 相手
-  const selfSel   = makeChipGroup('chipsSelfGender');// 申込者
+  const sizeSel   = makeChipGroup('chipsSize');
+  const genderSel = makeChipGroup('chipsGender');
+  const selfSel   = makeChipGroup('chipsSelfGender');
 
-  // util
   function getCredit(){ return Number(localStorage.getItem("credit")||"0"); }
   function setCredit(v){ localStorage.setItem("credit", String(v)); }
   function getSub(){ return JSON.parse(localStorage.getItem("sub")||"{}"); }
@@ -259,17 +252,17 @@ friend_bbb"></textarea></label>
   }
   async function sendAction(type,payload){ try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); } }
 
-  // 入力確定 → 同意へ
-  document.getElementById("btnCreateApply").addEventListener("click", async ()=>{
+  // 入力確定
+  $("#btnCreateApply").addEventListener("click", async ()=>{
     const group = sizeSel.value || "2v2";
     const selfGender = selfSel.value; if(!selfGender){ alert("申込者グループの性別を選択してください。"); return; }
     const targetGender = genderSel.value; if(!targetGender){ alert("希望相手グループの性別を選択してください。"); return; }
-    const area = document.getElementById("inArea").value; if(!area){ alert("エリアを選択してください。"); return; }
-    const ageMin = Number(document.getElementById("ageMin").value||0);
-    const ageMax = Number(document.getElementById("ageMax").value||0);
+    const area = $("#inArea").value; if(!area){ alert("エリアを選択してください。"); return; }
+    const ageMin = Number($("#ageMin").value||0);
+    const ageMax = Number($("#ageMax").value||0);
     if(ageMin && ageMax && ageMin>ageMax){ alert("年齢の下限・上限が逆になっています。"); return; }
-    const score = Number(document.getElementById("inScore").value||50);
-    const friends = (document.getElementById("inFriends").value||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    const score = Number($("#inScore").value||50);
+    const friends = ($("#inFriends").value||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
 
     APPLY.draft = { group, selfGender, targetGender, area, ageMin, ageMax, score, friends, ts: Date.now() };
     await sendAction("apply_draft", APPLY.draft);
@@ -277,45 +270,34 @@ friend_bbb"></textarea></label>
   });
 
   // 同意
-  document.getElementById("agreeChk").addEventListener("change", (e)=> document.getElementById("consentNext").disabled = !e.target.checked);
-  document.getElementById("consentBack").addEventListener("click", ()=>{ show("stepInfo"); mark(0); });
-  document.getElementById("consentNext").addEventListener("click", async ()=>{
+  $("#agreeChk").addEventListener("change", (e)=> $("#consentNext").disabled = !e.target.checked );
+  $("#consentBack").addEventListener("click", ()=>{ show("stepInfo"); mark(0); });
+  $("#consentNext").addEventListener("click", async ()=>{
     await sendAction("agree", { draft: APPLY.draft });
-    setupPaymentUI();
-    show("stepPayment"); mark(2);
+    setupPaymentUI(); show("stepPayment"); mark(2);
   });
 
-  // 決済UI
   function setupPaymentUI(){
     const profile = getProfile();
     const sub = getSub();
     const subActive = !!sub.active;
     const isFemale = (APPLY.draft?.selfGender === "female") || (profile.gender === "female");
 
-    // ラベル価格
-    document.getElementById("priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
-    document.getElementById("priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
+    $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
+    $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
 
-    // 表示制御
-    document.getElementById("femaleFreeWrap").style.display = isFemale ? "block" : "none";
-    document.getElementById("subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
-    document.getElementById("planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
+    $("#femaleFreeWrap").style.display = isFemale ? "block" : "none";
+    $("#subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
+    $("#planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
 
-    // 初期プランと金額
-    if(isFemale){
-      APPLY.selectedPlan = "female_free";
-      APPLY.payAmount = 0;
-    }else if(subActive){
-      APPLY.selectedPlan = "sub";
-      APPLY.payAmount = 0;
-    }else{
+    if(isFemale){ APPLY.selectedPlan="female_free"; APPLY.payAmount=0; }
+    else if(subActive){ APPLY.selectedPlan="sub"; APPLY.payAmount=0; }
+    else{
       APPLY.selectedPlan = (document.querySelector('input[name="payplan"]:checked')?.value || "oneoff");
       APPLY.payAmount = (APPLY.selectedPlan==="sub") ? PRICING.SUB_JOIN_COST : PRICING.ONE_OFF;
     }
-
     renderPaymentNumbers(getCredit(), APPLY.payAmount);
 
-    // プラン選択イベント
     document.querySelectorAll('input[name="payplan"]').forEach(r=>{
       r.onclick = ()=>{
         APPLY.selectedPlan = r.value;
@@ -327,57 +309,48 @@ friend_bbb"></textarea></label>
 
   function renderPaymentNumbers(creditBefore, pay){
     const after = creditBefore - pay;
-    document.getElementById("creditBefore").textContent = creditBefore;
-    document.getElementById("payAmount").textContent = pay;
-    document.getElementById("creditAfter").textContent = after;
+    $("#creditBefore").textContent = creditBefore;
+    $("#payAmount").textContent = pay;
+    $("#creditAfter").textContent = after;
     const lack = after < 0;
-    document.getElementById("payError").style.display = lack ? "block":"none";
-    document.getElementById("payConfirm").disabled = lack;
+    $("#payError").style.display = lack ? "block":"none";
+    $("#payConfirm").disabled = lack;
   }
 
-  // 決済アクション
-  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
-  document.getElementById("payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
+  $("#payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  $("#payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
 
-  document.getElementById("payConfirm").addEventListener("click", async ()=>{
+  $("#payConfirm").addEventListener("click", async ()=>{
     const credit = getCredit();
     const need = APPLY.payAmount || 0;
     const after = credit - need;
     if(after < 0){ alert("残高が不足しています。ホームでチャージしてください。"); return; }
 
-    // 残高差し引き
     setCredit(after);
-
-    // サブスク加入を選択したら加入に切替（次回以降0pt）
     if(APPLY.selectedPlan === "sub"){
       const sub = getSub();
       if(!sub.active){
         const newSub = {active:true, plan:"ベーシック", since:new Date().toISOString()};
-        setSub(newSub);
-        await sendAction("subscribe", newSub);
+        setSub(newSub); await sendAction("subscribe", newSub);
       }
     }
-
     APPLY.paid = true;
     await sendAction("payment_done", { draft: APPLY.draft, plan: APPLY.selectedPlan, amount: need });
-
     show("stepLottery"); mark(3);
   });
 
-  // 抽選
-  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
-  document.getElementById("lotStart").addEventListener("click", async ()=>{
+  $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  $("#lotStart").addEventListener("click", async ()=>{
     try{
       const r = await postJSON(APP.API, { type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH });
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
-      document.getElementById("lotResult").textContent = "結果：" + result;
+      $("#lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
       hist.unshift({ ts:Date.now(), result, payment: APPLY.payAmount, plan: APPLY.selectedPlan });
       localStorage.setItem("history", JSON.stringify(hist));
     }catch(e){ alert("抽選に失敗しました。"); }
   });
 
-  // LIFF
   document.addEventListener("DOMContentLoaded", async ()=>{
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
