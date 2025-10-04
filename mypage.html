@@ -9,22 +9,21 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
-    --tabbarH:96px; --headerH:56px; --fs:13px; /* ← 非太字の統一フォントサイズ */
+    --tabbarH:96px; --headerH:56px; --fs:13px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
-    line-height:1.6;overflow-x:hidden;
+    line-height:1.6;overflow-x:hidden;font-size:var(--fs);
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-    font-size:var(--fs); /* ← 基本サイズを統一 */
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px} /* ← 太字は従来通り */
+  .ttl{font-weight:800;font-size:18px}
   .sub{color:var(--muted);font-size:var(--fs)}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:var(--fs);cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
@@ -39,15 +38,14 @@
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
   .grid-def{display:grid;grid-template-columns: 9em 1fr;gap:10px 12px}
-  .val{font-weight:600} /* 半太字はサイズそのまま（基本サイズで表示） */
+  .val{font-weight:600}
   .placeholder{color:#9CA3AF}
   .btnRow{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
 
-  /* 履歴（招待URL） */
   .list{display:flex;flex-direction:column;gap:10px}
   .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  .row small{color:#6B7280}
+  .row small{color:#6B7280;font-size:var(--fs)}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
           backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
@@ -66,7 +64,7 @@
 </header>
 
 <main class="wrap">
-  <!-- 1) プロフィール（閲覧⇄編集） -->
+  <!-- プロフィール（閲覧⇄編集） -->
   <div class="card" id="profileView">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div class="ttl" style="font-size:16px">プロフィール</div>
@@ -114,7 +112,7 @@
     <p id="saveMsg" class="muted" style="display:none;margin-top:6px">保存しました。</p>
   </div>
 
-  <!-- 2) 本人確認（KYC：申込みと連動） -->
+  <!-- 本人確認 -->
   <div class="card">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
@@ -124,23 +122,23 @@
 
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
-      <div class="chips" id="chipsKyc">
-        <span class="chip" data-v="none">未完了</span>
-        <span class="chip" data-v="male">男性で確認済み</span>
-        <span class="chip" data-v="female">女性で確認済み</span>
+      <div class="chips" id="chipsKyc" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+        <span class="chip" data-v="none" style="padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer">未完了</span>
+        <span class="chip" data-v="male" style="padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer">男性で確認済み</span>
+        <span class="chip" data-v="female" style="padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer">女性で確認済み</span>
       </div>
       <div class="muted">・設定は端末に保存、申込みの決済に反映（女性は無料）。</div>
     </div>
   </div>
 
-  <!-- 3) 履歴（過去に発行した招待URL） -->
+  <!-- 履歴（招待URL） -->
   <div class="card" id="historyCard">
     <div class="ttl" style="font-size:16px">履歴（招待URL）</div>
     <div id="historyList" class="list" style="margin-top:10px"></div>
     <p id="historyEmpty" class="muted" style="margin-top:6px;display:none">まだ招待URLはありません。</p>
   </div>
 
-  <!-- 4) 問い合わせ -->
+  <!-- 問い合わせ -->
   <div class="card" id="contactCard">
     <div class="ttl" style="font-size:16px">問い合わせ</div>
     <label>件名<input id="qTitle" placeholder="例：決済について"></label>
@@ -160,12 +158,11 @@
 
 <script>
   window.addEventListener('gesturestart', e => e.preventDefault());
-
   const APP = { LIFF_ID:"2008178197-ELrxabO9",
                 API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
   const $=s=>document.querySelector(s);
 
-  /* ===== KYC（apply と連動） ===== */
+  /* KYC（apply と連動） */
   const getKyc = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
   const setKyc = k => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKyc(); };
   function renderKyc(){
@@ -175,7 +172,7 @@
       b.className="badge ok"; b.textContent=`KYC確認済み：${sex}`;
     }else{ b.className="badge ng"; b.textContent="KYC未完了"; }
     const el=$("#kycDemoPanel"); if(!el) return;
-    const chips=el.querySelectorAll('.chip'); chips.forEach(c=>c.classList.remove('active'));
+    el.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
     const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
     const t=el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
   }
@@ -191,7 +188,7 @@
   });
   window.addEventListener('storage', (e)=>{ if(e.key==='kyc') renderKyc(); });
 
-  /* ===== プロフィール（閲覧⇄編集） ===== */
+  /* プロフィール */
   const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
   const setProfile = p  => localStorage.setItem("profile", JSON.stringify(p));
   function areaName(v){ return ({tokyo:"東京",yokohama:"横浜",chiba:"千葉",saitama:"埼玉",nagoya:"名古屋",osaka:"大阪",fukuoka:"福岡"}[v]||v||""); }
@@ -243,54 +240,45 @@
   $("#cancelEdit").addEventListener("click", renderProfileView);
   $("#saveProfile").addEventListener("click", saveProfile);
 
-  /* ===== 履歴（招待URL） ===== */
+  /* 履歴（招待URL） */
   const getInvites = ()=> JSON.parse(localStorage.getItem("invites")||"[]");
   function renderInvites(){
-    const list = $("#historyList");
-    const empty = $("#historyEmpty");
+    const list = document.getElementById("historyList");
+    const empty = document.getElementById("historyEmpty");
     const items = getInvites();
     list.innerHTML = "";
     if(!items.length){ empty.style.display="block"; return; }
     empty.style.display="none";
-    items
-      .sort((a,b)=> (b.ts||0)-(a.ts||0))
-      .forEach((it)=>{
-        const row = document.createElement("div");
-        row.className = "row";
-        const left = document.createElement("div");
-        const u = it.url || "";
-        left.innerHTML = `<div class="mono" style="word-break:break-all"><a href="${u}" target="_blank" rel="noopener">${u}</a></div>
-                          <small>${new Date(it.ts||Date.now()).toLocaleString()}</small>`;
-        const right = document.createElement("div");
-        const copy = document.createElement("button");
-        copy.className = "btn btn--sm";
-        copy.textContent = "コピー";
-        copy.onclick = async ()=>{
-          try{ await navigator.clipboard.writeText(u); copy.textContent="コピー済み"; setTimeout(()=>copy.textContent="コピー",1000); }
-          catch(e){ alert("コピーできませんでした"); }
-        };
-        right.appendChild(copy);
-        row.appendChild(left);
-        row.appendChild(right);
-        list.appendChild(row);
-      });
+    items.sort((a,b)=> (b.ts||0)-(a.ts||0)).forEach((it)=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      const left = document.createElement("div");
+      const u = it.url || "";
+      left.innerHTML = `<div class="mono" style="word-break:break-all"><a href="${u}" target="_blank" rel="noopener">${u}</a></div>
+                        <small>${new Date(it.ts||Date.now()).toLocaleString()}</small>`;
+      const right = document.createElement("div");
+      const copy = document.createElement("button");
+      copy.className = "btn btn--sm"; copy.textContent = "コピー";
+      copy.onclick = async ()=>{ try{ await navigator.clipboard.writeText(u); copy.textContent="コピー済み"; setTimeout(()=>copy.textContent="コピー",1000); }catch(e){ alert("コピーできませんでした"); } };
+      right.appendChild(copy);
+      row.appendChild(left); row.appendChild(right); list.appendChild(row);
+    });
   }
   window.addEventListener('storage', (e)=>{ if(e.key==='invites') renderInvites(); });
 
-  /* ===== 問い合わせ ===== */
-  $("#sendInquiry").addEventListener("click", async ()=>{
-    const title = $("#qTitle").value.trim();
-    const body  = $("#qBody").value.trim();
+  /* 問い合わせ */
+  document.getElementById("sendInquiry").addEventListener("click", async ()=>{
+    const title = document.getElementById("qTitle").value.trim();
+    const body  = document.getElementById("qBody").value.trim();
     if(!title || !body){ alert("件名と内容を入力してください。"); return; }
     const payload = { type:"contact", payload:{ title, body, ts: Date.now() } };
     try{
       await fetch(APP.API, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
-      $("#qMsg").style.display="block"; $("#qTitle").value=""; $("#qBody").value="";
-      setTimeout(()=> $("#qMsg").style.display="none", 1800);
+      document.getElementById("qMsg").style.display="block"; document.getElementById("qTitle").value=""; document.getElementById("qBody").value="";
+      setTimeout(()=> document.getElementById("qMsg").style.display="none", 1800);
     }catch(e){
-      $("#qMsg").textContent = "送信しました（デモ）";
-      $("#qMsg").style.display="block";
-      setTimeout(()=> $("#qMsg").style.display="none", 1800);
+      const qMsg=document.getElementById("qMsg");
+      qMsg.textContent = "送信しました（デモ）"; qMsg.style.display="block"; setTimeout(()=> qMsg.style.display="none", 1800);
     }
   });
 
@@ -301,7 +289,7 @@
     }catch(e){ console.warn(e); }
     if(!localStorage.getItem('profile')) setProfile({});
     renderProfileView();
-    if(!localStorage.getItem('kyc'))     setKyc({verified:false}); else renderKyc();
+    if(!localStorage.getItem('kyc')) setKyc({verified:false}); else renderKyc();
     renderInvites();
   });
 </script>
