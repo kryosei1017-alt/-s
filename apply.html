@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<!-- ★ズーム無効化（全ページ統一） -->
+<!-- ズーム無効化 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜申込み</title>
 <meta name="theme-color" content="#F6F3EE" />
@@ -20,6 +20,7 @@
     line-height:1.6;overflow-x:hidden;
     /* 縦書き化対策 */
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    touch-action: manipulation;
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
@@ -44,7 +45,6 @@
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
@@ -54,7 +54,7 @@
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* 決済ステップを全面横書き固定 */
+  /* —— 決済ステップは全面横書き固定 —— */
   #stepPayment, #stepPayment *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px;overflow:hidden}
   .payopt{width:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin:0 0 10px 0}
@@ -64,7 +64,7 @@
 
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
-  /* 同意チェック：白枠で横並び */
+  /* 同意チェック（白枠で横並び） */
   .consentBox{
     display:flex; align-items:center; gap:12px;
     border:1px solid var(--border); border-radius:12px;
@@ -95,7 +95,7 @@
     </div>
     <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
 
-    <!-- KYC 状態（マイページと連動） -->
+    <!-- KYC 状態（マイページ連動） -->
     <div class="hrow" style="justify-content:space-between;align-items:center;margin:8px 0">
       <div class="badge" id="kycBadge">KYC確認状況: 取得中...</div>
       <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
@@ -104,13 +104,18 @@
       <b>本人確認が未完了です。</b> 申込み前に本人確認を済ませてください（デモでは「本人確認（デモ）」から設定できます）。
     </div>
 
+    <!-- プロフィール未完了の注意（必須3項目） -->
+    <div class="info warn" id="profileWarn" style="display:none">
+      <b>プロフィールが未完了です。</b> ニックネーム・エリア・年齢を<b>マイページ</b>で設定してください。
+    </div>
+
     <label>パーティ構成（人数）</label>
     <div class="chips" id="chipsSize">
       <span class="chip" data-v="2v2">2 : 2</span>
       <span class="chip" data-v="3v3">3 : 3</span>
     </div>
 
-    <!-- 申込者グループの性別 フィールドは削除（KYC性別を使用） -->
+    <!-- 申込者の性別はKYC連動のため削除 -->
 
     <label>希望相手グループの性別</label>
     <div class="chips" id="chipsGender">
@@ -255,6 +260,9 @@ friend_bbb"></textarea></label>
 </nav>
 
 <script>
+  /* iOSピンチズーム抑止 */
+  window.addEventListener('gesturestart', e => e.preventDefault());
+
   const PRICING = { ONE_OFF: 1000, SUB_JOIN_COST: 1980 };
   const APP   = { LIFF_ID:"2008178197-ELrxabO9",
                   API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
@@ -265,7 +273,7 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
-  /* ====== 共有：KYC helpers（mypage と連動） ====== */
+  /* ===== KYC（mypage と連動） ===== */
   const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
   const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
   const kycVerified = ()=> !!getKyc().verified;
@@ -302,8 +310,29 @@ friend_bbb"></textarea></label>
       if(v==="male")   setKyc({verified:true, gender:'male'});
       else if(v==="female") setKyc({verified:true, gender:'female'});
       else            setKyc({verified:false});
+      renderProfileWarn();
     });
   })();
+
+  /* ===== プロフィール必須チェック ===== */
+  const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
+  function isProfileComplete(){
+    const p = getProfile();
+    const nameOK = !!(p.name && String(p.name).trim());
+    const areaOK = !!(p.area && String(p.area).trim());
+    const ageOK  = Number(p.age) > 0;
+    return nameOK && areaOK && ageOK;
+  }
+  function renderProfileWarn(){
+    const w = $("#profileWarn");
+    if(!w) return;
+    w.style.display = isProfileComplete() ? "none" : "block";
+  }
+  // 他タブで更新された場合にも追随
+  window.addEventListener('storage', (e)=>{
+    if(e.key==='kyc') renderKycUI();
+    if(e.key==='profile') renderProfileWarn();
+  });
 
   // 年齢選択肢
   (function(){
@@ -330,15 +359,23 @@ friend_bbb"></textarea></label>
   const setCredit = v => localStorage.setItem("credit", String(v));
   const getSub    = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
   const setSub    = s => localStorage.setItem("sub", JSON.stringify(s));
-  const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
 
   // 入力確定 → 同意へ
   $("#btnCreateApply").addEventListener("click", async ()=>{
+    // 1) KYCチェック
     if(!kycVerified()){
       alert("本人確認が未完了です。本人確認（デモ）から「確認済み」を選択してください。");
       $("#kycDemoPanel").style.display = "block";
       return;
     }
+    // 2) プロフィール必須チェック
+    if(!isProfileComplete()){
+      if(confirm("プロフィールの「ニックネーム・エリア・年齢」が未設定です。マイページで設定しますか？")){
+        location.href = "mypage.html";
+      }
+      return;
+    }
+
     const group = sizeSel.value || "2v2";
     const targetGender = genderSel.value; if(!targetGender){ alert("希望相手グループの性別を選択してください。"); return; }
     const area = $("#inArea").value; if(!area){ alert("エリアを選択してください。"); return; }
@@ -365,12 +402,10 @@ friend_bbb"></textarea></label>
   function setupPaymentUI(){
     if(!kycVerified()){ alert("本人確認が未完了です。"); show("stepInfo"); mark(0); return; }
 
-    const profile   = getProfile();
     const sub       = getSub();
     const subActive = !!sub.active;
 
-    const genderKyc = kycGender() || profile.gender;     // KYC最優先
-    const isFemale  = (genderKyc === "female");
+    const isFemale  = (kycGender() === "female");
 
     $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
     $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
@@ -447,6 +482,7 @@ friend_bbb"></textarea></label>
       const prof=await liff.getProfile(); AUTH.userId=prof.userId||"";
     }catch(e){ console.warn(e); }
     if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
+    renderProfileWarn();
     mark(Number(localStorage.getItem("state.step")||"0"));
   });
 </script>
