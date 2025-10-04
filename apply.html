@@ -18,10 +18,9 @@
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
-  /* 横書き固定ユーティリティ */
   .force-horizontal,.force-horizontal *{
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important;
-    text-orientation:mixed!important; white-space:normal!important; transform:none!important;
+    text-orientation:mixed!important; transform:none!important;
   }
   .nowrap{white-space:nowrap!important}
 
@@ -52,15 +51,22 @@
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* 支払い方法の点線枠配下を完全横書きに */
+  /* 支払い方法ブロック */
   .payCard, .payCard *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px}
-  .payopt{display:flex;align-items:center;gap:10px;margin:0 0 10px 0;writing-mode:horizontal-tb!important}
+  .payopt{display:flex;align-items:center;gap:10px;margin:0 0 10px 0}
   .payopt:last-child{margin-bottom:0}
-  .payopt input[type="radio"]{flex:0 0 auto}
-  .labeltext{display:inline-block;flex:1 1 auto;min-width:0;writing-mode:horizontal-tb!important;white-space:normal!important;overflow-wrap:anywhere;}
+  .labeltext{display:inline-block;flex:1 1 auto;min-width:0;white-space:normal!important;overflow-wrap:anywhere;}
+
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
-  .consentRow{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px;width:100%;margin-top:8px}
+
+  /* ★ 同意チェックの白枠ボックス（はみ出し防止・中央寄せ） */
+  .consentBox{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    border:1px solid var(--border); border-radius:12px; padding:12px 14px;
+    max-width:100%; overflow:hidden; background:#fff; margin-top:8px;
+  }
+  .consentText{flex:1 1 auto; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 </style>
 </head>
 <body>
@@ -147,10 +153,11 @@ friend_bbb"></textarea></label>
     </div>
     <p><a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a></p>
 
-    <label class="force-horizontal consentRow">
+    <!-- ★ はみ出し防止・中央寄せの白枠 -->
+    <div class="consentBox force-horizontal">
       <input id="agreeChk" type="checkbox">
-      <span class="force-horizontal nowrap">利用規約に同意する</span>
-    </label>
+      <label for="agreeChk" class="consentText force-horizontal">利用規約に同意する</label>
+    </div>
 
     <div class="btnRow">
       <button class="btn btn--sm nowrap" id="consentBack">戻る</button>
@@ -296,12 +303,23 @@ friend_bbb"></textarea></label>
     const subActive = !!sub.active;
     const isFemale = (APPLY.draft?.selfGender === "female") || (profile.gender === "female");
 
-    $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
-    $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
+    document.getElementById("priceOneoff")?.remove(); // guard（無くてもOK）
 
-    $("#femaleFreeWrap").style.display = isFemale ? "block" : "none";
-    $("#subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
-    $("#planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
+    // 価格表示（中に入れておく）
+    const one = document.querySelector('.payopt input[value="oneoff"]').parentElement.querySelector('.labeltext');
+    const subL= document.querySelector('.payopt input[value="sub"]').parentElement.querySelector('.labeltext');
+    if(one && !one.querySelector('#priceOneoff')){
+      const s=document.createElement('span'); s.id='priceOneoff'; s.className='muted mono'; one.append(' ', s);
+    }
+    if(subL && !subL.querySelector('#priceSub')){
+      const s=document.createElement('span'); s.id='priceSub'; s.className='muted mono'; subL.append(' ', s);
+    }
+    document.querySelector('#priceOneoff').textContent = `(−${PRICING.ONE_OFF} pt)`;
+    document.querySelector('#priceSub').textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
+
+    document.getElementById("femaleFreeWrap").style.display = isFemale ? "block" : "none";
+    document.getElementById("subActiveWrap").style.display  = (!isFemale && subActive) ? "block" : "none";
+    document.getElementById("planChoiceWrap").style.display = (!isFemale && !subActive) ? "block" : "none";
 
     if(isFemale){ APPLY.selectedPlan="female_free"; APPLY.payAmount=0; }
     else if(subActive){ APPLY.selectedPlan="sub"; APPLY.payAmount=0; }
@@ -322,18 +340,17 @@ friend_bbb"></textarea></label>
 
   function renderPaymentNumbers(creditBefore, pay){
     const after = creditBefore - pay;
-    $("#creditBefore").textContent = creditBefore;
-    $("#payAmount").textContent = pay;
-    $("#creditAfter").textContent = after;
+    document.getElementById("creditBefore").textContent = creditBefore;
+    document.getElementById("payAmount").textContent = pay;
+    document.getElementById("creditAfter").textContent = after;
     const lack = after < 0;
-    $("#payError").style.display = lack ? "block":"none";
-    $("#payConfirm").disabled = lack;
+    document.getElementById("payError").style.display = lack ? "block":"none";
+    document.getElementById("payConfirm").disabled = lack;
   }
 
-  $("#payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
-  $("#payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
-
-  $("#payConfirm").addEventListener("click", async ()=>{
+  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  document.getElementById("payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
+  document.getElementById("payConfirm").addEventListener("click", async ()=>{
     const credit = getCredit();
     const need = APPLY.payAmount || 0;
     const after = credit - need;
@@ -352,12 +369,12 @@ friend_bbb"></textarea></label>
     show("stepLottery"); mark(3);
   });
 
-  $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
-  $("#lotStart").addEventListener("click", async ()=>{
+  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  document.getElementById("lotStart").addEventListener("click", async ()=>{
     try{
       const r = await postJSON(APP.API, { type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH });
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
-      $("#lotResult").textContent = "結果：" + result;
+      document.getElementById("lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
       hist.unshift({ ts:Date.now(), result, payment: APPLY.payAmount, plan: APPLY.selectedPlan });
       localStorage.setItem("history", JSON.stringify(hist));
@@ -372,6 +389,13 @@ friend_bbb"></textarea></label>
     }catch(e){ console.warn(e); }
     mark(Number(localStorage.getItem("state.step")||"0"));
   });
+
+  /* util: credit/sub/profile */
+  function getCredit(){ return Number(localStorage.getItem("credit")||"0"); }
+  function setCredit(v){ localStorage.setItem("credit", String(v)); }
+  function getSub(){ return JSON.parse(localStorage.getItem("sub")||"{}"); }
+  function setSub(s){ localStorage.setItem("sub", JSON.stringify(s)); }
+  function getProfile(){ return JSON.parse(localStorage.getItem("profile")||"{}"); }
 </script>
 </body>
 </html>
