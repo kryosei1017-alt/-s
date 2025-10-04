@@ -19,6 +19,7 @@
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
     line-height:1.6;overflow-x:hidden;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    touch-action: manipulation;
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
@@ -26,11 +27,11 @@
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:15px;cursor:pointer}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:15px;cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .danger{background:#fff;border-color:#fecaca;color:#7f1d1d}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
   label{display:block;font-size:14px;margin:8px 0 6px}
   input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
@@ -46,11 +47,16 @@
   .placeholder{color:#9CA3AF}
   .right{margin-left:auto}
   .btnRow{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px dashed var(--border);border-radius:12px;padding:10px 12px;background:#fff}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .nowrap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+  .small{font-size:12px;color:#6B7280}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
           backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
           padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -59,31 +65,12 @@
 <header>
   <div class="hrow">
     <div class="ttl">マイページ</div>
-    <div class="sub">プロフィールと本人確認</div>
+    <div class="sub">プロフィール・本人確認・履歴・お問い合わせ</div>
   </div>
 </header>
 
 <main class="wrap">
-  <!-- KYC（申込みと連動） -->
-  <div class="card">
-    <div class="hrow" style="justify-content:space-between;align-items:center">
-      <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
-      <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
-    </div>
-    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」の決済条件にも反映されます。</p>
-
-    <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
-      <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
-      <div class="chips" id="chipsKyc">
-        <span class="chip" data-v="none">未完了</span>
-        <span class="chip" data-v="male">男性で確認済み</span>
-        <span class="chip" data-v="female">女性で確認済み</span>
-      </div>
-      <div class="muted">・設定は端末に保存、申込みの決済に反映（女性は無料）。</div>
-    </div>
-  </div>
-
-  <!-- プロフィール：閲覧モード -->
+  <!-- 1) プロフィール：閲覧→編集 -->
   <div class="card" id="profileView">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div class="ttl" style="font-size:16px">プロフィール</div>
@@ -102,7 +89,6 @@
     </div>
   </div>
 
-  <!-- プロフィール：編集モード（初期は非表示） -->
   <div class="card" id="profileEdit" style="display:none">
     <div class="ttl" style="font-size:16px">プロフィールを編集</div>
     <label>ニックネーム（必須）<input id="pfName" placeholder="例：りょう"></label>
@@ -131,6 +117,45 @@
     </div>
     <p id="saveMsg" class="muted" style="display:none;margin-top:6px">保存しました。</p>
   </div>
+
+  <!-- 2) 本人確認（プロフィールの下に配置） -->
+  <div class="card">
+    <div class="hrow" style="justify-content:space-between;align-items:center">
+      <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
+      <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」の決済条件にも反映（女性は0pt）。</p>
+
+    <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
+      <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
+      <div class="chips" id="chipsKyc">
+        <span class="chip" data-v="none">未完了</span>
+        <span class="chip" data-v="male">男性で確認済み</span>
+        <span class="chip" data-v="female">女性で確認済み</span>
+      </div>
+      <div class="muted">・設定は端末に保存され、申込み画面と<b>連動</b>します。</div>
+    </div>
+  </div>
+
+  <!-- 3) 履歴（招待URL）— 下から2番目 -->
+  <div class="card" id="historyCard">
+    <div class="ttl" style="font-size:16px">履歴（招待URL）</div>
+    <p class="muted" style="margin-top:4px">過去に発行した招待URLを表示します。</p>
+    <div id="inviteList" class="list" style="margin-top:10px"></div>
+    <p id="inviteEmpty" class="muted" style="display:none;margin-top:6px">まだ招待URLはありません。</p>
+  </div>
+
+  <!-- 4) お問い合わせ — 一番下 -->
+  <div class="card" id="contactCard">
+    <div class="ttl" style="font-size:16px">お問い合わせ</div>
+    <label>件名（必須）<input id="qSubject" placeholder="例：機能についての質問"></label>
+    <label>メール（任意）<input id="qEmail" type="email" placeholder="例：you@example.com"></label>
+    <label>内容（必須）<textarea id="qBody" placeholder="できるだけ詳しくご記載ください"></textarea></label>
+    <div class="btnRow">
+      <button class="btn primary" id="qSend">送信</button>
+    </div>
+    <p id="qMsg" class="muted" style="display:none;margin-top:6px">送信しました。ご連絡までお待ちください。</p>
+  </div>
 </main>
 
 <nav class="tabbar">
@@ -140,10 +165,66 @@
 </nav>
 
 <script>
-  const APP = { LIFF_ID:"2008178197-ELrxabO9" };
+  const APP = {
+    LIFF_ID:"2008178197-ELrxabO9",
+    API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec"
+  };
   const $=s=>document.querySelector(s);
 
-  // ===== KYC（apply と連動） =====
+  /* ===== プロフィール ===== */
+  const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
+  const setProfile = p  => localStorage.setItem("profile", JSON.stringify(p));
+
+  function areaName(v){ return ({tokyo:"東京",yokohama:"横浜",chiba:"千葉",saitama:"埼玉",nagoya:"名古屋",osaka:"大阪",fukuoka:"福岡"}[v]||v||""); }
+
+  function renderProfileView(){
+    const p=getProfile();
+    const v = (x)=> x && String(x).trim() ? String(x) : '<span class="placeholder">未設定</span>';
+    $("#vName").innerHTML   = v(p.name);
+    $("#vArea").innerHTML   = v(areaName(p.area));
+    $("#vAge").innerHTML    = v(p.age);
+    $("#vHobby").innerHTML  = v(p.hobby);
+    $("#vLike").innerHTML   = v(p.like);
+    $("#vDaily").innerHTML  = v(p.daily);
+    $("#vJob").innerHTML    = v(p.job);
+    $("#vSchool").innerHTML = v(p.school);
+    $("#vFree").innerHTML   = v(p.free);
+    $("#profileView").style.display="block";
+    $("#profileEdit").style.display="none";
+  }
+  function openEdit(){
+    const p=getProfile();
+    $("#pfName").value = p.name||"";
+    $("#pfArea").value = p.area||"";
+    $("#pfAge").value  = p.age||"";
+    $("#pfHobby").value= p.hobby||"";
+    $("#pfLike").value = p.like||"";
+    $("#pfDaily").value= p.daily||"";
+    $("#pfJob").value  = p.job||"";
+    $("#pfSchool").value= p.school||"";
+    $("#pfFree").value = p.free||"";
+    $("#profileView").style.display="none";
+    $("#profileEdit").style.display="block";
+  }
+  function saveProfile(){
+    const name=$("#pfName").value.trim();
+    const area=$("#pfArea").value;
+    const age =Number($("#pfAge").value);
+    if(!name){ alert("ニックネームは必須です。"); return; }
+    if(!area){ alert("エリアは必須です。"); return; }
+    if(!age){ alert("年齢は必須です。"); return; }
+    const p={ name, area, age,
+      hobby:$("#pfHobby").value, like:$("#pfLike").value, daily:$("#pfDaily").value,
+      job:$("#pfJob").value, school:$("#pfSchool").value, free:$("#pfFree").value };
+    setProfile(p);
+    $("#saveMsg").style.display="block";
+    setTimeout(()=>{ $("#saveMsg").style.display="none"; renderProfileView(); }, 700);
+  }
+  $("#editBtn").addEventListener("click", openEdit);
+  $("#cancelEdit").addEventListener("click", renderProfileView);
+  $("#saveProfile").addEventListener("click", saveProfile);
+
+  /* ===== KYC（apply と連動） ===== */
   const getKyc = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
   const setKyc = k => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKyc(); };
   function renderKyc(){
@@ -152,7 +233,7 @@
       const sex = k.gender==='female'?'女性':(k.gender==='male'?'男性':'不明');
       b.className="badge ok"; b.textContent=`KYC確認済み：${sex}`;
     }else{ b.className="badge ng"; b.textContent="KYC未完了"; }
-    // デモチップの見た目更新
+    // デモチップ見た目
     const el=$("#kycDemoPanel"); if(!el) return;
     const chips=el.querySelectorAll('.chip'); chips.forEach(c=>c.classList.remove('active'));
     const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
@@ -168,68 +249,82 @@
     else if(v==="female") setKyc({verified:true, gender:'female'});
     else setKyc({verified:false});
   });
+  window.addEventListener('storage', (e)=>{ if(e.key==='kyc') renderKyc(); });
 
-  // ===== プロフィール =====
-  const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
-  const setProfile = p  => localStorage.setItem("profile", JSON.stringify(p));
+  /* ===== 履歴（招待URL） =====
+     期待フォーマット: localStorage.invites = [{ url:string, ts:number }, ...]
+     例: const inv = JSON.parse(localStorage.getItem('invites')||'[]'); inv.push({url:'https://liff.line.me/xxx?inv=abc', ts:Date.now()}); localStorage.setItem('invites', JSON.stringify(inv));
+  */
+  const getInvites = ()=> JSON.parse(localStorage.getItem("invites")||"[]");
+  function fmt(ts){
+    const d=new Date(ts||Date.now());
+    const z=n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+  }
+  async function copyText(t){
+    try{
+      if(navigator.clipboard){ await navigator.clipboard.writeText(t); alert("コピーしました"); }
+      else{
+        const i=document.createElement('textarea'); i.value=t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); alert("コピーしました");
+      }
+    }catch(e){ alert("コピーに失敗しました"); }
+  }
+  function renderInvites(){
+    const box=$("#inviteList"), empty=$("#inviteEmpty");
+    box.innerHTML="";
+    const arr=[...getInvites()].sort((a,b)=> (b.ts||0)-(a.ts||0));
+    if(!arr.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    arr.forEach((it,idx)=>{
+      const row=document.createElement('div');
+      row.className="row";
+      row.innerHTML = `
+        <div style="min-width:0">
+          <div class="mono nowrap"><a href="${it.url}" target="_blank" rel="noopener">${it.url}</a></div>
+          <div class="small">${fmt(it.ts)}</div>
+        </div>
+        <div class="hrow">
+          <button class="btn btn--sm" data-copy="${idx}">コピー</button>
+          <a class="btn btn--sm" href="${it.url}" target="_blank" rel="noopener">開く</a>
+        </div>`;
+      box.appendChild(row);
+    });
+    box.addEventListener('click', async (e)=>{
+      const b = e.target.closest('button[data-copy]'); if(!b) return;
+      const idx = Number(b.dataset.copy); const arr=[...getInvites()].sort((a,b)=> (b.ts||0)-(a.ts||0));
+      const t = arr[idx]?.url || "";
+      if(t) await copyText(t);
+    }, { once:true });
+  }
+  window.addEventListener('storage', (e)=>{ if(e.key==='invites') renderInvites(); });
 
-  // 閲覧表示
-  function renderProfileView(){
-    const p=getProfile();
-    const v = (x)=> x && String(x).trim() ? String(x) : '<span class="placeholder">未設定</span>';
-    $("#vName").innerHTML   = v(p.name);
-    $("#vArea").innerHTML   = v(areaName(p.area));
-    $("#vAge").innerHTML    = v(p.age);
-    $("#vHobby").innerHTML  = v(p.hobby);
-    $("#vLike").innerHTML   = v(p.like);
-    $("#vDaily").innerHTML  = v(p.daily);
-    $("#vJob").innerHTML    = v(p.job);
-    $("#vSchool").innerHTML = v(p.school);
-    $("#vFree").innerHTML   = v(p.free);
-    // 表示切替
-    $("#profileView").style.display="block";
-    $("#profileEdit").style.display="none";
+  /* ===== お問い合わせ ===== */
+  function getInquiries(){ return JSON.parse(localStorage.getItem("inquiries")||"[]"); }
+  function setInquiries(v){ localStorage.setItem("inquiries", JSON.stringify(v)); }
+  async function sendInquiry(){
+    const subject = $("#qSubject").value.trim();
+    const email   = $("#qEmail").value.trim();
+    const body    = $("#qBody").value.trim();
+    if(!subject){ alert("件名は必須です。"); return; }
+    if(!body){ alert("内容は必須です。"); return; }
+    const item = { subject, email, body, ts: Date.now() };
+    const list = getInquiries(); list.unshift(item); setInquiries(list);
+    $("#qMsg").style.display="block";
+    setTimeout(()=>$("#qMsg").style.display="none", 1800);
+    // 送信（任意・サーバー側があれば受ける）
+    try{
+      await fetch(APP.API, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ type:"inquiry", payload:item })
+      });
+    }catch(e){ /* オフラインでもローカル保存済みなので無視 */ }
+    // クリア
+    $("#qSubject").value=""; $("#qEmail").value=""; $("#qBody").value="";
   }
-  // 編集フォームへ
-  function openEdit(){
-    const p=getProfile();
-    $("#pfName").value = p.name||"";
-    $("#pfArea").value = p.area||"";
-    $("#pfAge").value  = p.age||"";
-    $("#pfHobby").value= p.hobby||"";
-    $("#pfLike").value = p.like||"";
-    $("#pfDaily").value= p.daily||"";
-    $("#pfJob").value  = p.job||"";
-    $("#pfSchool").value= p.school||"";
-    $("#pfFree").value = p.free||"";
-    $("#profileView").style.display="none";
-    $("#profileEdit").style.display="block";
-  }
-  // 保存
-  function saveProfile(){
-    const name=$("#pfName").value.trim();
-    const area=$("#pfArea").value;
-    const age =Number($("#pfAge").value);
-    if(!name){ alert("ニックネームは必須です。"); return; }
-    if(!area){ alert("エリアは必須です。"); return; }
-    if(!age){ alert("年齢は必須です。"); return; }
-    const p={ name, area, age,
-      hobby:$("#pfHobby").value, like:$("#pfLike").value, daily:$("#pfDaily").value,
-      job:$("#pfJob").value, school:$("#pfSchool").value, free:$("#pfFree").value };
-    setProfile(p);
-    $("#saveMsg").style.display="block";
-    setTimeout(()=>{ $("#saveMsg").style.display="none"; renderProfileView(); }, 700);
-  }
-  // エリア表示名
-  function areaName(v){
-    return ({tokyo:"東京",yokohama:"横浜",chiba:"千葉",saitama:"埼玉",nagoya:"名古屋",osaka:"大阪",fukuoka:"福岡"}[v]||v||"");
-  }
+  $("#qSend").addEventListener("click", sendInquiry);
 
-  // イベント
-  $("#editBtn").addEventListener("click", openEdit);
-  $("#cancelEdit").addEventListener("click", renderProfileView);
-  $("#saveProfile").addEventListener("click", saveProfile);
-
+  /* ===== 起動 ===== */
   document.addEventListener("DOMContentLoaded", async ()=>{
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
@@ -238,6 +333,7 @@
     if(!localStorage.getItem('profile')) setProfile({});
     if(!localStorage.getItem('kyc'))     setKyc({verified:false}); else renderKyc();
     renderProfileView();
+    renderInvites();
   });
 </script>
 </body>
