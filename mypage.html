@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<!-- ★ズーム無効化 -->
+<!-- ズーム無効化（固定表示） -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
@@ -26,14 +26,14 @@
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:15px;cursor:pointer}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
-  label{display:block;font-size:14px;margin:10px 0 6px}
+  .danger{background:#fff;border-color:#fecaca;color:#7f1d1d}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  label{display:block;font-size:14px;margin:8px 0 6px}
   input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
-  .grid{display:grid;grid-template-columns:1fr;gap:10px}
   .muted{color:#6B7280}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
@@ -41,9 +41,16 @@
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
   .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .grid-def{display:grid;grid-template-columns: 9em 1fr;gap:10px 12px}
+  .val{font-weight:600}
+  .placeholder{color:#9CA3AF}
+  .right{margin-left:auto}
+  .btnRow{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
 
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
+          backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
+          padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -57,13 +64,13 @@
 </header>
 
 <main class="wrap">
-  <!-- KYC -->
+  <!-- KYC（申込みと連動） -->
   <div class="card">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
       <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
     </div>
-    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」画面にも反映されます。</p>
+    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」の決済条件にも反映されます。</p>
 
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
@@ -72,37 +79,54 @@
         <span class="chip" data-v="male">男性で確認済み</span>
         <span class="chip" data-v="female">女性で確認済み</span>
       </div>
-      <div class="muted">・設定は端末に保存され、<b>申込みの決済条件</b>に反映されます（女性は無料）。</div>
+      <div class="muted">・設定は端末に保存、申込みの決済に反映（女性は無料）。</div>
     </div>
   </div>
 
-  <!-- プロフィール -->
-  <div class="card">
-    <div class="ttl" style="font-size:16px">プロフィール</div>
-    <div class="grid">
-      <label>ニックネーム（必須）<input id="pfName" placeholder="例：りょう"></label>
-      <label>エリア（必須）
-        <select id="pfArea">
-          <option value="">選択してください</option>
-          <option value="tokyo">東京</option>
-          <option value="yokohama">横浜</option>
-          <option value="chiba">千葉</option>
-          <option value="saitama">埼玉</option>
-          <option value="nagoya">名古屋</option>
-          <option value="osaka">大阪</option>
-          <option value="fukuoka">福岡</option>
-        </select>
-      </label>
-      <label>年齢（必須）<input id="pfAge" type="number" min="18" max="80" placeholder="例：24"></label>
-
-      <label>趣味<textarea id="pfHobby" placeholder="例：旅行、グルメ、スポーツ観戦"></textarea></label>
-      <label>好きなこと<textarea id="pfLike" placeholder="例：カフェ巡り、映画、サウナ"></textarea></label>
-      <label>普段何してる<textarea id="pfDaily" placeholder="例：会社員／大学生／自営業など"></textarea></label>
-      <label>仕事<textarea id="pfJob" placeholder="例：営業、エンジニア、看護師など"></textarea></label>
-      <label>学校<textarea id="pfSchool" placeholder="例：〇〇大学 △△学部"></textarea></label>
-      <label>自由記入<textarea id="pfFree" placeholder="自由にどうぞ"></textarea></label>
+  <!-- プロフィール：閲覧モード -->
+  <div class="card" id="profileView">
+    <div class="hrow" style="justify-content:space-between;align-items:center">
+      <div class="ttl" style="font-size:16px">プロフィール</div>
+      <button class="btn btn--sm" id="editBtn">編集</button>
     </div>
-    <div class="hrow" style="gap:8px;margin-top:12px">
+    <div class="grid-def" style="margin-top:8px">
+      <div class="muted">ニックネーム</div><div class="val" id="vName"></div>
+      <div class="muted">エリア</div><div class="val" id="vArea"></div>
+      <div class="muted">年齢</div><div class="val" id="vAge"></div>
+      <div class="muted">趣味</div><div class="val" id="vHobby"></div>
+      <div class="muted">好きなこと</div><div class="val" id="vLike"></div>
+      <div class="muted">普段何してる</div><div class="val" id="vDaily"></div>
+      <div class="muted">仕事</div><div class="val" id="vJob"></div>
+      <div class="muted">学校</div><div class="val" id="vSchool"></div>
+      <div class="muted">自由記入</div><div class="val" id="vFree"></div>
+    </div>
+  </div>
+
+  <!-- プロフィール：編集モード（初期は非表示） -->
+  <div class="card" id="profileEdit" style="display:none">
+    <div class="ttl" style="font-size:16px">プロフィールを編集</div>
+    <label>ニックネーム（必須）<input id="pfName" placeholder="例：りょう"></label>
+    <label>エリア（必須）
+      <select id="pfArea">
+        <option value="">選択してください</option>
+        <option value="tokyo">東京</option>
+        <option value="yokohama">横浜</option>
+        <option value="chiba">千葉</option>
+        <option value="saitama">埼玉</option>
+        <option value="nagoya">名古屋</option>
+        <option value="osaka">大阪</option>
+        <option value="fukuoka">福岡</option>
+      </select>
+    </label>
+    <label>年齢（必須）<input id="pfAge" type="number" min="18" max="80" placeholder="例：24"></label>
+    <label>趣味<textarea id="pfHobby"></textarea></label>
+    <label>好きなこと<textarea id="pfLike"></textarea></label>
+    <label>普段何してる<textarea id="pfDaily"></textarea></label>
+    <label>仕事<textarea id="pfJob"></textarea></label>
+    <label>学校<textarea id="pfSchool"></textarea></label>
+    <label>自由記入<textarea id="pfFree"></textarea></label>
+    <div class="btnRow">
+      <button class="btn danger" id="cancelEdit">キャンセル</button>
       <button class="btn primary" id="saveProfile">保存する</button>
     </div>
     <p id="saveMsg" class="muted" style="display:none;margin-top:6px">保存しました。</p>
@@ -116,57 +140,59 @@
 </nav>
 
 <script>
-  const APP   = { LIFF_ID:"2008178197-ELrxabO9" };
-
+  const APP = { LIFF_ID:"2008178197-ELrxabO9" };
   const $=s=>document.querySelector(s);
-  const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
-  const setProfile= v  => localStorage.setItem("profile", JSON.stringify(v));
 
-  // 共有：KYC helpers（apply.html と同じキー）
-  const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
-  const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
-  const kycVerified = ()=> !!getKyc().verified;
-
-  function renderKycUI(){
-    const k = getKyc();
-    const badge = $("#kycBadge");
+  // ===== KYC（apply と連動） =====
+  const getKyc = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
+  const setKyc = k => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKyc(); };
+  function renderKyc(){
+    const k=getKyc(), b=$("#kycBadge");
     if(k.verified){
-      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
-      badge.className = "badge ok";
-      badge.textContent = `KYC確認済み：${sex}`;
-    }else{
-      badge.className = "badge ng";
-      badge.textContent = "KYC未完了";
-    }
-    // デモチップの見た目
-    const el=$("#chipsKyc"); if(!el) return;
-    [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      const sex = k.gender==='female'?'女性':(k.gender==='male'?'男性':'不明');
+      b.className="badge ok"; b.textContent=`KYC確認済み：${sex}`;
+    }else{ b.className="badge ng"; b.textContent="KYC未完了"; }
+    // デモチップの見た目更新
+    const el=$("#kycDemoPanel"); if(!el) return;
+    const chips=el.querySelectorAll('.chip'); chips.forEach(c=>c.classList.remove('active'));
     const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
-    const t = el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
+    const t=el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
   }
-
-  // デモパネル開閉
   $("#kycDemoBtn").addEventListener("click", ()=>{
-    const p = $("#kycDemoPanel");
-    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
+    const p=$("#kycDemoPanel"); p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
   });
-  // デモ選択
-  (function(){
-    const el = $("#chipsKyc"); if(!el) return;
-    el.addEventListener("click",(e)=>{
-      const t = e.target.closest('.chip'); if(!t) return;
-      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-      t.classList.add('active');
-      const v = t.dataset.v;
-      if(v==="male")   setKyc({verified:true, gender:'male'});
-      else if(v==="female") setKyc({verified:true, gender:'female'});
-      else            setKyc({verified:false});
-    });
-  })();
+  document.addEventListener("click",(e)=>{
+    const t=e.target.closest('#kycDemoPanel .chip'); if(!t) return;
+    const v=t.dataset.v;
+    if(v==="male") setKyc({verified:true, gender:'male'});
+    else if(v==="female") setKyc({verified:true, gender:'female'});
+    else setKyc({verified:false});
+  });
 
-  // プロフィール表示
-  function fillProfile(){
-    const p = getProfile();
+  // ===== プロフィール =====
+  const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
+  const setProfile = p  => localStorage.setItem("profile", JSON.stringify(p));
+
+  // 閲覧表示
+  function renderProfileView(){
+    const p=getProfile();
+    const v = (x)=> x && String(x).trim() ? String(x) : '<span class="placeholder">未設定</span>';
+    $("#vName").innerHTML   = v(p.name);
+    $("#vArea").innerHTML   = v(areaName(p.area));
+    $("#vAge").innerHTML    = v(p.age);
+    $("#vHobby").innerHTML  = v(p.hobby);
+    $("#vLike").innerHTML   = v(p.like);
+    $("#vDaily").innerHTML  = v(p.daily);
+    $("#vJob").innerHTML    = v(p.job);
+    $("#vSchool").innerHTML = v(p.school);
+    $("#vFree").innerHTML   = v(p.free);
+    // 表示切替
+    $("#profileView").style.display="block";
+    $("#profileEdit").style.display="none";
+  }
+  // 編集フォームへ
+  function openEdit(){
+    const p=getProfile();
     $("#pfName").value = p.name||"";
     $("#pfArea").value = p.area||"";
     $("#pfAge").value  = p.age||"";
@@ -176,33 +202,42 @@
     $("#pfJob").value  = p.job||"";
     $("#pfSchool").value= p.school||"";
     $("#pfFree").value = p.free||"";
+    $("#profileView").style.display="none";
+    $("#profileEdit").style.display="block";
   }
-
-  $("#saveProfile").addEventListener("click", ()=>{
-    const name = $("#pfName").value.trim();
-    const area = $("#pfArea").value;
-    const age  = Number($("#pfAge").value);
+  // 保存
+  function saveProfile(){
+    const name=$("#pfName").value.trim();
+    const area=$("#pfArea").value;
+    const age =Number($("#pfAge").value);
     if(!name){ alert("ニックネームは必須です。"); return; }
     if(!area){ alert("エリアは必須です。"); return; }
     if(!age){ alert("年齢は必須です。"); return; }
-
-    const p = {
-      name, area, age,
+    const p={ name, area, age,
       hobby:$("#pfHobby").value, like:$("#pfLike").value, daily:$("#pfDaily").value,
-      job:$("#pfJob").value, school:$("#pfSchool").value, free:$("#pfFree").value
-    };
+      job:$("#pfJob").value, school:$("#pfSchool").value, free:$("#pfFree").value };
     setProfile(p);
     $("#saveMsg").style.display="block";
-    setTimeout(()=>$("#saveMsg").style.display="none",1800);
-  });
+    setTimeout(()=>{ $("#saveMsg").style.display="none"; renderProfileView(); }, 700);
+  }
+  // エリア表示名
+  function areaName(v){
+    return ({tokyo:"東京",yokohama:"横浜",chiba:"千葉",saitama:"埼玉",nagoya:"名古屋",osaka:"大阪",fukuoka:"福岡"}[v]||v||"");
+  }
+
+  // イベント
+  $("#editBtn").addEventListener("click", openEdit);
+  $("#cancelEdit").addEventListener("click", renderProfileView);
+  $("#saveProfile").addEventListener("click", saveProfile);
 
   document.addEventListener("DOMContentLoaded", async ()=>{
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
     }catch(e){ console.warn(e); }
-    if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
-    fillProfile();
+    if(!localStorage.getItem('profile')) setProfile({});
+    if(!localStorage.getItem('kyc'))     setKyc({verified:false}); else renderKyc();
+    renderProfileView();
   });
 </script>
 </body>
