@@ -19,7 +19,8 @@
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   label{display:block;font-size:14px;margin:10px 0 6px}
-  input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  textarea{min-height:88px;resize:vertical}
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
@@ -34,6 +35,8 @@
   .preview{display:flex;gap:10px;align-items:center;margin-top:8px}
   .preview img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#fff}
   .note{font-size:12px;color:#6B7280}
+  .req{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:8px;background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700}
+  .err{color:#991B1B;font-size:12px;display:none;margin-top:6px}
 </style>
 </head>
 <body>
@@ -46,6 +49,7 @@
 
 <main class="wrap">
   <section>
+    <!-- ヘッダー -->
     <div class="card">
       <div class="hrow" style="justify-content:space-between;align-items:center">
         <div class="hrow" style="gap:12px;align-items:center">
@@ -59,17 +63,54 @@
       </div>
     </div>
 
+    <!-- プロフィール -->
     <div class="card">
       <div class="ttl" style="font-size:16px">プロフィール</div>
-      <label>ニックネーム<input id="edNick" placeholder="ニックネーム"></label>
-      <div class="row">
-        <label style="flex:1">都道府県<input id="edPref" placeholder="例：東京都"></label>
-        <label style="flex:1">市区町村<input id="edCity" placeholder="例：渋谷区"></label>
+
+      <label>ニックネーム <span class="req">必須</span>
+        <input id="edNick" placeholder="ニックネーム" required>
+      </label>
+      <div id="errNick" class="err">ニックネームを入力してください。</div>
+
+      <label>エリア <span class="req">必須</span>
+        <input id="edArea" placeholder="例：東京 / 大阪 / 名古屋 など" required>
+      </label>
+      <div id="errArea" class="err">エリアを入力してください。</div>
+
+      <label>年齢
+        <input id="edAge" type="number" min="18" max="99" placeholder="例：25">
+      </label>
+
+      <label>趣味
+        <input id="edHobby" placeholder="例：カフェ巡り、サウナ、サッカー">
+      </label>
+
+      <label>好きなこと
+        <input id="edLike" placeholder="例：映画、旅行、料理">
+      </label>
+
+      <label>普段何してる（ライフスタイル）
+        <textarea id="edRoutine" placeholder="例：平日はIT企業で勤務、週末はアウトドアなど"></textarea>
+      </label>
+
+      <label>仕事
+        <input id="edJob" placeholder="例：営業 / エンジニア / 医療 など">
+      </label>
+
+      <label>学校
+        <input id="edSchool" placeholder="例：◯◯大学 / ◯◯専門学校 など">
+      </label>
+
+      <label>自由記入
+        <textarea id="edFree" placeholder="自己PRや希望条件など自由に入力"></textarea>
+      </label>
+
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" id="edSave">保存</button>
       </div>
-      <label>距離（km）<input id="edRadius" type="number" min="5" max="50" placeholder="15"></label>
-      <div class="row" style="margin-top:8px"><button class="btn primary" id="edSave">保存</button></div>
     </div>
 
+    <!-- KYC -->
     <div class="card">
       <div class="ttl" style="font-size:16px">本人確認（KYC） <span id="badge" class="badge b-gray">未提出</span></div>
       <div class="note">※ ピンぼけ・反射・マスク・加工は審査NGの原因になります。明るい場所で、四隅が入るよう撮影してください。</div>
@@ -107,6 +148,7 @@
       </div>
     </div>
 
+    <!-- サブスク -->
     <div class="card">
       <div class="ttl" style="font-size:16px">サブスク</div>
       <div id="subStatus">未加入</div>
@@ -116,6 +158,7 @@
       </div>
     </div>
 
+    <!-- 履歴 -->
     <div class="card">
       <div class="ttl" style="font-size:16px">履歴</div>
       <div id="mpHistory" class="sub">—</div>
@@ -139,6 +182,17 @@
   const AUTH = { userId:"", idToken:"" };
   const $=s=>document.querySelector(s);
 
+  // 旧キーからの移行（初回のみ）
+  (function migrate(){
+    if(STATE.profile){
+      if(!STATE.profile.area && STATE.profile.pref){ STATE.profile.area = STATE.profile.pref; }
+      delete STATE.profile.pref;
+      delete STATE.profile.city;
+      delete STATE.profile.radius;
+      localStorage.setItem("profile", JSON.stringify(STATE.profile));
+    }
+  })();
+
   function save(){
     localStorage.setItem("profile", JSON.stringify(STATE.profile));
     localStorage.setItem("sub", JSON.stringify(STATE.sub));
@@ -156,10 +210,16 @@
 
   function render(){
     // プロフィール
-    $("#edNick").value = STATE.profile.nick || "";
-    $("#edPref").value = STATE.profile.pref || "";
-    $("#edCity").value = STATE.profile.city || "";
-    $("#edRadius").value = (STATE.profile.radius!=null? STATE.profile.radius : "");
+    $("#edNick").value   = STATE.profile.nick  || "";
+    $("#edArea").value   = STATE.profile.area  || "";
+    $("#edAge").value    = (STATE.profile.age!=null? STATE.profile.age : "");
+    $("#edHobby").value  = STATE.profile.hobby || "";
+    $("#edLike").value   = STATE.profile.like  || "";
+    $("#edRoutine").value= STATE.profile.routine || "";
+    $("#edJob").value    = STATE.profile.job   || "";
+    $("#edSchool").value = STATE.profile.school|| "";
+    $("#edFree").value   = STATE.profile.free  || "";
+
     // サブスク
     $("#subStatus").textContent = STATE.sub.active ? `加入中（${STATE.sub.plan||'ベーシック'}）` : "未加入";
     // 履歴
@@ -169,15 +229,10 @@
     setBadge(STATE.kyc.status || "未提出");
     $("#kycSubmit").disabled = !(STATE.kyc.doc && STATE.kyc.selfie);
 
-    if(STATE.kyc.doc && STATE.kyc.doc.preview){
-      $("#docPreview").style.display = "flex";
-      $("#docImg").src = STATE.kyc.doc.preview;
-    }else{ $("#docPreview").style.display = "none"; }
-
-    if(STATE.kyc.selfie && STATE.kyc.selfie.preview){
-      $("#selfiePreview").style.display = "flex";
-      $("#selfieImg").src = STATE.kyc.selfie.preview;
-    }else{ $("#selfiePreview").style.display = "none"; }
+    if(STATE.kyc.doc && STATE.kyc.doc.preview){ $("#docPreview").style.display = "flex"; $("#docImg").src = STATE.kyc.doc.preview; }
+    else { $("#docPreview").style.display = "none"; }
+    if(STATE.kyc.selfie && STATE.kyc.selfie.preview){ $("#selfiePreview").style.display = "flex"; $("#selfieImg").src = STATE.kyc.selfie.preview; }
+    else { $("#selfiePreview").style.display = "none"; }
   }
 
   async function postJSON(url, body){
@@ -201,6 +256,16 @@
     });
   }
 
+  function validate(){
+    let ok = true;
+    const nick = $("#edNick").value.trim();
+    const area = $("#edArea").value.trim();
+    $("#errNick").style.display = nick ? "none":"block";
+    $("#errArea").style.display = area ? "none":"block";
+    if(!nick || !area) ok=false;
+    return ok;
+  }
+
   document.addEventListener("DOMContentLoaded", async ()=>{
     // LIFFログイン
     try{
@@ -216,17 +281,25 @@
       if(!STATE.profile.nick){ STATE.profile.nick = prof.displayName || "ユーザー"; save(); }
     }catch(e){ console.warn(e); }
 
-    // イベント
+    // 保存
     $("#edSave").addEventListener("click", ()=>{
+      if(!validate()) return;
       STATE.profile = {
-        nick: $("#edNick").value.trim()||"ユーザー",
-        pref: $("#edPref").value.trim(),
-        city: $("#edCity").value.trim(),
-        radius: Number($("#edRadius").value||15)
+        nick:   $("#edNick").value.trim(),
+        area:   $("#edArea").value.trim(),
+        age:    $("#edAge").value? Number($("#edAge").value): null,
+        hobby:  $("#edHobby").value.trim(),
+        like:   $("#edLike").value.trim(),
+        routine:$("#edRoutine").value.trim(),
+        job:    $("#edJob").value.trim(),
+        school: $("#edSchool").value.trim(),
+        free:   $("#edFree").value.trim()
       };
-      save(); render(); sendAction("update_profile", STATE.profile); alert("保存しました");
+      save(); render(); sendAction("update_profile", STATE.profile);
+      alert("保存しました");
     });
 
+    // KYCファイル
     $("#docFile").addEventListener("change", async (e)=>{
       const f=e.target.files && e.target.files[0]; if(!f) return;
       STATE.kyc.doc = await fileToData(f);
@@ -249,10 +322,10 @@
       STATE.kyc.status = "審査中"; save(); render();
       await sendAction("kyc_upload", { doc: STATE.kyc.doc, selfie: STATE.kyc.selfie });
       alert("提出しました。審査中です。");
-      // 承認/差し戻しはサーバ側結果で setBadge を更新してください
-      // 例: STATE.kyc.status="承認済み"; save(); render();
+      // 承認/差し戻しはサーバ結果でSTATE.kyc.statusを更新して保存してください
     });
 
+    // サブスク
     $("#btnJoinSub").addEventListener("click", ()=>{ STATE.sub={active:true, plan:"ベーシック", since:new Date().toISOString()}; save(); render(); sendAction("subscribe", STATE.sub); });
     $("#btnCancelSub").addEventListener("click", ()=>{ STATE.sub={active:false}; save(); render(); sendAction("unsubscribe", {}); });
     $("#btnLogout").addEventListener("click", ()=>{ try{ if(window.liff && liff.isLoggedIn()) liff.logout(); }catch{} });
