@@ -24,7 +24,7 @@
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:#0C7C59}
   .avatar{width:64px;height:64px;border-radius:50%;background:#D1D5DB;display:grid;place-items:center;font-weight:700;overflow:hidden}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid}
@@ -77,9 +77,10 @@
       </label>
       <div id="errArea" class="err">エリアを入力してください。</div>
 
-      <label>年齢
-        <input id="edAge" type="number" min="18" max="99" placeholder="例：25">
+      <label>年齢 <span class="req">必須</span>
+        <input id="edAge" type="number" min="18" max="99" placeholder="例：25" required>
       </label>
+      <div id="errAge" class="err">年齢は18〜99の整数で入力してください。</div>
 
       <label>趣味
         <input id="edHobby" placeholder="例：カフェ巡り、サウナ、サッカー">
@@ -158,11 +159,7 @@
       </div>
     </div>
 
-    <!-- 履歴 -->
-    <div class="card">
-      <div class="ttl" style="font-size:16px">履歴</div>
-      <div id="mpHistory" class="sub">—</div>
-    </div>
+    <!-- 履歴カードは削除済み -->
   </section>
 </main>
 
@@ -186,9 +183,7 @@
   (function migrate(){
     if(STATE.profile){
       if(!STATE.profile.area && STATE.profile.pref){ STATE.profile.area = STATE.profile.pref; }
-      delete STATE.profile.pref;
-      delete STATE.profile.city;
-      delete STATE.profile.radius;
+      delete STATE.profile.pref; delete STATE.profile.city; delete STATE.profile.radius;
       localStorage.setItem("profile", JSON.stringify(STATE.profile));
     }
   })();
@@ -209,7 +204,6 @@
   }
 
   function render(){
-    // プロフィール
     $("#edNick").value   = STATE.profile.nick  || "";
     $("#edArea").value   = STATE.profile.area  || "";
     $("#edAge").value    = (STATE.profile.age!=null? STATE.profile.age : "");
@@ -220,12 +214,8 @@
     $("#edSchool").value = STATE.profile.school|| "";
     $("#edFree").value   = STATE.profile.free  || "";
 
-    // サブスク
     $("#subStatus").textContent = STATE.sub.active ? `加入中（${STATE.sub.plan||'ベーシック'}）` : "未加入";
-    // 履歴
-    const h = JSON.parse(localStorage.getItem("history")||"[]");
-    $("#mpHistory").innerHTML = h.length ? `<ul>${h.slice(0,10).map(i=>`<li>${new Date(i.ts).toLocaleString('ja-JP')}：${i.result}${i.payment?` / ¥${i.payment}`:""}</li>`).join('')}</ul>` : "—";
-    // KYC
+
     setBadge(STATE.kyc.status || "未提出");
     $("#kycSubmit").disabled = !(STATE.kyc.doc && STATE.kyc.selfie);
 
@@ -260,9 +250,15 @@
     let ok = true;
     const nick = $("#edNick").value.trim();
     const area = $("#edArea").value.trim();
+    const ageVal = $("#edAge").value.trim();
+    const ageNum = parseInt(ageVal,10);
+
     $("#errNick").style.display = nick ? "none":"block";
     $("#errArea").style.display = area ? "none":"block";
-    if(!nick || !area) ok=false;
+    const ageValid = !!ageVal && Number.isInteger(ageNum) && ageNum>=18 && ageNum<=99;
+    $("#errAge").style.display = ageValid ? "none":"block";
+
+    if(!nick || !area || !ageValid) ok=false;
     return ok;
   }
 
@@ -287,7 +283,7 @@
       STATE.profile = {
         nick:   $("#edNick").value.trim(),
         area:   $("#edArea").value.trim(),
-        age:    $("#edAge").value? Number($("#edAge").value): null,
+        age:    parseInt($("#edAge").value,10),
         hobby:  $("#edHobby").value.trim(),
         like:   $("#edLike").value.trim(),
         routine:$("#edRoutine").value.trim(),
@@ -322,7 +318,6 @@
       STATE.kyc.status = "審査中"; save(); render();
       await sendAction("kyc_upload", { doc: STATE.kyc.doc, selfie: STATE.kyc.selfie });
       alert("提出しました。審査中です。");
-      // 承認/差し戻しはサーバ結果でSTATE.kyc.statusを更新して保存してください
     });
 
     // サブスク
