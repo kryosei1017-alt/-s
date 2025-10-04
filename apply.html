@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- ★ズーム無効化（全ページ統一） -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜申込み</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -17,7 +18,7 @@
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
     line-height:1.6;overflow-x:hidden;
-    /* LINE/Safari の縦書き化対策 */
+    /* 縦書き化対策 */
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
@@ -53,11 +54,8 @@
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* —— 決済ステップは全面横書き固定 —— */
-  #stepPayment, #stepPayment *{
-    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-  }
-  /* 支払い方法（白い点線枠） */
+  /* 決済ステップを全面横書き固定 */
+  #stepPayment, #stepPayment *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px;overflow:hidden}
   .payopt{width:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin:0 0 10px 0}
   .payopt:last-child{margin-bottom:0}
@@ -66,7 +64,7 @@
 
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
-  /* 同意チェック（白枠で横並び） */
+  /* 同意チェック：白枠で横並び */
   .consentBox{
     display:flex; align-items:center; gap:12px;
     border:1px solid var(--border); border-radius:12px;
@@ -77,9 +75,7 @@
   .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; }
 
   /* 「ホームでチャージ」も横書き固定 */
-  #payGoCharge, #payGoCharge *{
-    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-  }
+  #payGoCharge, #payGoCharge *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
 </style>
 </head>
 <body>
@@ -99,7 +95,7 @@
     </div>
     <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
 
-    <!-- KYC 状態 -->
+    <!-- KYC 状態（マイページと連動） -->
     <div class="hrow" style="justify-content:space-between;align-items:center;margin:8px 0">
       <div class="badge" id="kycBadge">KYC確認状況: 取得中...</div>
       <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
@@ -154,7 +150,7 @@ friend_bbb"></textarea></label>
       <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
     </div>
 
-    <!-- ▼ デモ用：本人確認の簡易設定（折りたたみ） -->
+    <!-- ▼ デモ用：本人確認の簡易設定（マイページと連動） -->
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
       <p class="sub">外部eKYCが未決定のため、検証用にローカルで状態を切り替えます。</p>
@@ -168,6 +164,7 @@ friend_bbb"></textarea></label>
         ・性別は決済ロジックに反映されます（<b>女性は無料</b>）。<br>
         ・未完了のままでは申込みできません。
       </div>
+      <p class="sub">※ 同じアカウントで開いた <b>マイページ</b> でも同じ状態になります。</p>
     </div>
     <!-- ▲ デモ用 -->
   </div>
@@ -268,6 +265,46 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
+  /* ====== 共有：KYC helpers（mypage と連動） ====== */
+  const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
+  const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
+  const kycVerified = ()=> !!getKyc().verified;
+  const kycGender   = ()=> getKyc().gender;
+
+  function renderKycUI(){
+    const k = getKyc();
+    const badge = $("#kycBadge");
+    const warn  = $("#kycWarn");
+    if(k.verified){
+      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
+      badge.className = "badge ok";
+      badge.textContent = `KYC確認済み：${sex}`;
+      warn.style.display = "none";
+    }else{
+      badge.className = "badge ng";
+      badge.textContent = "KYC未完了";
+      warn.style.display = "block";
+    }
+  }
+
+  // KYC デモ UI
+  $("#kycDemoBtn").addEventListener("click", ()=>{
+    const p = $("#kycDemoPanel");
+    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
+  });
+  (function setupKycChips(){
+    const el = $("#chipsKyc"); if(!el) return;
+    el.addEventListener("click",(e)=>{
+      const t = e.target.closest('.chip'); if(!t) return;
+      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      t.classList.add('active');
+      const v = t.dataset.v; // none | male | female
+      if(v==="male")   setKyc({verified:true, gender:'male'});
+      else if(v==="female") setKyc({verified:true, gender:'female'});
+      else            setKyc({verified:false});
+    });
+  })();
+
   // 年齢選択肢
   (function(){
     const minSel=$("#ageMin"), maxSel=$("#ageMax");
@@ -288,66 +325,15 @@ friend_bbb"></textarea></label>
   const sizeSel   = makeChipGroup('chipsSize');
   const genderSel = makeChipGroup('chipsGender');
 
-  // LocalStorage helpers
+  // LocalStorage helpers（省略形）
   const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
   const setCredit = v => localStorage.setItem("credit", String(v));
   const getSub    = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
   const setSub    = s => localStorage.setItem("sub", JSON.stringify(s));
   const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
 
-  // ▼ KYC（デモ） helpers
-  function getKyc(){
-    const k = JSON.parse(localStorage.getItem("kyc")||"{}");
-    // { verified:boolean, gender:'male'|'female'|undefined, updated:string }
-    return k;
-  }
-  function setKyc(k){
-    k.updated = new Date().toISOString();
-    localStorage.setItem("kyc", JSON.stringify(k));
-    renderKycUI();
-  }
-  function kycVerified(){ return !!getKyc().verified; }
-  function kycGender(){ return getKyc().gender; } // 'male'|'female'|undefined
-
-  // KYC表示更新
-  function renderKycUI(){
-    const k = getKyc();
-    const badge = $("#kycBadge");
-    const warn  = $("#kycWarn");
-    if(k.verified){
-      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
-      badge.className = "badge ok";
-      badge.textContent = `KYC確認済み：${sex}`;
-      warn.style.display = "none";
-    }else{
-      badge.className = "badge ng";
-      badge.textContent = "KYC未完了";
-      warn.style.display = "block";
-    }
-  }
-
-  // デモパネル
-  $("#kycDemoBtn").addEventListener("click", ()=>{
-    const p = $("#kycDemoPanel");
-    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
-  });
-  (function setupKycChips(){
-    const el = $("#chipsKyc");
-    if(!el) return;
-    el.addEventListener("click",(e)=>{
-      const t = e.target.closest('.chip'); if(!t) return;
-      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-      t.classList.add('active');
-      const v = t.dataset.v; // none | male | female
-      if(v==="male")   setKyc({verified:true, gender:'male'});
-      else if(v==="female") setKyc({verified:true, gender:'female'});
-      else            setKyc({verified:false});
-    });
-  })();
-
   // 入力確定 → 同意へ
   $("#btnCreateApply").addEventListener("click", async ()=>{
-    // KYC未完了なら進めない
     if(!kycVerified()){
       alert("本人確認が未完了です。本人確認（デモ）から「確認済み」を選択してください。");
       $("#kycDemoPanel").style.display = "block";
@@ -460,7 +446,6 @@ friend_bbb"></textarea></label>
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
       const prof=await liff.getProfile(); AUTH.userId=prof.userId||"";
     }catch(e){ console.warn(e); }
-    // 初期KYC表示
     if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
     mark(Number(localStorage.getItem("state.step")||"0"));
   });
