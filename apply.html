@@ -57,14 +57,34 @@
       ・不一致が確認された場合、参加見送りやアカウント制限の対象となります。
     </div>
 
+    <!-- 人数 -->
     <label>パーティ構成（人数）</label>
     <div class="chips" id="chipsSize">
       <span class="chip" data-v="2v2">2 : 2</span>
       <span class="chip" data-v="3v3">3 : 3</span>
     </div>
 
-    <label>エリア（自由入力）<input id="inArea" placeholder="例：渋谷・新宿・横浜 など"></label>
+    <!-- 希望相手グループの性別 -->
+    <label>希望相手グループの性別</label>
+    <div class="chips" id="chipsGender">
+      <span class="chip" data-v="male">男性グループ</span>
+      <span class="chip" data-v="female">女性グループ</span>
+    </div>
 
+    <!-- エリア（選択） -->
+    <label>エリア</label>
+    <select id="inArea">
+      <option value="">選択してください</option>
+      <option value="tokyo">東京</option>
+      <option value="yokohama">横浜</option>
+      <option value="chiba">千葉</option>
+      <option value="saitama">埼玉</option>
+      <option value="nagoya">名古屋</option>
+      <option value="osaka">大阪</option>
+      <option value="fukuoka">福岡</option>
+    </select>
+
+    <!-- 希望年齢層 -->
     <label>相手の希望年齢層</label>
     <div class="hrow" style="gap:10px">
       <select id="ageMin" style="flex:1"><option value="">下限</option></select>
@@ -72,16 +92,16 @@
       <select id="ageMax" style="flex:1"><option value="">上限</option></select>
     </div>
 
-    <label>自己評価スコア（総合）</label>
+    <!-- 自己評価（0〜100） -->
+    <label>自己評価スコア（0〜100）</label>
     <div class="hrow" style="gap:10px;align-items:center">
-      <input id="inScore" type="range" min="1" max="5" step="1" value="3" oninput="document.getElementById('scoreVal').textContent=this.value">
-      <span id="scoreVal" class="chip" style="border-style:dashed">3</span>
-      <span class="sub">1=控えめ / 5=高め</span>
+      <input id="inScore" type="range" min="0" max="100" step="1" value="50" oninput="document.getElementById('scoreVal').textContent=this.value">
+      <span id="scoreVal" class="chip" style="border-style:dashed">50</span>
     </div>
 
+    <!-- 友だちID -->
     <label>友だちのLINE ID（改行で複数）<textarea id="inFriends" placeholder="例：friend_aaa
 friend_bbb"></textarea></label>
-    <label>メモ（任意）<textarea id="inNote" placeholder="連絡先や希望など"></textarea></label>
 
     <div class="hrow" style="gap:8px;margin-top:6px">
       <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
@@ -140,22 +160,27 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
-  // 年齢選択を生成
+  // 年齢選択の選択肢を生成
   (function(){
     const minSel=document.getElementById('ageMin'); const maxSel=document.getElementById('ageMax');
     for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); minSel.appendChild(o); }
     for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=String(i); maxSel.appendChild(o); }
   })();
 
-  // 人数チップ
-  const sizeSel = { value:null };
-  document.addEventListener("click",(e)=>{
-    if(e.target.classList.contains("chip")){
-      document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-      e.target.classList.add("active");
-      sizeSel.value = e.target.getAttribute("data-v");
-    }
-  });
+  // 汎用：チップグループ
+  function makeChipGroup(containerId){
+    const el = document.getElementById(containerId);
+    const sel = { value:null };
+    el.addEventListener('click', (e)=>{
+      const t = e.target.closest('.chip'); if(!t) return;
+      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      t.classList.add('active');
+      sel.value = t.dataset.v;
+    });
+    return sel;
+  }
+  const sizeSel   = makeChipGroup('chipsSize');   // 2v2 / 3v3
+  const genderSel = makeChipGroup('chipsGender'); // male / female
 
   async function postJSON(url, body){
     const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
@@ -168,14 +193,20 @@ friend_bbb"></textarea></label>
 
   document.getElementById("btnCreateApply").addEventListener("click", async ()=>{
     const group = sizeSel.value || "2v2";
-    const area = document.getElementById("inArea").value.trim();
+    const targetGender = genderSel.value; // 必須
+    if(!targetGender){ alert("希望相手グループの性別を選択してください。"); return; }
+
+    const area = document.getElementById("inArea").value;
+    if(!area){ alert("エリアを選択してください。"); return; }
+
     const ageMin = Number(document.getElementById("ageMin").value||0);
     const ageMax = Number(document.getElementById("ageMax").value||0);
     if(ageMin && ageMax && ageMin>ageMax){ alert("年齢の下限・上限が逆になっています。"); return; }
-    const score = Number(document.getElementById("inScore").value||3);
+
+    const score = Number(document.getElementById("inScore").value||50);
     const friends = (document.getElementById("inFriends").value||"").split(/\\n+/).map(s=>s.trim()).filter(Boolean);
-    const note = document.getElementById("inNote").value.trim();
-    APPLY.draft = { group, area, ageMin, ageMax, score, friends, note, ts: Date.now() };
+
+    APPLY.draft = { group, targetGender, area, ageMin, ageMax, score, friends, ts: Date.now() };
     await sendAction("apply_draft", APPLY.draft);
     show("stepConsent"); mark(1);
   });
