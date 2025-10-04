@@ -1,7 +1,7 @@
 /* ===== api.js ===== */
 (function(global){
   // ★GAS WebアプリURL（あなたの新URLに更新）
-  const API_URL = "https://script.google.com/macros/s/AKfycbxoQU_HzEuDiCUuKaeznE6PJ6j5_WjNnevx9jfU137QPR9fqxUrFCa6l32pdUTACIA/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzHp4U585kJEC1BZ5KYRr2V561XF5snofYBCXCJCbZtdfayQmlDu-yGOXxyaCVL7ai2/exec";
 
   async function postJSON(body){
     const res = await fetch(API_URL, {
