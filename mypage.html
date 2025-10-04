@@ -2,74 +2,189 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1, minimum-scale=1" />
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<!-- 共有ユーティリティ（必須） -->
 <script src="api.js"></script>
 <style>
-:root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; --fs:13px; }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;font-size:var(--fs);touch-action:manipulation;}
-.wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-.hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ttl{font-weight:800;font-size:18px}
-.sub{color:var(--muted)}
-.card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
-.btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:14px;font-size:14px;cursor:pointer}
-.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.row{display:flex;gap:10px;align-items:center}
-input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff}
-.badge{display:inline-block;background:#E7EFE7;color:#0b5b42;border-radius:999px;padding:4px 8px;font-weight:700}
-.tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-.tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
-.tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-.tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  :root{
+    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280;
+    --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
+    --fs:14px; --fs-sm:12.5px; --fs-lg:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans JP",sans-serif;
+    line-height:1.6; overflow-x:hidden; font-size:var(--fs);
+    -webkit-text-size-adjust:100%;
+  }
+  /* 横書き固定＆ズーム禁止 */
+  html{ writing-mode: horizontal-tb !important; -webkit-writing-mode: horizontal-tb !important; text-orientation: mixed !important;}
+  *{ touch-action: manipulation; }
+
+  .wrap{ max-width:720px; margin:0 auto; padding:12px 16px 112px; }
+
+  header{ position:sticky; top:0; z-index:20; background:var(--bg); padding:10px 16px; }
+  .hrow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .ttl{ font-weight:800; font-size:var(--fs-lg); }
+  .sub{ color:var(--muted); font-size:var(--fs-sm); }
+
+  .pill{ display:inline-flex; align-items:center; justify-content:center; padding:8px 12px;
+         border-radius:999px; background:#E7EFE7; color:#10381F; font-weight:700; }
+  .pill.kyc-ok{ background:#E7F5ED; color:#065F46; }
+  .pill.kyc-ng{ background:#FEE2E2; color:#991B1B; }
+
+  .btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#111827;
+        padding:14px 16px; border-radius:14px; cursor:pointer; font-size:var(--fs); }
+  .btn.primary{ background:var(--accent); color:#fff; border-color:transparent; }
+  .btn.outline{ background:#fff; }
+  .btn.small{ padding:10px 12px; font-size:var(--fs-sm); }
+
+  .card{ background:#FFF; border:1px solid var(--border); border-radius:var(--radius);
+         padding:16px; box-shadow:0 4px 12px rgba(0,0,0,.04); margin-bottom:12px; }
+  .row{ display:flex; align-items:center; gap:10px; }
+  .row.spread{ justify-content:space-between; }
+
+  .kv{ display:grid; grid-template-columns: 136px 1fr; gap:8px 12px; }
+  .kv .label{ font-weight:700; }
+  .kv .value{ border-bottom:1px dashed var(--border); min-height:28px; padding-bottom:6px; }
+
+  .edit-toggle{ margin-left:auto; }
+
+  /* 編集フォーム */
+  .form{ display:grid; grid-template-columns:1fr; gap:12px; }
+  label{ font-weight:700; }
+  input, select, textarea{
+    width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; background:#fff;
+    font-size:var(--fs);
+  }
+  textarea{ min-height:84px; resize:vertical; }
+  .hint{ font-size:var(--fs-sm); color:var(--muted); }
+
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{ padding:8px 10px; background:#FAFAF7; border:1px solid var(--border); border-radius:999px; font-size:var(--fs-sm); }
+
+  .list{ display:grid; gap:10px; }
+  .note{ border-left:4px solid #E5F6EA; background:#F7FFFB; padding:10px 12px; border-radius:10px; }
+
+  .tabbar{ position:fixed; left:0; right:0; bottom:0; height:96px; background:rgba(255,255,255,.96);
+           backdrop-filter:blur(10px); border-top:1px solid var(--border); display:flex; z-index:30;
+           padding-bottom:calc(env(safe-area-inset-bottom) + 8px) }
+  .tabbar a{ flex:1; text-decoration:none; color:#6B7280; padding:18px 6px; display:flex; flex-direction:column; gap:6px; align-items:center; min-height:76px; text-align:center }
+  .tabicon{ width:24px; height:24px; border-radius:6px; background:#CBD5CB }
+  .tabbar .active{ color:#0d3a23; font-weight:800 } .tabbar .active .tabicon{ background:var(--accent) }
+
+  /* UID 行 */
+  .uidline{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .uid{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; letter-spacing: .3px; }
+
 </style>
 </head>
 <body>
-<header><div class="hrow"><div class="ttl">マイページ</div><span class="badge" id="uid">—</span></div></header>
+<header>
+  <div class="hrow">
+    <div class="ttl">マイページ</div>
+    <div class="sub" id="siteSub"></div>
+  </div>
+</header>
+
 <main class="wrap">
 
+  <!-- UID & コピー -->
   <section class="card">
-    <div class="hrow" style="justify-content:space-between">
-      <div class="ttl" style="font-size:17px">プロフィール</div>
-      <button class="btn" id="editBtn">編集</button>
+    <div class="row spread">
+      <div class="sub">UID: <span class="uid" id="uid">—</span></div>
+      <button class="btn small outline" id="copyUID">コピー</button>
     </div>
+  </section>
 
-    <div id="profView" class="sub"></div>
+  <!-- プロフィール（閲覧モード） -->
+  <section class="card" id="profView">
+    <div class="row spread" style="margin-bottom:4px">
+      <div class="ttl" style="font-size:16px">プロフィール</div>
+      <button class="btn small outline edit-toggle" id="toEdit">編集</button>
+    </div>
+    <div class="kv">
+      <div class="label">ニックネーム</div><div class="value" id="v_name">—</div>
+      <div class="label">年齢</div><div class="value" id="v_age">—</div>
+      <div class="label">エリア</div><div class="value" id="v_area">—</div>
+      <div class="label">趣味</div><div class="value" id="v_hobby">—</div>
+      <div class="label">好きなこと</div><div class="value" id="v_like">—</div>
+      <div class="label">普段何してる</div><div class="value" id="v_daily">—</div>
+      <div class="label">仕事</div><div class="value" id="v_job">—</div>
+      <div class="label">学校</div><div class="value" id="v_school">—</div>
+      <div class="label">自由記入</div><div class="value" id="v_free">—</div>
+    </div>
+  </section>
 
-    <div id="profForm" style="display:none;margin-top:10px">
-      <label>ニックネーム（必須）<input id="pfName" /></label>
-      <label style="margin-top:8px">年齢（必須）<input id="pfAge" type="number" min="18" max="80" /></label>
-      <label style="margin-top:8px">エリア（必須）
-        <select id="pfArea"><option value="">選択してください</option><option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option><option>名古屋</option><option>大阪</option><option>福岡</option></select>
+  <!-- プロフィール（編集モード） -->
+  <section class="card" id="profEdit" style="display:none">
+    <div class="ttl" style="font-size:16px">プロフィール編集</div>
+    <p class="hint">※ <b>ニックネーム・年齢・エリア</b>は必須です。</p>
+    <div class="form">
+      <label>ニックネーム（必須）<input id="name" placeholder="例）おかか" maxlength="40"></label>
+      <label>年齢（必須）<input id="age" type="number" min="18" max="80" placeholder="例）21"></label>
+      <label>エリア（必須）
+        <select id="area">
+          <option value="">選択してください</option>
+          <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
+          <option>名古屋</option><option>大阪</option><option>福岡</option>
+        </select>
       </label>
-      <div class="row" style="justify-content:flex-end;margin-top:10px">
-        <button class="btn" id="cancelEdit">キャンセル</button>
-        <button class="btn primary" id="saveProf">保存</button>
+      <label>趣味<input id="hobby" placeholder="例）カフェ巡り"></label>
+      <label>好きなこと<input id="like" placeholder="例）映画・旅行"></label>
+      <label>普段何してる<input id="daily" placeholder="例）大学・バイト・ジム"></label>
+      <label>仕事<input id="job" placeholder="例）営業"></label>
+      <label>学校<input id="school" placeholder="例）○○大学 △△学部"></label>
+      <label>自由記入<textarea id="free" placeholder="自由にどうぞ"></textarea></label>
+      <div class="row" style="gap:10px; justify-content:flex-end">
+        <button class="btn outline" id="cancelEdit">キャンセル</button>
+        <button class="btn primary" id="saveEdit" disabled>保存する</button>
       </div>
     </div>
   </section>
 
+  <!-- 本人確認 -->
   <section class="card">
-    <div class="ttl" style="font-size:17px">本人確認</div>
-    <div class="row" style="gap:8px">
-      <span class="badge" id="kycBadge">未確認</span>
-      <button class="btn" id="kycMale">男性で確認（デモ）</button>
-      <button class="btn" id="kycFemale">女性で確認（デモ）</button>
-      <button class="btn" id="kycReset">リセット</button>
+    <div class="ttl" style="font-size:16px">本人確認</div>
+    <div class="row" style="gap:8px; margin-top:10px">
+      <span class="pill" id="kycBadge">未完了</span>
+      <span class="sub">※ デモ：性別を選ぶと完了扱い</span>
+    </div>
+    <div class="chips" style="margin-top:12px">
+      <button class="btn small outline" id="kycAsFemale">女性として確認</button>
+      <button class="btn small outline" id="kycAsMale">男性として確認</button>
+      <button class="btn small outline" id="kycReset">再撮影（やり直し）</button>
+    </div>
+    <p class="hint" style="margin-top:10px">※ 本番では外部 eKYC を起動します。</p>
+  </section>
+
+  <!-- 履歴 -->
+  <section class="card">
+    <div class="ttl" style="font-size:16px">履歴</div>
+    <div id="history" class="list" style="margin-top:8px">
+      <div class="sub">まだ履歴がありません。</div>
     </div>
   </section>
 
+  <!-- お問い合わせ -->
   <section class="card">
-    <div class="ttl" style="font-size:17px">問い合わせ</div>
-    <div class="sub">ご不明点はLINEでお問い合わせください。</div>
+    <div class="ttl" style="font-size:16px">お問い合わせ</div>
+    <p class="sub">ご不明点は下記からご連絡ください。</p>
+    <div class="row" style="gap:8px; margin-top:6px">
+      <a class="btn outline" href="mailto:support@example.com?subject=お問い合わせ">メールで問い合わせ</a>
+      <a class="btn outline" href="#" onclick="try{liff.openWindow({url:'https://line.me/R/ti/p/@your_official', external:true})}catch(e){location.href='https://line.me/R/ti/p/@your_official'}">LINE公式を開く</a>
+    </div>
   </section>
 
 </main>
 
+<!-- Tab -->
 <nav class="tabbar">
   <a href="index.html"><span class="tabicon"></span>ホーム</a>
   <a href="apply.html"><span class="tabicon"></span>申込み</a>
@@ -77,61 +192,173 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);bor
 </nav>
 
 <script>
-const APP={ LIFF_ID:"2008178197-ELrxabO9" };
-const $=s=>document.querySelector(s);
+  const $ = s => document.querySelector(s);
+  const get = k => JSON.parse(localStorage.getItem(k) || "null");
+  const put = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+  const uidKey = 'app.uid';
 
-function ensureUID(){
-  let uid = localStorage.getItem('appUID');
-  if(!uid){
-    uid='GX-'+Math.random().toString(36).slice(2,6).toUpperCase()+'-'+Date.now().toString().slice(-6);
-    localStorage.setItem('appUID',uid);
+  function fillView(k, v){
+    $(k).textContent = (v && String(v).trim()) ? v : '—';
   }
-  $("#uid").textContent = localStorage.getItem('appUID');
-}
 
-function renderProf(){
-  const p = JSON.parse(localStorage.getItem('profile')||'{}');
-  $("#profView").innerHTML = `
-    <div>ニックネーム：${p.name||'—'}</div>
-    <div>年齢：${p.age||'—'}</div>
-    <div>エリア：${p.area||'—'}</div>
-  `;
-  $("#pfName").value = p.name||'';
-  $("#pfAge").value  = p.age||'';
-  $("#pfArea").value = p.area||'';
-}
+  function renderProfileView(){
+    const p = get('profile') || {};
+    fillView('#v_name',   p.name);
+    fillView('#v_age',    p.age);
+    fillView('#v_area',   p.area);
+    fillView('#v_hobby',  p.hobby);
+    fillView('#v_like',   p.like);
+    fillView('#v_daily',  p.daily);
+    fillView('#v_job',    p.job);
+    fillView('#v_school', p.school);
+    fillView('#v_free',   p.free);
+  }
 
-function renderKyc(){
-  const k=JSON.parse(localStorage.getItem('kyc')||'{}');
-  $("#kycBadge").textContent = k.verified ? `確認済み（${k.gender||'不明'}）` : '未確認';
-}
+  function openEdit(){
+    const p = get('profile') || {};
+    $('#name').value   = p.name   || '';
+    $('#age').value    = p.age    || '';
+    $('#area').value   = p.area   || '';
+    $('#hobby').value  = p.hobby  || '';
+    $('#like').value   = p.like   || '';
+    $('#daily').value  = p.daily  || '';
+    $('#job').value    = p.job    || '';
+    $('#school').value = p.school || '';
+    $('#free').value   = p.free   || '';
+    validateEdit();
+    $('#profView').style.display='none';
+    $('#profEdit').style.display='block';
+  }
+  function closeEdit(){
+    $('#profEdit').style.display='none';
+    $('#profView').style.display='block';
+  }
+  function validateEdit(){
+    const ok = ($('#name').value.trim() && $('#age').value && $('#area').value);
+    $('#saveEdit').disabled = !ok;
+  }
 
-document.addEventListener('DOMContentLoaded', async ()=>{
-  try{
-    await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
-    if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-    ensureUID();
-    const pf=await liff.getProfile(); await SYNC.syncOnLogin(pf);
-  }catch(e){ console.warn(e); }
+  function renderKYC(){
+    const k = get('kyc') || {};
+    const badge = $('#kycBadge');
+    if(k.verified){
+      badge.textContent = `完了（${k.gender==='female'?'女性':'男性'}）`;
+      badge.classList.add('kyc-ok'); badge.classList.remove('kyc-ng');
+    }else{
+      badge.textContent = '未完了';
+      badge.classList.remove('kyc-ok'); badge.classList.add('kyc-ng');
+    }
+  }
 
-  renderProf(); renderKyc();
+  function renderHistory(){
+    const list = get('invite.history') || [];
+    const box = $('#history');
+    box.innerHTML = '';
+    if(!list.length){
+      box.innerHTML = '<div class="sub">まだ履歴がありません。</div>';
+      return;
+    }
+    list.slice().reverse().forEach(x=>{
+      const el = document.createElement('div');
+      el.className='note';
+      el.innerHTML = `<div class="sub">${x.date || ''}</div><div>${x.text || ''}</div>`;
+      box.appendChild(el);
+    });
+  }
 
-  $("#editBtn").addEventListener('click', ()=>{ $("#profForm").style.display='block'; });
-  $("#cancelEdit").addEventListener('click', ()=>{ $("#profForm").style.display='none'; renderProf(); });
-
-  $("#saveProf").addEventListener('click', async ()=>{
-    const name=$("#pfName").value.trim(); const age=$("#pfAge").value.trim(); const area=$("#pfArea").value.trim();
-    if(!name||!age||!area){ alert('ニックネーム・年齢・エリアは必須です'); return; }
-    localStorage.setItem('profile', JSON.stringify({name, age, area}));
-    $("#profForm").style.display='none'; renderProf();
-    await SYNC.syncNow();
-    alert('保存しました');
+  document.addEventListener('input', (e)=>{
+    if(['name','age','area','hobby','like','daily','job','school','free'].includes(e.target.id)){
+      validateEdit();
+    }
   });
 
-  $("#kycMale").addEventListener('click', async ()=>{ localStorage.setItem('kyc', JSON.stringify({verified:true, gender:'male'})); renderKyc(); await SYNC.syncNow(); });
-  $("#kycFemale").addEventListener('click', async ()=>{ localStorage.setItem('kyc', JSON.stringify({verified:true, gender:'female'})); renderKyc(); await SYNC.syncNow(); });
-  $("#kycReset").addEventListener('click', async ()=>{ localStorage.setItem('kyc', JSON.stringify({verified:false})); renderKyc(); await SYNC.syncNow(); });
-});
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    $("#siteSub").textContent = location.hostname.replace(/^www\./,'');
+    renderProfileView(); renderKYC(); renderHistory();
+
+    // コピー
+    $('#copyUID').addEventListener('click', async ()=>{
+      const u = $('#uid').textContent.trim();
+      try{ await navigator.clipboard.writeText(u); alert('UIDをコピーしました'); }
+      catch{ prompt('コピーできない環境です。手動でコピーしてください。', u); }
+    });
+
+    // 編集トグル
+    $('#toEdit').addEventListener('click', openEdit);
+    $('#cancelEdit').addEventListener('click', closeEdit);
+
+    // 保存
+    $('#saveEdit').addEventListener('click', async ()=>{
+      const prof = {
+        name: $('#name').value.trim(),
+        age:  Number($('#age').value||0),
+        area: $('#area').value,
+        hobby: $('#hobby').value.trim(),
+        like:  $('#like').value.trim(),
+        daily: $('#daily').value.trim(),
+        job:   $('#job').value.trim(),
+        school:$('#school').value.trim(),
+        free:  $('#free').value.trim()
+      };
+      put('profile', prof);
+      renderProfileView();
+      closeEdit();
+
+      // サーバ同期（シート連携）
+      try{
+        const line = await liff.getProfile().catch(()=>({displayName:'', userId:''}));
+        const uid = localStorage.getItem(uidKey) || '';
+        await SYNC.upsertUser({
+          uid, lineUserId: line.userId, displayName: line.displayName,
+          profile: prof
+        });
+      }catch(e){ console.warn(e); }
+      alert('プロフィールを保存しました');
+    });
+
+    // KYC デモ
+    $('#kycAsFemale').addEventListener('click', async ()=>{
+      put('kyc', {verified:true, gender:'female'});
+      renderKYC();
+      try{
+        const uid = localStorage.getItem(uidKey)||'';
+        await SYNC.upsertUser({ uid, kyc:{verified:true, gender:'female'} });
+      }catch(e){}
+    });
+    $('#kycAsMale').addEventListener('click', async ()=>{
+      put('kyc', {verified:true, gender:'male'});
+      renderKYC();
+      try{
+        const uid = localStorage.getItem(uidKey)||'';
+        await SYNC.upsertUser({ uid, kyc:{verified:true, gender:'male'} });
+      }catch(e){}
+    });
+    $('#kycReset').addEventListener('click', async ()=>{
+      put('kyc', {verified:false});
+      renderKYC();
+      try{
+        const uid = localStorage.getItem(uidKey)||'';
+        await SYNC.upsertUser({ uid, kyc:{verified:false} });
+      }catch(e){}
+    });
+
+    // LIFF 初期化＆ログイン・UID 確定・同期
+    try{
+      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
+      if(!liff.isLoggedIn()){ liff.login({redirectUri: location.href}); return; }
+      const prof = await liff.getProfile();
+      const uid = ensureAppUID(prof.userId);             // 既存なら再利用
+      $('#uid').textContent = uid;
+
+      // 初回ログイン時の upsert
+      await SYNC.syncOnLogin(prof);
+    }catch(e){
+      console.warn(e);
+      // LIFF 不使用環境のためローカル UID を最低限表示
+      const uid = localStorage.getItem(uidKey) || ensureAppUID('LOCAL-'+Date.now());
+      $('#uid').textContent = uid;
+    }
+  });
 </script>
 </body>
 </html>
