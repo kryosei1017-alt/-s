@@ -1,55 +1,87 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>利用規約</title>
+<meta name="theme-color" content="#F6F3EE" />
 <style>
-  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.8;margin:0;background:#F6F3EE;color:#111}
-  main{max-width:900px;margin:0 auto;padding:24px}
-  h1{font-size:22px;margin:0 0 12px;font-weight:800}
-  h2{font-size:18px;margin:20px 0 8px}
-  .card{background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
-  small{color:#6B7280}
+  :root{
+    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
+    --fs:13px; /* 非太字の統一サイズ */
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.75; font-size:var(--fs);
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+  }
+  .wrap{max-width:800px;margin:0 auto;padding:20px 18px 80px}
+  h1{font-size:20px;margin:8px 0 14px;font-weight:800}
+  h2{font-size:16px;margin:22px 0 8px;font-weight:800}
+  p,li{margin:6px 0}
+  .note{color:var(--muted)}
+  .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+  a{color:#0C7C59}
 </style>
 </head>
 <body>
-<main>
+<div class="wrap">
+  <h1>利用規約</h1>
+  <p class="note">最終更新日：2025-10-04</p>
+
   <div class="card">
-    <h1>利用規約 <small>（最終更新：2025-10-04）</small></h1>
-    <p>本規約は、本サービス（LIFFミニアプリ）をご利用いただく際の条件を定めるものです。ユーザーは本サービスの利用により、本規約に同意したものとみなされます。</p>
-
-    <h2>1. アカウント・認証・年齢</h2>
-    <ul>
-      <li>本サービスはLINEログインを利用します。</li>
-      <li><b>18歳未満の方はご利用いただけません。</b></li>
-      <li>年齢確認のため、必要に応じて<b>本人確認（身分証およびセルフィー）</b>をお願いする場合があります。</li>
-    </ul>
-
-    <h2>2. 申込み・決済・抽選</h2>
-    <ul>
-      <li>申込み情報（人数構成、エリア、年齢希望、自己評価等）はマッチング・抽選・運営連絡のために利用します。</li>
-      <li>決済後のキャンセル・返金可否は企画ごとのルールに従います。</li>
-      <li>抽選結果は最終とし、異議は受け付けません。</li>
-    </ul>
-
-    <h2>3. コミュニティ・禁止事項</h2>
-    <ul>
-      <li>迷惑行為、不適切表現、なりすまし、他者の権利侵害を禁止します。</li>
-      <li>複数アカウントの悪用、不正なリファラル、同一人物による重複申込みを禁止します。</li>
-    </ul>
-
-    <h2>4. 個人情報・データ取扱い</h2>
-    <p>入力データ・本人確認画像は運営目的に限り利用し、不要となったデータは適切に削除します。詳細はプライバシーポリシーに準拠します。</p>
-
-    <h2>5. 免責</h2>
-    <p>本サービスは現状有姿で提供され、システム障害等による損害について運営は責任を負いません。</p>
-
-    <h2>6. 規約の変更</h2>
-    <p>本規約は必要に応じて変更されます。重要な変更がある場合はアプリ内でお知らせします。</p>
-
-    <h2>7. 連絡先</h2>
-    <p>運営への連絡はアプリ内のフォームまたは公式アカウントより行ってください。</p>
+    <p>この利用規約（以下「本規約」）は、本サービスの利用条件を定めるものです。ユーザーは、本サービスを利用することにより、本規約に同意したものとみなされます。</p>
   </div>
-</main>
+
+  <h2>1. 本サービスの概要</h2>
+  <ul>
+    <li>グループマッチングの申込み、抽選、連絡等の機能を提供します。</li>
+    <li>本人確認（KYC）は外部eKYCサービスと連携予定です。現時点のデモでは端末内保存（ローカル）で状態を切替えます。</li>
+  </ul>
+
+  <h2>2. アカウント</h2>
+  <ul>
+    <li>本サービスはLINEログイン（LIFF）を利用します。</li>
+    <li>ユーザーは正確なプロフィール（ニックネーム・エリア・年齢）を登録・維持してください。</li>
+  </ul>
+
+  <h2>3. 本人確認（KYC）</h2>
+  <ul>
+    <li>年齢確認・なりすまし防止のため、必要に応じて公的身分証とセルフィーの提出が必要です。</li>
+    <li>確認結果が未完了の場合、申込みはできません。</li>
+    <li>デモ環境では性別判定をローカルで模擬し、決済条件に反映します（女性は無料）。</li>
+  </ul>
+
+  <h2>4. 料金・サブスク・決済</h2>
+  <ul>
+    <li>男性ユーザー：単発申込みは<span class="note">1000pt</span>の消費、サブスク加入時は初回<span class="note">1980pt</span>、次回以降の申込みは<span class="note">0pt</span>。</li>
+    <li>女性ユーザー：申込みは<span class="note">0pt</span>。</li>
+    <li>チャージはポイント（pt）として扱われ、残高が不足する場合は申込みできません。</li>
+    <li>デモ環境のチャージは端末内保存のみであり、実決済ではありません。</li>
+  </ul>
+
+  <h2>5. 禁止事項</h2>
+  <ul>
+    <li>虚偽の情報登録、第三者へのなりすまし。</li>
+    <li>法令または公序良俗に反する行為。</li>
+    <li>他者の権利を侵害する行為、迷惑行為。</li>
+  </ul>
+
+  <h2>6. 免責</h2>
+  <ul>
+    <li>デモ環境のデータは端末に保存され、消失の可能性があります。</li>
+    <li>当社は、通信障害・外部サービス障害等による不具合について責任を負いません。</li>
+  </ul>
+
+  <h2>7. 規約の変更</h2>
+  <p>本規約は必要に応じて変更されます。変更後の内容は本ページで告知します。</p>
+
+  <h2>8. お問い合わせ</h2>
+  <p>アプリ内の「マイページ → 問い合わせ」からご連絡ください。</p>
+
+  <p class="note" style="margin-top:18px">本規約に同意のうえ、本サービスをご利用ください。</p>
+</div>
 </body>
 </html>
