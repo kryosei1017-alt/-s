@@ -1,166 +1,112 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<!-- ★ズーム無効化 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜マイページ</title>
-<meta name="theme-color" content="#F6F3EE">
+<meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;}
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-  .hrow{display:flex;align-items:center;gap:10px}
+  :root{
+    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
+    --tabbarH:96px; --headerH:56px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.6;overflow-x:hidden;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
+        min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
+  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
+  .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
   label{display:block;font-size:14px;margin:10px 0 6px}
   input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
   textarea{min-height:88px;resize:vertical}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .muted{color:#6B7280}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
+  .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
+  .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:#0C7C59}
-  .avatar{width:64px;height:64px;border-radius:50%;background:#D1D5DB;display:grid;place-items:center;font-weight:700;overflow:hidden}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid}
-  .b-gray{color:#374151;border-color:#D1D5DB;background:#F3F4F6}
-  .b-warn{color:#92400e;border-color:#FCD34D;background:#FFFBEB}
-  .b-ok{color:#065f46;border-color:#6EE7B7;background:#ECFDF5}
-  .b-ng{color:#991b1b;border-color:#FCA5A5;background:#FEF2F2}
-  .preview{display:flex;gap:10px;align-items:center;margin-top:8px}
-  .preview img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#fff}
-  .note{font-size:12px;color:#6B7280}
-  .req{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:8px;background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700}
-  .err{color:#991B1B;font-size:12px;display:none;margin-top:6px}
+  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
 </head>
 <body>
 <header>
   <div class="hrow">
     <div class="ttl">マイページ</div>
-    <div class="sub">プロフィール / サブスク / 本人確認</div>
+    <div class="sub">プロフィールと本人確認</div>
   </div>
 </header>
 
 <main class="wrap">
-  <section>
-    <!-- ヘッダー -->
-    <div class="card">
-      <div class="hrow" style="justify-content:space-between;align-items:center">
-        <div class="hrow" style="gap:12px;align-items:center">
-          <div id="avatar" class="avatar">🙂</div>
-          <div>
-            <div class="ttl" id="uname">—</div>
-            <div class="sub" id="uid">—</div>
-          </div>
-        </div>
-        <button class="btn" id="btnLogout">ログアウト</button>
-      </div>
+  <!-- KYC -->
+  <div class="card">
+    <div class="hrow" style="justify-content:space-between;align-items:center">
+      <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
+      <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
     </div>
+    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」画面にも反映されます。</p>
 
-    <!-- プロフィール -->
-    <div class="card">
-      <div class="ttl" style="font-size:16px">プロフィール</div>
-
-      <label>ニックネーム <span class="req">必須</span>
-        <input id="edNick" placeholder="ニックネーム" required>
-      </label>
-      <div id="errNick" class="err">ニックネームを入力してください。</div>
-
-      <label>エリア <span class="req">必須</span>
-        <input id="edArea" placeholder="例：東京 / 大阪 / 名古屋 など" required>
-      </label>
-      <div id="errArea" class="err">エリアを入力してください。</div>
-
-      <label>年齢 <span class="req">必須</span>
-        <input id="edAge" type="number" min="18" max="99" placeholder="例：25" required>
-      </label>
-      <div id="errAge" class="err">年齢は18〜99の整数で入力してください。</div>
-
-      <label>趣味
-        <input id="edHobby" placeholder="例：カフェ巡り、サウナ、サッカー">
-      </label>
-
-      <label>好きなこと
-        <input id="edLike" placeholder="例：映画、旅行、料理">
-      </label>
-
-      <label>普段何してる（ライフスタイル）
-        <textarea id="edRoutine" placeholder="例：平日はIT企業で勤務、週末はアウトドアなど"></textarea>
-      </label>
-
-      <label>仕事
-        <input id="edJob" placeholder="例：営業 / エンジニア / 医療 など">
-      </label>
-
-      <label>学校
-        <input id="edSchool" placeholder="例：◯◯大学 / ◯◯専門学校 など">
-      </label>
-
-      <label>自由記入
-        <textarea id="edFree" placeholder="自己PRや希望条件など自由に入力"></textarea>
-      </label>
-
-      <div class="row" style="margin-top:8px">
-        <button class="btn primary" id="edSave">保存</button>
+    <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
+      <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
+      <div class="chips" id="chipsKyc">
+        <span class="chip" data-v="none">未完了</span>
+        <span class="chip" data-v="male">男性で確認済み</span>
+        <span class="chip" data-v="female">女性で確認済み</span>
       </div>
+      <div class="muted">・設定は端末に保存され、<b>申込みの決済条件</b>に反映されます（女性は無料）。</div>
     </div>
+  </div>
 
-    <!-- KYC -->
-    <div class="card">
-      <div class="ttl" style="font-size:16px">本人確認（KYC） <span id="badge" class="badge b-gray">未提出</span></div>
-      <div class="note">※ ピンぼけ・反射・マスク・加工は審査NGの原因になります。明るい場所で、四隅が入るよう撮影してください。</div>
-
-      <div class="row" style="margin-top:10px">
-        <select id="docType" style="flex:1">
-          <option value="license">運転免許証</option>
-          <option value="myNumber">マイナンバーカード</option>
-          <option value="passport">パスポート</option>
+  <!-- プロフィール -->
+  <div class="card">
+    <div class="ttl" style="font-size:16px">プロフィール</div>
+    <div class="grid">
+      <label>ニックネーム（必須）<input id="pfName" placeholder="例：りょう"></label>
+      <label>エリア（必須）
+        <select id="pfArea">
+          <option value="">選択してください</option>
+          <option value="tokyo">東京</option>
+          <option value="yokohama">横浜</option>
+          <option value="chiba">千葉</option>
+          <option value="saitama">埼玉</option>
+          <option value="nagoya">名古屋</option>
+          <option value="osaka">大阪</option>
+          <option value="fukuoka">福岡</option>
         </select>
+      </label>
+      <label>年齢（必須）<input id="pfAge" type="number" min="18" max="80" placeholder="例：24"></label>
 
-        <label class="btn" style="flex:1;text-align:center">
-          身分証を選択<input id="docFile" type="file" accept="image/*" capture="environment" style="display:none">
-        </label>
-        <label class="btn" style="flex:1;text-align:center">
-          セルフィー<input id="selfieFile" type="file" accept="image/*" capture="user" style="display:none">
-        </label>
-      </div>
-
-      <!-- プレビュー & 再撮影 -->
-      <div class="preview" id="docPreview" style="display:none">
-        <img id="docImg" alt="">
-        <div class="note" style="flex:1">身分証プレビュー</div>
-        <button class="btn" id="docRetake">再撮影（身分証）</button>
-      </div>
-      <div class="preview" id="selfiePreview" style="display:none">
-        <img id="selfieImg" alt="">
-        <div class="note" style="flex:1">セルフィープレビュー</div>
-        <button class="btn" id="selfieRetake">再撮影（セルフィー）</button>
-      </div>
-
-      <div class="row" style="margin-top:8px">
-        <button class="btn" id="kycReset">リセット</button>
-        <button class="btn primary" id="kycSubmit" disabled>提出する</button>
-      </div>
+      <label>趣味<textarea id="pfHobby" placeholder="例：旅行、グルメ、スポーツ観戦"></textarea></label>
+      <label>好きなこと<textarea id="pfLike" placeholder="例：カフェ巡り、映画、サウナ"></textarea></label>
+      <label>普段何してる<textarea id="pfDaily" placeholder="例：会社員／大学生／自営業など"></textarea></label>
+      <label>仕事<textarea id="pfJob" placeholder="例：営業、エンジニア、看護師など"></textarea></label>
+      <label>学校<textarea id="pfSchool" placeholder="例：〇〇大学 △△学部"></textarea></label>
+      <label>自由記入<textarea id="pfFree" placeholder="自由にどうぞ"></textarea></label>
     </div>
-
-    <!-- サブスク -->
-    <div class="card">
-      <div class="ttl" style="font-size:16px">サブスク</div>
-      <div id="subStatus">未加入</div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn primary" id="btnJoinSub">加入</button>
-        <button class="btn" id="btnCancelSub">解約</button>
-      </div>
+    <div class="hrow" style="gap:8px;margin-top:12px">
+      <button class="btn primary" id="saveProfile">保存する</button>
     </div>
-
-    <!-- 履歴カードは削除済み -->
-  </section>
+    <p id="saveMsg" class="muted" style="display:none;margin-top:6px">保存しました。</p>
+  </div>
 </main>
 
 <nav class="tabbar">
@@ -170,162 +116,93 @@
 </nav>
 
 <script>
-  const APP = { LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const STATE = {
-    profile: JSON.parse(localStorage.getItem("profile")||"{}"),
-    sub: JSON.parse(localStorage.getItem("sub")||"{}"),
-    kyc: JSON.parse(localStorage.getItem("kyc")||"{}") // {status, doc:{...}, selfie:{...}}
-  };
-  const AUTH = { userId:"", idToken:"" };
-  const $=s=>document.querySelector(s);
+  const APP   = { LIFF_ID:"2008178197-ELrxabO9" };
 
-  // 旧キーからの移行（初回のみ）
-  (function migrate(){
-    if(STATE.profile){
-      if(!STATE.profile.area && STATE.profile.pref){ STATE.profile.area = STATE.profile.pref; }
-      delete STATE.profile.pref; delete STATE.profile.city; delete STATE.profile.radius;
-      localStorage.setItem("profile", JSON.stringify(STATE.profile));
+  const $=s=>document.querySelector(s);
+  const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
+  const setProfile= v  => localStorage.setItem("profile", JSON.stringify(v));
+
+  // 共有：KYC helpers（apply.html と同じキー）
+  const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
+  const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
+  const kycVerified = ()=> !!getKyc().verified;
+
+  function renderKycUI(){
+    const k = getKyc();
+    const badge = $("#kycBadge");
+    if(k.verified){
+      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
+      badge.className = "badge ok";
+      badge.textContent = `KYC確認済み：${sex}`;
+    }else{
+      badge.className = "badge ng";
+      badge.textContent = "KYC未完了";
     }
+    // デモチップの見た目
+    const el=$("#chipsKyc"); if(!el) return;
+    [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+    const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
+    const t = el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
+  }
+
+  // デモパネル開閉
+  $("#kycDemoBtn").addEventListener("click", ()=>{
+    const p = $("#kycDemoPanel");
+    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
+  });
+  // デモ選択
+  (function(){
+    const el = $("#chipsKyc"); if(!el) return;
+    el.addEventListener("click",(e)=>{
+      const t = e.target.closest('.chip'); if(!t) return;
+      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      t.classList.add('active');
+      const v = t.dataset.v;
+      if(v==="male")   setKyc({verified:true, gender:'male'});
+      else if(v==="female") setKyc({verified:true, gender:'female'});
+      else            setKyc({verified:false});
+    });
   })();
 
-  function save(){
-    localStorage.setItem("profile", JSON.stringify(STATE.profile));
-    localStorage.setItem("sub", JSON.stringify(STATE.sub));
-    localStorage.setItem("kyc", JSON.stringify(STATE.kyc));
+  // プロフィール表示
+  function fillProfile(){
+    const p = getProfile();
+    $("#pfName").value = p.name||"";
+    $("#pfArea").value = p.area||"";
+    $("#pfAge").value  = p.age||"";
+    $("#pfHobby").value= p.hobby||"";
+    $("#pfLike").value = p.like||"";
+    $("#pfDaily").value= p.daily||"";
+    $("#pfJob").value  = p.job||"";
+    $("#pfSchool").value= p.school||"";
+    $("#pfFree").value = p.free||"";
   }
 
-  function setBadge(status){
-    const b = $("#badge");
-    b.className = "badge b-gray";
-    b.textContent = status || "未提出";
-    if(status==="審査中"){ b.className = "badge b-warn"; }
-    if(status==="承認済み"){ b.className = "badge b-ok"; }
-    if(status==="差し戻し"){ b.className = "badge b-ng"; }
-  }
+  $("#saveProfile").addEventListener("click", ()=>{
+    const name = $("#pfName").value.trim();
+    const area = $("#pfArea").value;
+    const age  = Number($("#pfAge").value);
+    if(!name){ alert("ニックネームは必須です。"); return; }
+    if(!area){ alert("エリアは必須です。"); return; }
+    if(!age){ alert("年齢は必須です。"); return; }
 
-  function render(){
-    $("#edNick").value   = STATE.profile.nick  || "";
-    $("#edArea").value   = STATE.profile.area  || "";
-    $("#edAge").value    = (STATE.profile.age!=null? STATE.profile.age : "");
-    $("#edHobby").value  = STATE.profile.hobby || "";
-    $("#edLike").value   = STATE.profile.like  || "";
-    $("#edRoutine").value= STATE.profile.routine || "";
-    $("#edJob").value    = STATE.profile.job   || "";
-    $("#edSchool").value = STATE.profile.school|| "";
-    $("#edFree").value   = STATE.profile.free  || "";
-
-    $("#subStatus").textContent = STATE.sub.active ? `加入中（${STATE.sub.plan||'ベーシック'}）` : "未加入";
-
-    setBadge(STATE.kyc.status || "未提出");
-    $("#kycSubmit").disabled = !(STATE.kyc.doc && STATE.kyc.selfie);
-
-    if(STATE.kyc.doc && STATE.kyc.doc.preview){ $("#docPreview").style.display = "flex"; $("#docImg").src = STATE.kyc.doc.preview; }
-    else { $("#docPreview").style.display = "none"; }
-    if(STATE.kyc.selfie && STATE.kyc.selfie.preview){ $("#selfiePreview").style.display = "flex"; $("#selfieImg").src = STATE.kyc.selfie.preview; }
-    else { $("#selfiePreview").style.display = "none"; }
-  }
-
-  async function postJSON(url, body){
-    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    return await res.json();
-  }
-  async function sendAction(type,payload){ try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); } }
-
-  // File -> b64 + previewURL
-  function fileToData(f){
-    return new Promise((resolve,reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        const dataUrl = reader.result; // data:image/...;base64,xxxx
-        const base64 = String(dataUrl).split(',')[1];
-        resolve({ name:f.name, type:f.type||"image/jpeg", data: base64, preview: URL.createObjectURL(f) });
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(f);
-    });
-  }
-
-  function validate(){
-    let ok = true;
-    const nick = $("#edNick").value.trim();
-    const area = $("#edArea").value.trim();
-    const ageVal = $("#edAge").value.trim();
-    const ageNum = parseInt(ageVal,10);
-
-    $("#errNick").style.display = nick ? "none":"block";
-    $("#errArea").style.display = area ? "none":"block";
-    const ageValid = !!ageVal && Number.isInteger(ageNum) && ageNum>=18 && ageNum<=99;
-    $("#errAge").style.display = ageValid ? "none":"block";
-
-    if(!nick || !area || !ageValid) ok=false;
-    return ok;
-  }
+    const p = {
+      name, area, age,
+      hobby:$("#pfHobby").value, like:$("#pfLike").value, daily:$("#pfDaily").value,
+      job:$("#pfJob").value, school:$("#pfSchool").value, free:$("#pfFree").value
+    };
+    setProfile(p);
+    $("#saveMsg").style.display="block";
+    setTimeout(()=>$("#saveMsg").style.display="none",1800);
+  });
 
   document.addEventListener("DOMContentLoaded", async ()=>{
-    // LIFFログイン
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-      const prof=await liff.getProfile();
-      AUTH.userId = prof.userId || "";
-      $("#uname").textContent = prof.displayName || "ユーザー";
-      $("#uid").textContent = AUTH.userId;
-      if(prof.pictureUrl){
-        $("#avatar").innerHTML = `<img src="${prof.pictureUrl}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-      }
-      if(!STATE.profile.nick){ STATE.profile.nick = prof.displayName || "ユーザー"; save(); }
     }catch(e){ console.warn(e); }
-
-    // 保存
-    $("#edSave").addEventListener("click", ()=>{
-      if(!validate()) return;
-      STATE.profile = {
-        nick:   $("#edNick").value.trim(),
-        area:   $("#edArea").value.trim(),
-        age:    parseInt($("#edAge").value,10),
-        hobby:  $("#edHobby").value.trim(),
-        like:   $("#edLike").value.trim(),
-        routine:$("#edRoutine").value.trim(),
-        job:    $("#edJob").value.trim(),
-        school: $("#edSchool").value.trim(),
-        free:   $("#edFree").value.trim()
-      };
-      save(); render(); sendAction("update_profile", STATE.profile);
-      alert("保存しました");
-    });
-
-    // KYCファイル
-    $("#docFile").addEventListener("change", async (e)=>{
-      const f=e.target.files && e.target.files[0]; if(!f) return;
-      STATE.kyc.doc = await fileToData(f);
-      save(); render();
-    });
-    $("#selfieFile").addEventListener("change", async (e)=>{
-      const f=e.target.files && e.target.files[0]; if(!f) return;
-      STATE.kyc.selfie = await fileToData(f);
-      save(); render();
-    });
-
-    // 再撮影導線
-    $("#docRetake").addEventListener("click", ()=> $("#docFile").click());
-    $("#selfieRetake").addEventListener("click", ()=> $("#selfieFile").click());
-
-    $("#kycReset").addEventListener("click", ()=>{ STATE.kyc = {}; save(); render(); });
-
-    $("#kycSubmit").addEventListener("click", async ()=>{
-      if(!(STATE.kyc.doc && STATE.kyc.selfie)){ alert("身分証とセルフィーを選択してください。"); return; }
-      STATE.kyc.status = "審査中"; save(); render();
-      await sendAction("kyc_upload", { doc: STATE.kyc.doc, selfie: STATE.kyc.selfie });
-      alert("提出しました。審査中です。");
-    });
-
-    // サブスク
-    $("#btnJoinSub").addEventListener("click", ()=>{ STATE.sub={active:true, plan:"ベーシック", since:new Date().toISOString()}; save(); render(); sendAction("subscribe", STATE.sub); });
-    $("#btnCancelSub").addEventListener("click", ()=>{ STATE.sub={active:false}; save(); render(); sendAction("unsubscribe", {}); });
-    $("#btnLogout").addEventListener("click", ()=>{ try{ if(window.liff && liff.isLoggedIn()) liff.logout(); }catch{} });
-
-    render();
+    if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
+    fillProfile();
   });
 </script>
 </body>
