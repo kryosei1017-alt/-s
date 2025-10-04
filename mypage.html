@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<!-- ズーム無効化（固定表示） -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
@@ -10,7 +9,7 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
-    --tabbarH:96px; --headerH:56px;
+    --tabbarH:96px; --headerH:56px; --fs:13px; /* ← 非太字の統一フォントサイズ */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -19,44 +18,41 @@
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
     line-height:1.6;overflow-x:hidden;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-    touch-action: manipulation;
+    font-size:var(--fs); /* ← 基本サイズを統一 */
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
         min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px}
-  .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:15px;cursor:pointer;writing-mode:horizontal-tb!important}
+  .ttl{font-weight:800;font-size:18px} /* ← 太字は従来通り */
+  .sub{color:var(--muted);font-size:var(--fs)}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;font-size:var(--fs);cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .danger{background:#fff;border-color:#fecaca;color:#7f1d1d}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
-  label{display:block;font-size:14px;margin:8px 0 6px}
-  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  label{display:block;margin:8px 0 6px;font-size:var(--fs)}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:var(--fs)}
   textarea{min-height:88px;resize:vertical}
   .muted{color:#6B7280}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:var(--fs);border:1px solid var(--border);background:#fff}
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
-  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
-  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .grid-def{display:grid;grid-template-columns: 9em 1fr;gap:10px 12px}
-  .val{font-weight:600}
+  .val{font-weight:600} /* 半太字はサイズそのまま（基本サイズで表示） */
   .placeholder{color:#9CA3AF}
-  .right{margin-left:auto}
   .btnRow{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+
+  /* 履歴（招待URL） */
   .list{display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px dashed var(--border);border-radius:12px;padding:10px 12px;background:#fff}
+  .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  .nowrap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
-  .small{font-size:12px;color:#6B7280}
+  .row small{color:#6B7280}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
           backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
           padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;font-size:var(--fs)}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -65,12 +61,12 @@
 <header>
   <div class="hrow">
     <div class="ttl">マイページ</div>
-    <div class="sub">プロフィール・本人確認・履歴・お問い合わせ</div>
+    <div class="sub">プロフィール・本人確認・履歴・問い合わせ</div>
   </div>
 </header>
 
 <main class="wrap">
-  <!-- 1) プロフィール：閲覧→編集 -->
+  <!-- 1) プロフィール（閲覧⇄編集） -->
   <div class="card" id="profileView">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div class="ttl" style="font-size:16px">プロフィール</div>
@@ -118,13 +114,13 @@
     <p id="saveMsg" class="muted" style="display:none;margin-top:6px">保存しました。</p>
   </div>
 
-  <!-- 2) 本人確認（プロフィールの下に配置） -->
+  <!-- 2) 本人確認（KYC：申込みと連動） -->
   <div class="card">
     <div class="hrow" style="justify-content:space-between;align-items:center">
       <div id="kycBadge" class="badge">KYC確認状況: 取得中...</div>
       <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
     </div>
-    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」の決済条件にも反映（女性は0pt）。</p>
+    <p class="muted" style="margin:8px 0 0">※ ここで設定した状態は「申込み」の決済条件にも反映されます。</p>
 
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
@@ -133,28 +129,26 @@
         <span class="chip" data-v="male">男性で確認済み</span>
         <span class="chip" data-v="female">女性で確認済み</span>
       </div>
-      <div class="muted">・設定は端末に保存され、申込み画面と<b>連動</b>します。</div>
+      <div class="muted">・設定は端末に保存、申込みの決済に反映（女性は無料）。</div>
     </div>
   </div>
 
-  <!-- 3) 履歴（招待URL）— 下から2番目 -->
+  <!-- 3) 履歴（過去に発行した招待URL） -->
   <div class="card" id="historyCard">
     <div class="ttl" style="font-size:16px">履歴（招待URL）</div>
-    <p class="muted" style="margin-top:4px">過去に発行した招待URLを表示します。</p>
-    <div id="inviteList" class="list" style="margin-top:10px"></div>
-    <p id="inviteEmpty" class="muted" style="display:none;margin-top:6px">まだ招待URLはありません。</p>
+    <div id="historyList" class="list" style="margin-top:10px"></div>
+    <p id="historyEmpty" class="muted" style="margin-top:6px;display:none">まだ招待URLはありません。</p>
   </div>
 
-  <!-- 4) お問い合わせ — 一番下 -->
+  <!-- 4) 問い合わせ -->
   <div class="card" id="contactCard">
-    <div class="ttl" style="font-size:16px">お問い合わせ</div>
-    <label>件名（必須）<input id="qSubject" placeholder="例：機能についての質問"></label>
-    <label>メール（任意）<input id="qEmail" type="email" placeholder="例：you@example.com"></label>
-    <label>内容（必須）<textarea id="qBody" placeholder="できるだけ詳しくご記載ください"></textarea></label>
+    <div class="ttl" style="font-size:16px">問い合わせ</div>
+    <label>件名<input id="qTitle" placeholder="例：決済について"></label>
+    <label>内容<textarea id="qBody" placeholder="できるだけ詳しくご記入ください"></textarea></label>
     <div class="btnRow">
-      <button class="btn primary" id="qSend">送信</button>
+      <button class="btn primary" id="sendInquiry">送信</button>
     </div>
-    <p id="qMsg" class="muted" style="display:none;margin-top:6px">送信しました。ご連絡までお待ちください。</p>
+    <p id="qMsg" class="muted" style="display:none;margin-top:6px">送信しました。担当からご連絡します。</p>
   </div>
 </main>
 
@@ -165,16 +159,41 @@
 </nav>
 
 <script>
-  const APP = {
-    LIFF_ID:"2008178197-ELrxabO9",
-    API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec"
-  };
+  window.addEventListener('gesturestart', e => e.preventDefault());
+
+  const APP = { LIFF_ID:"2008178197-ELrxabO9",
+                API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
   const $=s=>document.querySelector(s);
 
-  /* ===== プロフィール ===== */
+  /* ===== KYC（apply と連動） ===== */
+  const getKyc = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
+  const setKyc = k => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKyc(); };
+  function renderKyc(){
+    const k=getKyc(), b=$("#kycBadge");
+    if(k.verified){
+      const sex = k.gender==='female'?'女性':(k.gender==='male'?'男性':'不明');
+      b.className="badge ok"; b.textContent=`KYC確認済み：${sex}`;
+    }else{ b.className="badge ng"; b.textContent="KYC未完了"; }
+    const el=$("#kycDemoPanel"); if(!el) return;
+    const chips=el.querySelectorAll('.chip'); chips.forEach(c=>c.classList.remove('active'));
+    const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
+    const t=el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
+  }
+  $("#kycDemoBtn").addEventListener("click", ()=>{
+    const p=$("#kycDemoPanel"); p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
+  });
+  document.addEventListener("click",(e)=>{
+    const t=e.target.closest('#kycDemoPanel .chip'); if(!t) return;
+    const v=t.dataset.v;
+    if(v==="male") setKyc({verified:true, gender:'male'});
+    else if(v==="female") setKyc({verified:true, gender:'female'});
+    else setKyc({verified:false});
+  });
+  window.addEventListener('storage', (e)=>{ if(e.key==='kyc') renderKyc(); });
+
+  /* ===== プロフィール（閲覧⇄編集） ===== */
   const getProfile = ()=> JSON.parse(localStorage.getItem("profile")||"{}");
   const setProfile = p  => localStorage.setItem("profile", JSON.stringify(p));
-
   function areaName(v){ return ({tokyo:"東京",yokohama:"横浜",chiba:"千葉",saitama:"埼玉",nagoya:"名古屋",osaka:"大阪",fukuoka:"福岡"}[v]||v||""); }
 
   function renderProfileView(){
@@ -224,115 +243,65 @@
   $("#cancelEdit").addEventListener("click", renderProfileView);
   $("#saveProfile").addEventListener("click", saveProfile);
 
-  /* ===== KYC（apply と連動） ===== */
-  const getKyc = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
-  const setKyc = k => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKyc(); };
-  function renderKyc(){
-    const k=getKyc(), b=$("#kycBadge");
-    if(k.verified){
-      const sex = k.gender==='female'?'女性':(k.gender==='male'?'男性':'不明');
-      b.className="badge ok"; b.textContent=`KYC確認済み：${sex}`;
-    }else{ b.className="badge ng"; b.textContent="KYC未完了"; }
-    // デモチップ見た目
-    const el=$("#kycDemoPanel"); if(!el) return;
-    const chips=el.querySelectorAll('.chip'); chips.forEach(c=>c.classList.remove('active'));
-    const key = k.verified ? (k.gender==='female'?'female':'male') : 'none';
-    const t=el.querySelector(`[data-v="${key}"]`); if(t) t.classList.add('active');
-  }
-  $("#kycDemoBtn").addEventListener("click", ()=>{
-    const p=$("#kycDemoPanel"); p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
-  });
-  document.addEventListener("click",(e)=>{
-    const t=e.target.closest('#kycDemoPanel .chip'); if(!t) return;
-    const v=t.dataset.v;
-    if(v==="male") setKyc({verified:true, gender:'male'});
-    else if(v==="female") setKyc({verified:true, gender:'female'});
-    else setKyc({verified:false});
-  });
-  window.addEventListener('storage', (e)=>{ if(e.key==='kyc') renderKyc(); });
-
-  /* ===== 履歴（招待URL） =====
-     期待フォーマット: localStorage.invites = [{ url:string, ts:number }, ...]
-     例: const inv = JSON.parse(localStorage.getItem('invites')||'[]'); inv.push({url:'https://liff.line.me/xxx?inv=abc', ts:Date.now()}); localStorage.setItem('invites', JSON.stringify(inv));
-  */
+  /* ===== 履歴（招待URL） ===== */
   const getInvites = ()=> JSON.parse(localStorage.getItem("invites")||"[]");
-  function fmt(ts){
-    const d=new Date(ts||Date.now());
-    const z=n=>String(n).padStart(2,'0');
-    return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
-  }
-  async function copyText(t){
-    try{
-      if(navigator.clipboard){ await navigator.clipboard.writeText(t); alert("コピーしました"); }
-      else{
-        const i=document.createElement('textarea'); i.value=t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); alert("コピーしました");
-      }
-    }catch(e){ alert("コピーに失敗しました"); }
-  }
   function renderInvites(){
-    const box=$("#inviteList"), empty=$("#inviteEmpty");
-    box.innerHTML="";
-    const arr=[...getInvites()].sort((a,b)=> (b.ts||0)-(a.ts||0));
-    if(!arr.length){ empty.style.display="block"; return; }
+    const list = $("#historyList");
+    const empty = $("#historyEmpty");
+    const items = getInvites();
+    list.innerHTML = "";
+    if(!items.length){ empty.style.display="block"; return; }
     empty.style.display="none";
-    arr.forEach((it,idx)=>{
-      const row=document.createElement('div');
-      row.className="row";
-      row.innerHTML = `
-        <div style="min-width:0">
-          <div class="mono nowrap"><a href="${it.url}" target="_blank" rel="noopener">${it.url}</a></div>
-          <div class="small">${fmt(it.ts)}</div>
-        </div>
-        <div class="hrow">
-          <button class="btn btn--sm" data-copy="${idx}">コピー</button>
-          <a class="btn btn--sm" href="${it.url}" target="_blank" rel="noopener">開く</a>
-        </div>`;
-      box.appendChild(row);
-    });
-    box.addEventListener('click', async (e)=>{
-      const b = e.target.closest('button[data-copy]'); if(!b) return;
-      const idx = Number(b.dataset.copy); const arr=[...getInvites()].sort((a,b)=> (b.ts||0)-(a.ts||0));
-      const t = arr[idx]?.url || "";
-      if(t) await copyText(t);
-    }, { once:true });
+    items
+      .sort((a,b)=> (b.ts||0)-(a.ts||0))
+      .forEach((it)=>{
+        const row = document.createElement("div");
+        row.className = "row";
+        const left = document.createElement("div");
+        const u = it.url || "";
+        left.innerHTML = `<div class="mono" style="word-break:break-all"><a href="${u}" target="_blank" rel="noopener">${u}</a></div>
+                          <small>${new Date(it.ts||Date.now()).toLocaleString()}</small>`;
+        const right = document.createElement("div");
+        const copy = document.createElement("button");
+        copy.className = "btn btn--sm";
+        copy.textContent = "コピー";
+        copy.onclick = async ()=>{
+          try{ await navigator.clipboard.writeText(u); copy.textContent="コピー済み"; setTimeout(()=>copy.textContent="コピー",1000); }
+          catch(e){ alert("コピーできませんでした"); }
+        };
+        right.appendChild(copy);
+        row.appendChild(left);
+        row.appendChild(right);
+        list.appendChild(row);
+      });
   }
   window.addEventListener('storage', (e)=>{ if(e.key==='invites') renderInvites(); });
 
-  /* ===== お問い合わせ ===== */
-  function getInquiries(){ return JSON.parse(localStorage.getItem("inquiries")||"[]"); }
-  function setInquiries(v){ localStorage.setItem("inquiries", JSON.stringify(v)); }
-  async function sendInquiry(){
-    const subject = $("#qSubject").value.trim();
-    const email   = $("#qEmail").value.trim();
-    const body    = $("#qBody").value.trim();
-    if(!subject){ alert("件名は必須です。"); return; }
-    if(!body){ alert("内容は必須です。"); return; }
-    const item = { subject, email, body, ts: Date.now() };
-    const list = getInquiries(); list.unshift(item); setInquiries(list);
-    $("#qMsg").style.display="block";
-    setTimeout(()=>$("#qMsg").style.display="none", 1800);
-    // 送信（任意・サーバー側があれば受ける）
+  /* ===== 問い合わせ ===== */
+  $("#sendInquiry").addEventListener("click", async ()=>{
+    const title = $("#qTitle").value.trim();
+    const body  = $("#qBody").value.trim();
+    if(!title || !body){ alert("件名と内容を入力してください。"); return; }
+    const payload = { type:"contact", payload:{ title, body, ts: Date.now() } };
     try{
-      await fetch(APP.API, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ type:"inquiry", payload:item })
-      });
-    }catch(e){ /* オフラインでもローカル保存済みなので無視 */ }
-    // クリア
-    $("#qSubject").value=""; $("#qEmail").value=""; $("#qBody").value="";
-  }
-  $("#qSend").addEventListener("click", sendInquiry);
+      await fetch(APP.API, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+      $("#qMsg").style.display="block"; $("#qTitle").value=""; $("#qBody").value="";
+      setTimeout(()=> $("#qMsg").style.display="none", 1800);
+    }catch(e){
+      $("#qMsg").textContent = "送信しました（デモ）";
+      $("#qMsg").style.display="block";
+      setTimeout(()=> $("#qMsg").style.display="none", 1800);
+    }
+  });
 
-  /* ===== 起動 ===== */
   document.addEventListener("DOMContentLoaded", async ()=>{
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
     }catch(e){ console.warn(e); }
     if(!localStorage.getItem('profile')) setProfile({});
-    if(!localStorage.getItem('kyc'))     setKyc({verified:false}); else renderKyc();
     renderProfileView();
+    if(!localStorage.getItem('kyc'))     setKyc({verified:false}); else renderKyc();
     renderInvites();
   });
 </script>
