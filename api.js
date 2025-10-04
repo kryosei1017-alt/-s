@@ -1,7 +1,7 @@
 /* ===== api.js ===== */
 (function(global){
-  // ★ あなたのGAS WebアプリのURL（そのままでOK。差し替える場合はここだけ変えればOK）
-  const API_URL = "https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec";
+  // ★GAS WebアプリURL（あなたの新URLに更新）
+  const API_URL = "https://script.google.com/macros/s/AKfycbxoQU_HzEuDiCUuKaeznE6PJ6j5_WjNnevx9jfU137QPR9fqxUrFCa6l32pdUTACIA/exec";
 
   async function postJSON(body){
     const res = await fetch(API_URL, {
@@ -12,7 +12,7 @@
     return res.json().catch(()=> ({}));
   }
 
-  // localStorage から現在の状態を集める
+  // localStorageの状態を収集
   function collectState(profile){
     const uid = localStorage.getItem('appUID') || '';
     const p   = JSON.parse(localStorage.getItem('profile') || '{}');
@@ -30,7 +30,7 @@
     };
   }
 
-  // ログイン直後に1回呼ぶ用
+  // ログイン直後に呼ぶ
   async function syncOnLogin(profile){
     try{
       const payload = collectState(profile);
@@ -39,7 +39,7 @@
     }catch(e){ console.warn('syncOnLogin failed', e); }
   }
 
-  // いつでも最新を送る用（プロフィール保存後やKYC変更後など）
+  // 任意タイミングで最新同期（プロフ保存／KYC変更／決済後など）
   async function syncNow(){
     try{
       const payload = collectState(null);
@@ -48,7 +48,7 @@
     }catch(e){ console.warn('syncNow failed', e); }
   }
 
-  // イベント（決済など）を履歴シートに追記
+  // イベントログ（決済など）
   async function logEvent(type, detail){
     try{
       const uid = localStorage.getItem('appUID') || '';
@@ -56,6 +56,6 @@
     }catch(e){ console.warn('logEvent failed', e); }
   }
 
-  // グローバル公開
+  // 公開
   global.SYNC = { API_URL, syncOnLogin, syncNow, logEvent };
 })(window);
