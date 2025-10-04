@@ -1,7 +1,7 @@
 /* ===== api.js (front) ===== */
 const SYNC = (() => {
   // あなたの /exec URL
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzHp4U585kJEC1BZ5KYRr2V561XF5snofYBCXCJCbZtdfayQmlDu-yGOXxyaCVL7ai2/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz6_13624N9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec';
 
   // CORS プリフライト回避のため text/plain を使用
   async function post(type, payload){
