@@ -190,6 +190,7 @@
       $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
       const prof = await liff.getProfile();
       ensureAppUID(prof.userId||"");
+      SYNC.syncOnLogin(prof);   // ← 追加：ログイン時にスプレッドシートへ同期
     }catch(e){ console.warn(e); }
   });
 </script>
