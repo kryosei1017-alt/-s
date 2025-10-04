@@ -2,28 +2,65 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ズーム無効化 & セーフエリア対応 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>LIFF Minimal｜ホーム</title>
 <meta name="theme-color" content="#F6F3EE">
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
   :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
   *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.6;overflow-x:hidden;
+    /* 横書き固定（縦文字化対策） */
+    writing-mode: horizontal-tb !important;
+    -webkit-writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    touch-action: manipulation;
+  }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
   .sub{font-size:12px;color:var(--muted)}
   .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .btn{
+    appearance:none;border:1px solid var(--border);background:#fff;color:#111827;
+    padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;
+    writing-mode: horizontal-tb !important;
+  }
+  .card{
+    background:#FFF;border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;
+    writing-mode: horizontal-tb !important;
+  }
   .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+
+  /* お知らせ */
+  .notiList{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .notiItem{border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px 12px}
+  .notiHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}
+  .tag{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:2px 8px;background:#fff}
+  .tag.sub{border-color:#86efac;background:#ecfdf5;color:#065f46}
+  .tag.alert{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
+  .time{font-size:12px;color:#6B7280}
+
+  /* タブバー */
+  .tabbar{
+    position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);
+    backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
+    padding-bottom:calc(env(safe-area-inset-bottom) + 8px)
+  }
+  .tabbar a{
+    flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;
+    align-items:center;min-height:76px;text-align:center;
+    writing-mode: horizontal-tb !important;
+  }
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -39,6 +76,7 @@
 
 <main class="wrap">
   <section>
+    <!-- 進捗 -->
     <div class="card" id="progressCard" style="cursor:pointer">
       <div class="hrow" style="justify-content:space-between">
         <div>
@@ -51,6 +89,7 @@
       <div class="sub">タップして申込みに進む（別ページ）</div>
     </div>
 
+    <!-- 招待URL -->
     <div class="card">
       <div class="ttl" style="font-size:17px">招待URL & 期限</div>
       <div class="urlbox" id="inviteUrl">— 未発行 —</div>
@@ -64,13 +103,14 @@
     </div>
 
     <div class="grid2">
+      <!-- クレジット -->
       <div class="card">
         <div class="ttl" style="font-size:17px">クレジット残高</div>
         <div style="font-size:32px;font-weight:800"><span id="credit">0</span> <span class="sub">pt</span></div>
         <div class="hrow" style="gap:8px;margin-top:8px">
           <button class="btn" id="chargeBtn">チャージ</button>
         </div>
-        <!-- 追加：簡易チャージUI -->
+        <!-- 簡易チャージUI -->
         <div id="chargePanel" class="sub" style="display:none;margin-top:10px">
           <div class="hrow" style="gap:8px;align-items:center">
             <select id="chargeAmount">
@@ -85,10 +125,14 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="ttl" style="font-size:17px">通報ステータス</div>
-        <div class="sub" id="report">—</div>
-        <div class="sub" style="margin-top:6px">※ ノーショー蓄積で停止措置の可能性あり</div>
+      <!-- お知らせ -->
+      <div class="card" id="newsCard">
+        <div class="hrow" style="justify-content:space-between;align-items:center">
+          <div class="ttl" style="font-size:17px">お知らせ</div>
+          <button class="btn" id="refreshNoti" style="font-size:14px;padding:10px 12px">更新</button>
+        </div>
+        <ul id="notiList" class="notiList"></ul>
+        <p id="notiEmpty" class="sub" style="margin-top:6px">まだお知らせはありません。</p>
       </div>
     </div>
   </section>
@@ -101,18 +145,89 @@
 </nav>
 
 <script>
+  /* iOSのピンチズーム抑止 */
+  window.addEventListener('gesturestart', e => e.preventDefault());
+
   const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0"), report:localStorage.getItem("report")||"問題なし" };
+  const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0") };
   const $=s=>document.querySelector(s);
-  function setProgress(step){const labels=["未開始","同意","決済","抽選"];$("#stepPill").textContent=labels[step]||"未開始";[1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
 
+  /* -------- 進捗表示 -------- */
+  function setProgress(step){
+    const labels=["未開始","同意","決済","抽選"];
+    $("#stepPill").textContent=labels[step]||"未開始";
+    [1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));
+  }
+
+  /* -------- 残高 -------- */
   function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
+  const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
 
+  /* -------- サブスク -------- */
+  const getSub = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
+
+  /* -------- お知らせ（ローカル＋配信） -------- */
+  const getNoti = ()=> JSON.parse(localStorage.getItem("notifications")||"[]");
+  const setNoti = list => localStorage.setItem("notifications", JSON.stringify(list));
+  const hasNoti = id => getNoti().some(n=>n.id===id);
+  function addNoti(n){
+    const list = getNoti();
+    if(n.id && hasNoti(n.id)) return; // 重複回避
+    list.unshift({ id: n.id || String(Date.now()), ts: n.ts || Date.now(), type: n.type || "system", text: n.text || "" });
+    setNoti(list); renderNoti();
+  }
+  function mergeNoti(items){
+    if(!Array.isArray(items)) return;
+    const map = new Map(getNoti().map(n=>[n.id,n]));
+    for(const it of items){
+      if(!it || !it.id) continue;
+      if(!map.has(it.id)) map.set(it.id, it);
+    }
+    const merged = Array.from(map.values()).sort((a,b)=> (b.ts||0)-(a.ts||0));
+    setNoti(merged); renderNoti();
+  }
+  function renderNoti(){
+    const list = getNoti().sort((a,b)=> (b.ts||0)-(a.ts||0));
+    const ul = $("#notiList"); const empty=$("#notiEmpty");
+    ul.innerHTML="";
+    if(!list.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    for(const n of list){
+      const li = document.createElement("li"); li.className="notiItem";
+      const tagClass = n.type==="sub" ? "tag sub" : (n.type==="alert" ? "tag alert" : "tag");
+      li.innerHTML = `
+        <div class="notiHead">
+          <span class="${tagClass}">${(n.type==="sub")?"サブスク":(n.type==="alert")?"お知らせ":"システム"}</span>
+          <span class="time">${new Date(n.ts||Date.now()).toLocaleString()}</span>
+        </div>
+        <div>${(n.text||"").replace(/\n/g,"<br>")}</div>`;
+      ul.appendChild(li);
+    }
+  }
+  // サーバ配信の取得
+  async function fetchRemoteNoti(){
+    try{
+      const payload = { type:"pull_notifications", auth:{} };
+      const res = await fetch(APP.API,{ method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+      const json = await res.json().catch(()=>null);
+      if(json && Array.isArray(json.items)) mergeNoti(json.items);
+    }catch(e){ /* API未設定でも無視 */ }
+  }
+  // 加入済サブスクの自動表示（未登録なら1回だけ）
+  function ensureSubNoti(){
+    const sub = getSub(); if(!sub || !sub.active) return;
+    const id = "sub_active_" + (sub.since || "").slice(0,10);
+    if(!hasNoti(id)){
+      const next = sub.nextRenewal ? new Date(sub.nextRenewal) : new Date(Date.now()+30*864e5);
+      addNoti({ id, type:"sub", text:`サブスクに加入しました（${sub.plan||"プラン"}）。\n次回更新日：${next.toLocaleDateString()}` });
+    }
+  }
+
+  /* -------- 起動 -------- */
   document.addEventListener("DOMContentLoaded", async ()=>{
-    $("#siteSub").textContent = location.hostname.replace(/^www\\./,'');
+    $("#siteSub").textContent = location.hostname.replace(/^www\./,'');
     setProgress(STATE.step||0);
     $("#credit").textContent = STATE.credit;
-    $("#report").textContent = STATE.report || "—";
 
     // 申込みへ
     $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
@@ -122,12 +237,19 @@
     $("#chargeBtn").addEventListener("click", ()=> panel.style.display = (panel.style.display==="none"?"block":"none"));
     $("#chargeDo").addEventListener("click", ()=>{
       const add = Number($("#chargeAmount").value||0);
-      const cur = Number(localStorage.getItem("credit")||"0");
-      const next = cur + add;
+      const next = getCredit() + add;
       setCredit(next);
-      alert(`+${add} pt チャージしました（残高：${next} pt）`);
+      addNoti({ type:"system", text:`${add} ptをチャージしました。現在残高：${next} pt` });
     });
 
+    // お知らせ
+    $("#refreshNoti").addEventListener("click", fetchRemoteNoti);
+    renderNoti();       // ローカル表示
+    ensureSubNoti();    // サブスク自動通知
+    fetchRemoteNoti();  // サーバ配信を1回取得
+    window.addEventListener("storage", (e)=>{ if(e.key==="notifications"||e.key==="sub") { renderNoti(); ensureSubNoti(); } });
+
+    // LIFF
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
