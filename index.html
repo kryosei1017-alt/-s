@@ -1,29 +1,46 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜ホーム</title>
-<meta name="theme-color" content="#F6F3EE">
+<meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-  :root{ --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px; }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;line-height:1.6;overflow-x:hidden;}
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px 112px}
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
+  :root{
+    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
+    --tabbarH:96px; --headerH:56px; --fs:13px; /* 非太字の統一サイズ */
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.6;overflow-x:hidden;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    font-size:var(--fs);
+    touch-action: manipulation;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
+        min-height:calc(100dvh - var(--headerH) - var(--tabbarH)); display:flex; flex-direction:column;}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ttl{font-weight:800;font-size:18px}
-  .sub{font-size:12px;color:var(--muted)}
-  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .ttl{font-weight:800;font-size:18px} /* 太字はそのまま */
+  .sub{color:var(--muted)}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
-  .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
-  .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
-  .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:96px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:var(--fs);cursor:pointer;writing-mode:horizontal-tb!important}
+  .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btnRow{display:flex;gap:8px;flex-wrap:wrap}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .muted{color:#6B7280}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cta{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+  /* タブバー */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
+          backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
+          padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;font-size:var(--fs)}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
@@ -32,66 +49,52 @@
 <header>
   <div class="hrow">
     <div class="ttl">ホーム</div>
-    <div class="sub" id="siteSub"></div>
-    <span class="pill" id="envPill">—</span>
+    <div class="sub" id="hello" style="margin-left:auto"></div>
   </div>
 </header>
 
 <main class="wrap">
-  <section>
-    <div class="card" id="progressCard" style="cursor:pointer">
-      <div class="hrow" style="justify-content:space-between">
-        <div>
-          <div class="ttl" style="font-size:17px">進捗</div>
-          <div class="sub">同意 → 決済 → 抽選</div>
-        </div>
-        <span class="pill" id="stepPill">未開始</span>
-      </div>
-      <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
-      <div class="sub">タップして申込みに進む（別ページ）</div>
+  <!-- ウォレット -->
+  <div class="card">
+    <div class="ttl" style="font-size:16px">クレジット</div>
+    <p class="mono" style="font-size:20px;margin:6px 0"><span id="credit">0</span> pt</p>
+    <div class="btnRow">
+      <button class="btn" data-add="1000">+1000 pt チャージ</button>
+      <button class="btn" data-add="3000">+3000 pt チャージ</button>
+      <button class="btn" data-add="5000">+5000 pt チャージ</button>
     </div>
+    <p class="muted" style="margin-top:8px">※ チャージはデモ（ローカル保存）です。本番では決済連携に置き換わります。</p>
+  </div>
 
-    <div class="card">
-      <div class="ttl" style="font-size:17px">招待URL & 期限</div>
-      <div class="urlbox" id="inviteUrl">— 未発行 —</div>
-      <div class="hrow" style="justify-content:space-between;margin-top:10px">
-        <div class="sub">残り <span id="remain">—</span></div>
-        <div class="hrow" style="gap:8px">
-          <button class="btn" id="shareBtn" disabled>共有</button>
-          <button class="btn" id="copyBtn" disabled>URLをコピー</button>
-        </div>
-      </div>
+  <!-- サブスク状況 -->
+  <div class="card">
+    <div class="ttl" style="font-size:16px">サブスク</div>
+    <div id="subStatus" class="muted">未加入</div>
+    <div class="btnRow" style="margin-top:8px">
+      <button class="btn" id="subInfoBtn">詳細を見る</button>
     </div>
+    <p class="muted" style="margin-top:8px">※ 加入は申込み時に選択できます（初回1980pt、以降0pt）。</p>
+  </div>
 
-    <div class="grid2">
-      <div class="card">
-        <div class="ttl" style="font-size:17px">クレジット残高</div>
-        <div style="font-size:32px;font-weight:800"><span id="credit">0</span> <span class="sub">pt</span></div>
-        <div class="hrow" style="gap:8px;margin-top:8px">
-          <button class="btn" id="chargeBtn">チャージ</button>
-        </div>
-        <!-- 追加：簡易チャージUI -->
-        <div id="chargePanel" class="sub" style="display:none;margin-top:10px">
-          <div class="hrow" style="gap:8px;align-items:center">
-            <select id="chargeAmount">
-              <option value="500">+500 pt</option>
-              <option value="1000" selected>+1,000 pt</option>
-              <option value="3000">+3,000 pt</option>
-              <option value="5000">+5,000 pt</option>
-            </select>
-            <button class="btn" id="chargeDo">チャージ実行</button>
-          </div>
-          <div class="sub" style="margin-top:6px">※ デモ：即時で残高に反映します</div>
-        </div>
+  <!-- 申込み CTA -->
+  <div class="card">
+    <div class="cta">
+      <div>
+        <div class="ttl" style="font-size:16px">申込み</div>
+        <div class="muted">入力 → 同意 → 決済 → 抽選</div>
       </div>
-
-      <div class="card">
-        <div class="ttl" style="font-size:17px">通報ステータス</div>
-        <div class="sub" id="report">—</div>
-        <div class="sub" style="margin-top:6px">※ ノーショー蓄積で停止措置の可能性あり</div>
-      </div>
+      <button class="btn primary" id="goApply">申込みへ進む</button>
     </div>
-  </section>
+  </div>
+
+  <!-- お知らせ（任意） -->
+  <div class="card">
+    <div class="ttl" style="font-size:16px">お知らせ</div>
+    <ul class="muted" style="margin:8px 0 0 18px; padding:0">
+      <li>本人確認（デモ）はマイページから切り替えできます。</li>
+      <li>女性は決済0pt。男性は単発1000pt or 加入1980pt（次回以降0pt）。</li>
+    </ul>
+  </div>
 </main>
 
 <nav class="tabbar">
@@ -101,38 +104,53 @@
 </nav>
 
 <script>
-  const APP={ LIFF_ID:"2008178197-ELrxabO9", API:"https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec" };
-  const STATE={ step:Number(localStorage.getItem("state.step")||"0"), credit:Number(localStorage.getItem("credit")||"0"), report:localStorage.getItem("report")||"問題なし" };
-  const $=s=>document.querySelector(s);
-  function setProgress(step){const labels=["未開始","同意","決済","抽選"];$("#stepPill").textContent=labels[step]||"未開始";[1,2,3].forEach(i=>$("#seg"+i).classList.toggle("on", i<=step));}
+  window.addEventListener('gesturestart', e => e.preventDefault());
 
-  function setCredit(v){ localStorage.setItem("credit", String(v)); $("#credit").textContent = v; }
+  const APP = { LIFF_ID:"2008178197-ELrxabO9" };
+  const $=s=>document.querySelector(s);
+
+  // LocalStorage helpers
+  const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
+  const setCredit = v => localStorage.setItem("credit", String(v));
+  const getSub    = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
+  const setSub    = s => localStorage.setItem("sub", JSON.stringify(s));
+  const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
+
+  function render(){
+    $("#credit").textContent = getCredit();
+    const sub = getSub();
+    $("#subStatus").textContent = sub.active ? `加入中（${new Date(sub.since||Date.now()).toLocaleDateString()}〜）` : "未加入";
+    const name = getProfile().name;
+    $("#hello").textContent = name ? `こんにちは、${name} さん` : "";
+  }
+
+  // チャージ
+  document.addEventListener("click",(e)=>{
+    const btn = e.target.closest('button[data-add]');
+    if(!btn) return;
+    const add = Number(btn.dataset.add||0);
+    setCredit(getCredit()+add);
+    render();
+  });
+
+  $("#subInfoBtn").addEventListener("click", ()=>{
+    const sub = getSub();
+    if(sub.active){
+      alert("現在サブスク加入中です。次回以降の申込みは0ptになります。");
+    }else{
+      alert("サブスクは申込み時に加入できます（加入料1980pt・次回以降0pt）。");
+    }
+  });
+
+  $("#goApply").addEventListener("click", ()=> location.href="apply.html" );
 
   document.addEventListener("DOMContentLoaded", async ()=>{
-    $("#siteSub").textContent = location.hostname.replace(/^www\\./,'');
-    setProgress(STATE.step||0);
-    $("#credit").textContent = STATE.credit;
-    $("#report").textContent = STATE.report || "—";
-
-    // 申込みへ
-    $("#progressCard").addEventListener("click", ()=> location.href="apply.html");
-
-    // チャージUI
-    const panel = $("#chargePanel");
-    $("#chargeBtn").addEventListener("click", ()=> panel.style.display = (panel.style.display==="none"?"block":"none"));
-    $("#chargeDo").addEventListener("click", ()=>{
-      const add = Number($("#chargeAmount").value||0);
-      const cur = Number(localStorage.getItem("credit")||"0");
-      const next = cur + add;
-      setCredit(next);
-      alert(`+${add} pt チャージしました（残高：${next} pt）`);
-    });
-
     try{
       await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser: true });
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-      $("#envPill").textContent = liff.isInClient()? "LINE内":"外部ブラウザ";
     }catch(e){ console.warn(e); }
+    if(!localStorage.getItem('profile')) localStorage.setItem('profile','{}');
+    render();
   });
 </script>
 </body>
