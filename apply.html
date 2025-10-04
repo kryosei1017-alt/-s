@@ -17,6 +17,7 @@
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
     line-height:1.6;overflow-x:hidden;
+    /* LINE/Safari の縦書き化対策 */
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 16px);
@@ -38,21 +39,25 @@
   .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
+  .warn{background:#FEF2F2;border:1px solid #FCA5A5;color:#7F1D1D}
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
+  .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
+  .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* —— 決済ステップはページごと横書きを強制 —— */
+  /* —— 決済ステップは全面横書き固定 —— */
   #stepPayment, #stepPayment *{
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
   }
-
-  /* 支払い方法：白い点線枠の中で横並び＋収まり安定 */
+  /* 支払い方法（白い点線枠） */
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px;overflow:hidden}
   .payopt{width:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin:0 0 10px 0}
   .payopt:last-child{margin-bottom:0}
@@ -61,7 +66,7 @@
 
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
-  /* 同意チェック：白枠内で横並び（はみ出し防止） */
+  /* 同意チェック（白枠で横並び） */
   .consentBox{
     display:flex; align-items:center; gap:12px;
     border:1px solid var(--border); border-radius:12px;
@@ -94,11 +99,13 @@
     </div>
     <div class="stepper"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
 
-    <div class="info" style="margin-bottom:10px">
-      <b>年齢確認の注意</b><br>
-      ・18歳未満の方はご利用いただけません。<br>
-      ・必要に応じて<strong>本人確認（身分証＋セルフィー）</strong>をお願いする場合があります。<br>
-      ・不一致が確認された場合、参加見送りやアカウント制限の対象となります。
+    <!-- KYC 状態 -->
+    <div class="hrow" style="justify-content:space-between;align-items:center;margin:8px 0">
+      <div class="badge" id="kycBadge">KYC確認状況: 取得中...</div>
+      <button class="btn btn--sm" id="kycDemoBtn">本人確認（デモ）</button>
+    </div>
+    <div class="info warn" id="kycWarn" style="display:none">
+      <b>本人確認が未完了です。</b> 申込み前に本人確認を済ませてください（デモでは「本人確認（デモ）」から設定できます）。
     </div>
 
     <label>パーティ構成（人数）</label>
@@ -107,11 +114,7 @@
       <span class="chip" data-v="3v3">3 : 3</span>
     </div>
 
-    <label>申込者グループの性別</label>
-    <div class="chips" id="chipsSelfGender">
-      <span class="chip" data-v="male">男性グループ</span>
-      <span class="chip" data-v="female">女性グループ</span>
-    </div>
+    <!-- 申込者グループの性別 フィールドは削除（KYC性別を使用） -->
 
     <label>希望相手グループの性別</label>
     <div class="chips" id="chipsGender">
@@ -150,6 +153,23 @@ friend_bbb"></textarea></label>
     <div class="hrow" style="gap:8px;margin-top:6px">
       <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
     </div>
+
+    <!-- ▼ デモ用：本人確認の簡易設定（折りたたみ） -->
+    <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
+      <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
+      <p class="sub">外部eKYCが未決定のため、検証用にローカルで状態を切り替えます。</p>
+      <div class="chips" id="chipsKyc">
+        <span class="chip" data-v="none">未完了</span>
+        <span class="chip" data-v="male">男性で確認済み</span>
+        <span class="chip" data-v="female">女性で確認済み</span>
+      </div>
+      <div class="info" style="margin-top:8px">
+        ・設定は端末のローカルに保存されます（本番APIとは連動しません）。<br>
+        ・性別は決済ロジックに反映されます（<b>女性は無料</b>）。<br>
+        ・未完了のままでは申込みできません。
+      </div>
+    </div>
+    <!-- ▲ デモ用 -->
   </div>
 
   <!-- 同意 -->
@@ -267,26 +287,73 @@ friend_bbb"></textarea></label>
   }
   const sizeSel   = makeChipGroup('chipsSize');
   const genderSel = makeChipGroup('chipsGender');
-  const selfSel   = makeChipGroup('chipsSelfGender');
 
   // LocalStorage helpers
-  function getCredit(){ return Number(localStorage.getItem("credit")||"0"); }
-  function setCredit(v){ localStorage.setItem("credit", String(v)); }
-  function getSub(){ return JSON.parse(localStorage.getItem("sub")||"{}"); }
-  function setSub(s){ localStorage.setItem("sub", JSON.stringify(s)); }
-  function getProfile(){ return JSON.parse(localStorage.getItem("profile")||"{}"); }
+  const getCredit = ()=> Number(localStorage.getItem("credit")||"0");
+  const setCredit = v => localStorage.setItem("credit", String(v));
+  const getSub    = ()=> JSON.parse(localStorage.getItem("sub")||"{}");
+  const setSub    = s => localStorage.setItem("sub", JSON.stringify(s));
+  const getProfile= ()=> JSON.parse(localStorage.getItem("profile")||"{}");
 
-  async function postJSON(url, body){
-    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    return await res.json();
+  // ▼ KYC（デモ） helpers
+  function getKyc(){
+    const k = JSON.parse(localStorage.getItem("kyc")||"{}");
+    // { verified:boolean, gender:'male'|'female'|undefined, updated:string }
+    return k;
   }
-  async function sendAction(type,payload){ try{ await postJSON(APP.API,{ type, payload, auth:AUTH }); }catch(e){ console.warn(e); } }
+  function setKyc(k){
+    k.updated = new Date().toISOString();
+    localStorage.setItem("kyc", JSON.stringify(k));
+    renderKycUI();
+  }
+  function kycVerified(){ return !!getKyc().verified; }
+  function kycGender(){ return getKyc().gender; } // 'male'|'female'|undefined
+
+  // KYC表示更新
+  function renderKycUI(){
+    const k = getKyc();
+    const badge = $("#kycBadge");
+    const warn  = $("#kycWarn");
+    if(k.verified){
+      const sex = k.gender==='female' ? '女性' : (k.gender==='male' ? '男性' : '不明');
+      badge.className = "badge ok";
+      badge.textContent = `KYC確認済み：${sex}`;
+      warn.style.display = "none";
+    }else{
+      badge.className = "badge ng";
+      badge.textContent = "KYC未完了";
+      warn.style.display = "block";
+    }
+  }
+
+  // デモパネル
+  $("#kycDemoBtn").addEventListener("click", ()=>{
+    const p = $("#kycDemoPanel");
+    p.style.display = (p.style.display==="none"||!p.style.display) ? "block":"none";
+  });
+  (function setupKycChips(){
+    const el = $("#chipsKyc");
+    if(!el) return;
+    el.addEventListener("click",(e)=>{
+      const t = e.target.closest('.chip'); if(!t) return;
+      [...el.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      t.classList.add('active');
+      const v = t.dataset.v; // none | male | female
+      if(v==="male")   setKyc({verified:true, gender:'male'});
+      else if(v==="female") setKyc({verified:true, gender:'female'});
+      else            setKyc({verified:false});
+    });
+  })();
 
   // 入力確定 → 同意へ
   $("#btnCreateApply").addEventListener("click", async ()=>{
+    // KYC未完了なら進めない
+    if(!kycVerified()){
+      alert("本人確認が未完了です。本人確認（デモ）から「確認済み」を選択してください。");
+      $("#kycDemoPanel").style.display = "block";
+      return;
+    }
     const group = sizeSel.value || "2v2";
-    const selfGender = selfSel.value; if(!selfGender){ alert("申込者グループの性別を選択してください。"); return; }
     const targetGender = genderSel.value; if(!targetGender){ alert("希望相手グループの性別を選択してください。"); return; }
     const area = $("#inArea").value; if(!area){ alert("エリアを選択してください。"); return; }
     const ageMin = Number($("#ageMin").value||0);
@@ -295,8 +362,8 @@ friend_bbb"></textarea></label>
     const score = Number($("#inScore").value||50);
     const friends = ($("#inFriends").value||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
 
-    APPLY.draft = { group, selfGender, targetGender, area, ageMin, ageMax, score, friends, ts: Date.now() };
-    await sendAction("apply_draft", APPLY.draft);
+    APPLY.draft = { group, kycGender: kycGender(), targetGender, area, ageMin, ageMax, score, friends, ts: Date.now() };
+    try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"apply_draft", payload:APPLY.draft, auth:AUTH })}); }catch(e){}
     show("stepConsent"); mark(1);
   });
 
@@ -304,16 +371,20 @@ friend_bbb"></textarea></label>
   $("#agreeChk").addEventListener("change", e => $("#consentNext").disabled = !e.target.checked );
   $("#consentBack").addEventListener("click", ()=>{ show("stepInfo"); mark(0); });
   $("#consentNext").addEventListener("click", async ()=>{
-    await sendAction("agree", { draft: APPLY.draft });
+    try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"agree", payload:{draft:APPLY.draft}, auth:AUTH })}); }catch(e){}
     setupPaymentUI(); show("stepPayment"); mark(2);
   });
 
   // 決済UI
   function setupPaymentUI(){
+    if(!kycVerified()){ alert("本人確認が未完了です。"); show("stepInfo"); mark(0); return; }
+
     const profile   = getProfile();
     const sub       = getSub();
     const subActive = !!sub.active;
-    const isFemale  = (APPLY.draft?.selfGender === "female") || (profile.gender === "female");
+
+    const genderKyc = kycGender() || profile.gender;     // KYC最優先
+    const isFemale  = (genderKyc === "female");
 
     $("#priceOneoff").textContent = `(−${PRICING.ONE_OFF} pt)`;
     $("#priceSub").textContent    = `(−${PRICING.SUB_JOIN_COST} pt)`;
@@ -362,18 +433,19 @@ friend_bbb"></textarea></label>
       const sub = getSub();
       if(!sub.active){
         const newSub = {active:true, plan:"ベーシック", since:new Date().toISOString()};
-        setSub(newSub); await sendAction("subscribe", newSub);
+        setSub(newSub);
+        try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"subscribe", payload:newSub, auth:AUTH })}); }catch(e){}
       }
     }
     APPLY.paid = true;
-    await sendAction("payment_done", { draft: APPLY.draft, plan: APPLY.selectedPlan, amount: need });
+    try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"payment_done", payload:{ draft: APPLY.draft, plan: APPLY.selectedPlan, amount: need }, auth:AUTH })}); }catch(e){}
     show("stepLottery"); mark(3);
   });
 
   $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
   $("#lotStart").addEventListener("click", async ()=>{
     try{
-      const r = await postJSON(APP.API, { type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH });
+      const r = await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH })}).then(r=>r.json());
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
       $("#lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
@@ -388,6 +460,8 @@ friend_bbb"></textarea></label>
       if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
       const prof=await liff.getProfile(); AUTH.userId=prof.userId||"";
     }catch(e){ console.warn(e); }
+    // 初期KYC表示
+    if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
     mark(Number(localStorage.getItem("state.step")||"0"));
   });
 </script>
