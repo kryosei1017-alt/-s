@@ -172,9 +172,10 @@
   // ピンチズーム無効
   window.addEventListener('gesturestart', e => e.preventDefault());
 
-  const FEMALE_FREE = true;        // 女性は支払い0
-  const ONCE_COST   = 1000;        // 単発コスト
-  const SUB_FIRST   = 1980;        // サブスク初回
+  // 決済設定
+  const FEMALE_FREE = true;   // 女性は支払い0
+  const ONCE_COST   = 1000;   // 単発コスト
+  const SUB_FIRST   = 1980;   // サブスク初回
   const SUB_PLAN    = "basic";
 
   const $=s=>document.querySelector(s);
@@ -191,9 +192,14 @@
   /* 入力→同意 */
   $("#toAgree").addEventListener('click', ()=>{
     const prof=getProf(), kyc=getKyc();
-    if(!(prof && prof.name && prof.area && prof.age)){ alert("マイページの必須（ニックネーム・年齢・エリア）を入力してください。"); return; }
-    if(!(kyc && kyc.verified)){ alert("本人確認が未完了です。マイページで完了させてください。"); return; }
-
+    if(!(prof && prof.name && prof.area && prof.age)){
+      alert("マイページの必須（ニックネーム・年齢・エリア）を入力してください。");
+      return;
+    }
+    if(!(kyc && kyc.verified)){
+      alert("本人確認が未完了です。マイページで完了させてください。");
+      return;
+    }
     $("#secInput").style.display="none";
     $("#secAgree").style.display="";
     step(2);
@@ -217,7 +223,7 @@
     const plan = document.querySelector('input[name="payPlan"]:checked').value;
 
     let pay = 0;
-    if(isFemale() && ${FEMALE_FREE}){  // 女性は常に0
+    if(isFemale() && FEMALE_FREE){  // ← 修正：${...} をやめて普通の定数参照に
       pay = 0;
       $("#paySub").checked = false; $("#payOnce").checked = true;
       document.getElementById('paySub').disabled = true;
@@ -246,7 +252,7 @@
 
     let pay=0, nextCredit=cur;
 
-    if(isFemale() && ${FEMALE_FREE}){
+    if(isFemale() && FEMALE_FREE){   // ← ここも修正
       pay=0;
     }else{
       if(plan==='once'){ pay=ONCE_COST; }
