@@ -1,61 +1,54 @@
-/* ===== api.js ===== */
-(function(global){
-  // ★GAS WebアプリURL（あなたの新URLに更新）
-  const API_URL = "https://script.google.com/macros/s/AKfycbzHp4U585kJEC1BZ5KYRr2V561XF5snofYBCXCJCbZtdfayQmlDu-yGOXxyaCVL7ai2/exec";
+/* ===== api.js (front) ===== */
+const SYNC = (() => {
+  // ★ここをあなたの /exec URL に
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzHp4U585kJEC1BZ5KYRr2V561XF5snofYBCXCJCbZtdfayQmlDu-yGOXxyaCVL7ai2/exec';
 
-  async function postJSON(body){
-    const res = await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(body)
-    });
-    return res.json().catch(()=> ({}));
+  async function post(type, payload){
+    try{
+      const r = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({type, payload})
+      });
+      const txt = await r.text();
+      let json; try{ json = JSON.parse(txt); } catch { json = {ok:false, parseError:txt}; }
+      if(!r.ok || json.ok === false){ console.error('API NG', r.status, json); }
+      return json;
+    }catch(e){
+      console.error('API ERR', e);
+      return {ok:false, error:String(e)};
+    }
   }
 
-  // localStorageの状態を収集
-  function collectState(profile){
-    const uid = localStorage.getItem('appUID') || '';
-    const p   = JSON.parse(localStorage.getItem('profile') || '{}');
-    const kyc = JSON.parse(localStorage.getItem('kyc') || '{}');
-    const sub = JSON.parse(localStorage.getItem('sub') || '{}');
-    const credit = Number(localStorage.getItem('credit') || '0');
-
-    return {
-      uid,
-      lineUserId:   profile?.userId || '',
-      displayName:  profile?.displayName || '',
-      pictureUrl:   profile?.pictureUrl || '',
-      statusMessage:profile?.statusMessage || '',
-      profile: p, kyc, sub, credit
-    };
-  }
-
-  // ログイン直後に呼ぶ
   async function syncOnLogin(profile){
-    try{
-      const payload = collectState(profile);
-      if(!payload.uid) return;
-      await postJSON({ type:'upsert_user', payload });
-    }catch(e){ console.warn('syncOnLogin failed', e); }
+    const uid = localStorage.getItem('appUID') || '';
+    const payload = {
+      uid,
+      lineUserId: profile?.userId || '',
+      displayName: profile?.displayName || '',
+      pictureUrl: profile?.pictureUrl || '',
+      statusMessage: profile?.statusMessage || '',
+      credit: Number(localStorage.getItem('credit')||'0'),
+      profile: JSON.parse(localStorage.getItem('profile')||'{}'),
+      kyc:     JSON.parse(localStorage.getItem('kyc')||'{}'),
+      sub:     JSON.parse(localStorage.getItem('sub')||'{}'),
+    };
+    const res = await post('upsert_user', payload);
+    return res;
   }
 
-  // 任意タイミングで最新同期（プロフ保存／KYC変更／決済後など）
-  async function syncNow(){
-    try{
-      const payload = collectState(null);
-      if(!payload.uid) return;
-      await postJSON({ type:'upsert_user', payload });
-    }catch(e){ console.warn('syncNow failed', e); }
-  }
-
-  // イベントログ（決済など）
   async function logEvent(type, detail){
-    try{
-      const uid = localStorage.getItem('appUID') || '';
-      await postJSON({ type:'log_event', payload:{ uid, type, detail, ts:Date.now() } });
-    }catch(e){ console.warn('logEvent failed', e); }
+    const uid = localStorage.getItem('appUID') || '';
+    return await post('log_event', {uid, type, detail});
   }
 
-  // 公開
-  global.SYNC = { API_URL, syncOnLogin, syncNow, logEvent };
-})(window);
+  async function syncNow(){
+    let pf=null;
+    if(window.liff && liff.getProfile){
+      try{ pf = await liff.getProfile(); }catch(_){}
+    }
+    return await syncOnLogin(pf);
+  }
+
+  return {API_URL, post, syncOnLogin, syncNow, logEvent};
+})();
