@@ -9,14 +9,14 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59; --border:#E5E7EB; --radius:16px;
-    --tabbarH:96px; --headerH:56px;
+    --tabbarH:96px; --headerH:56px; --fs:13px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
-    line-height:1.6;overflow-x:hidden;
+    line-height:1.6;overflow-x:hidden;font-size:var(--fs);
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
     touch-action: manipulation;
   }
@@ -25,41 +25,40 @@
   header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px;min-height:var(--headerH);display:flex;align-items:center}
   .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ttl{font-weight:800;font-size:18px}
-  .sub{font-size:12px;color:var(--muted)}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer;writing-mode:horizontal-tb!important}
+  .sub{color:var(--muted);font-size:var(--fs)}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:14px 16px;border-radius:14px;font-size:var(--fs);cursor:pointer;writing-mode:horizontal-tb!important}
   .btn--sm{min-width:92px}
   .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px;writing-mode:horizontal-tb!important}
-  label{display:block;font-size:14px;margin:10px 0 6px}
-  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  label{display:block;margin:10px 0 6px;font-size:var(--fs)}
+  input, textarea, select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:var(--fs)}
   textarea{min-height:88px;resize:vertical}
   .stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 10px}
   .seg{height:10px;border-radius:999px;background:#E0E7E0}.seg.on{background:var(--accent)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
   .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:13px}
+  .info{background:#fffbeb;border:1px solid #fcd34d;color:#593d00;padding:12px;border-radius:12px;font-size:var(--fs)}
   .warn{background:#FEF2F2;border:1px solid #FCA5A5;color:#7F1D1D}
   .em{font-weight:800}
   .muted{color:#6B7280}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:var(--fs);border:1px solid var(--border);background:#fff}
   .badge.ok{border-color:#86efac;background:#ecfdf5;color:#065f46}
   .badge.ng{border-color:#fecaca;background:#fff1f2;color:#7f1d1d}
 
   .tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center;writing-mode:horizontal-tb!important;font-size:var(--fs)}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
   .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 
-  /* 決済は横書き固定 */
   #stepPayment, #stepPayment *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
   .payCard{border:1px dashed var(--border);border-radius:14px;padding:14px;overflow:hidden}
   .payopt{width:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin:0 0 10px 0}
   .payopt:last-child{margin-bottom:0}
   .payopt input[type="radio"]{width:22px;height:22px}
-  .labeltext{display:block;white-space:normal!important;overflow-wrap:anywhere;line-height:1.5;font-size:14px}
+  .labeltext{display:block;white-space:normal!important;overflow-wrap:anywhere;line-height:1.5;font-size:var(--fs)}
   .btnRow{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
 
   .consentBox{
@@ -67,10 +66,10 @@
     border:1px solid var(--border); border-radius:12px;
     padding:12px 14px; background:#fff; margin-top:8px; max-width:100%;
     writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
-    font-size:14px;
+    font-size:var(--fs);
   }
   .consentBox input[type="checkbox"]{ width:22px; height:22px; flex:0 0 auto; }
-  .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:14px; }
+  .consentText{ flex:1 1 auto; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:var(--fs); }
   #payGoCharge, #payGoCharge *{ writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important; }
 </style>
 </head>
@@ -147,7 +146,7 @@ friend_bbb"></textarea></label>
       <button class="btn primary" id="btnCreateApply">申込み内容を確定</button>
     </div>
 
-    <!-- KYCデモ（省略：前回同様） -->
+    <!-- KYCデモ -->
     <div id="kycDemoPanel" class="card" style="margin-top:10px; display:none">
       <div class="ttl" style="font-size:15px">本人確認（デモ）</div>
       <p class="sub">外部eKYCが未決定のため、検証用にローカルで状態を切り替えます。</p>
@@ -226,19 +225,18 @@ friend_bbb"></textarea></label>
   const show = id => ["stepInfo","stepConsent","stepPayment","stepLottery"].forEach(k=>document.getElementById(k).style.display = (k===id?"block":"none"));
   const mark = step => { [1,2,3].forEach(i=>document.getElementById("seg"+i).classList.toggle("on", i<=step)); localStorage.setItem("state.step", String(step)); };
 
-  /* --- 通知（index のお知らせ枠と共有） --- */
+  /* 通知（index と共有） */
   const getNoti = ()=> JSON.parse(localStorage.getItem("notifications")||"[]");
   const setNoti = list => localStorage.setItem("notifications", JSON.stringify(list));
   const hasNoti = id => getNoti().some(n=>n.id===id);
   function addNoti(n){
-    const list = getNoti();
-    if(n.id && hasNoti(n.id)) return;
+    const list = getNoti(); if(n.id && hasNoti(n.id)) return;
     list.unshift({ id: n.id || String(Date.now()), ts: n.ts || Date.now(), type: n.type || "system", text: n.text || "" });
     setNoti(list);
   }
   const addDays = (d, n)=> { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
 
-  /* --- KYC / Profile チェック類（前回同様） --- */
+  /* KYC / Profile */
   const getKyc   = ()=> JSON.parse(localStorage.getItem("kyc")||"{}");
   const setKyc   = k  => { k.updated=new Date().toISOString(); localStorage.setItem("kyc", JSON.stringify(k)); renderKycUI(); };
   const kycVerified = ()=> !!getKyc().verified;
@@ -272,11 +270,7 @@ friend_bbb"></textarea></label>
     return nameOK && areaOK && ageOK;
   }
   function renderProfileWarn(){ const w = $("#profileWarn"); if(!w) return; w.style.display = isProfileComplete() ? "none" : "block"; }
-
-  window.addEventListener('storage', (e)=>{
-    if(e.key==='kyc') renderKycUI();
-    if(e.key==='profile') renderProfileWarn();
-  });
+  window.addEventListener('storage', (e)=>{ if(e.key==='kyc') renderKycUI(); if(e.key==='profile') renderProfileWarn(); });
 
   (function(){ const minSel=$("#ageMin"), maxSel=$("#ageMax"); for(let i=18;i<=49;i++){ const o=document.createElement('option'); o.value=o.textContent=i; minSel.appendChild(o); } for(let i=18;i<=59;i++){ const o=document.createElement('option'); o.value=o.textContent=i; maxSel.appendChild(o); } })();
 
@@ -364,36 +358,33 @@ friend_bbb"></textarea></label>
 
   function renderPaymentNumbers(creditBefore, pay){
     const after = creditBefore - pay;
-    $("#creditBefore").textContent = creditBefore;
-    $("#payAmount").textContent    = pay;
-    $("#creditAfter").textContent  = after;
+    document.getElementById("creditBefore").textContent = creditBefore;
+    document.getElementById("payAmount").textContent    = pay;
+    document.getElementById("creditAfter").textContent  = after;
     const lack = after < 0;
-    $("#payError").style.display   = lack ? "block":"none";
-    $("#payConfirm").disabled      = lack;
+    document.getElementById("payError").style.display   = lack ? "block":"none";
+    document.getElementById("payConfirm").disabled      = lack;
   }
 
-  $("#payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
-  $("#payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
+  document.getElementById("payBack").addEventListener("click", ()=>{ show("stepConsent"); mark(1); });
+  document.getElementById("payGoCharge").addEventListener("click", ()=>{ location.href = "index.html"; });
 
-  // ▼▼▼ 決済確定：サブスク加入時に「お知らせ」へ自動通知 ▼▼▼
-  $("#payConfirm").addEventListener("click", async ()=>{
+  document.getElementById("payConfirm").addEventListener("click", async ()=>{
     const credit = getCredit();
     const need   = APPLY.payAmount || 0;
     const after  = credit - need;
     if(after < 0){ alert("残高が不足しています。ホームでチャージしてください。"); return; }
 
-    setCredit(after);
+    localStorage.setItem("credit", String(after));
     if(APPLY.selectedPlan === "sub"){
       const existed = getSub().active;
       if(!existed){
         const since = new Date();
         const next  = addDays(since, 30);
         const newSub = {active:true, plan:"ベーシック", since: since.toISOString(), nextRenewal: next.toISOString()};
-        setSub(newSub);
-        // ローカル通知（ホームのお知らせ枠に表示）
+        localStorage.setItem("sub", JSON.stringify(newSub));
         addNoti({ id: "sub_"+since.toISOString(), type:"sub", ts: Date.now(),
           text: `サブスクに加入しました（ベーシック）。\n次回更新日：${next.toLocaleDateString()}` });
-        // （任意）サーバにも通知。未設定でもエラー無視。
         try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"notify", payload:{ kind:"sub_joined", nextRenewal:newSub.nextRenewal }, auth:AUTH })}); }catch(e){}
       }
     }
@@ -401,14 +392,13 @@ friend_bbb"></textarea></label>
     try{ await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"payment_done", payload:{ draft: APPLY.draft, plan: APPLY.selectedPlan, amount: need }, auth:AUTH })}); }catch(e){}
     show("stepLottery"); mark(3);
   });
-  // ▲▲▲ ここまで自動通知対応 ▲▲▲
 
-  $("#lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
-  $("#lotStart").addEventListener("click", async ()=>{
+  document.getElementById("lotBack").addEventListener("click", ()=>{ show("stepPayment"); mark(2); });
+  document.getElementById("lotStart").addEventListener("click", async ()=>{
     try{
       const r = await fetch(APP.API,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:"enter_lottery", payload:{ draft: APPLY.draft }, auth: AUTH })}).then(r=>r.json());
       const result = r && r.result ? r.result : (Math.random()<0.5 ? "当選" : "落選");
-      $("#lotResult").textContent = "結果：" + result;
+      document.getElementById("lotResult").textContent = "結果：" + result;
       const hist = JSON.parse(localStorage.getItem("history")||"[]");
       hist.unshift({ ts:Date.now(), result, payment: APPLY.payAmount, plan: APPLY.selectedPlan });
       localStorage.setItem("history", JSON.stringify(hist));
@@ -422,8 +412,8 @@ friend_bbb"></textarea></label>
       const prof=await liff.getProfile(); AUTH.userId=prof.userId||"";
     }catch(e){ console.warn(e); }
     if(!localStorage.getItem('kyc')){ setKyc({verified:false}); } else { renderKycUI(); }
-    renderProfileWarn();
-    mark(Number(localStorage.getItem("state.step")||"0"));
+    if(!localStorage.getItem('profile')) localStorage.setItem('profile','{}');
+    document.getElementById("seg1").classList.toggle("on", false);
   });
 </script>
 </body>
