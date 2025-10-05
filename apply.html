@@ -22,28 +22,16 @@
   header{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 16px 8px}
   .ttl{font-weight:800;font-size:18px}.sub{color:var(--muted);font-size:12px}
   .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 20px)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;border-radius:14px;font-size:16px;padding:14px 16px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}
   .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  /* ミニ進捗 */
   .mini{display:flex;align-items:center;gap:10px}
   .segmini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-left:auto;min-width:120px}
   .seg{height:8px;border-radius:999px;background:#DFE6DF}.seg.on{background:var(--accent)}
-  /* 入力 */
   .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
   .label{font-weight:700}
-  .picker-wrap{position:relative}
-  select, input[type="number"], input[type="text"]{
-    width:100%;border:1px solid var(--border);border-radius:12px;background:#fff;
-    font-size:16px;padding:14px 14px;height:56px;appearance:none;
-  }
-  .picker-wrap:after{
-    content:"";position:absolute;right:14px;top:50%;width:10px;height:10px;
-    border-right:2px solid #9AA29A;border-bottom:2px solid #9AA29A;transform:translateY(-60%) rotate(45deg);pointer-events:none;
-  }
-  .ghost{border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;padding:12px}
   nav.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
   .tabicon{width:22px;height:22px;border-radius:6px;background:#CBD5CB}
@@ -53,126 +41,62 @@
 <body>
 <header>
   <div class="ttl">申込み</div>
-  <div class="sub">入力 → 同意 → 決済 → 抽選</div>
+  <div class="sub" id="siteSub"></div>
 </header>
 
 <main class="wrap">
-
-  <!-- ホームの「進捗」をミニ化して統合 -->
-  <section class="card" id="progressMini">
-    <div class="mini">
-      <div class="row" style="gap:6px">
-        <div style="font-weight:700">進捗</div>
-        <span class="pill" id="stepPill">未開始</span>
-      </div>
-      <div class="segmini">
-        <div class="seg" id="seg1"></div>
-        <div class="seg" id="seg2"></div>
-        <div class="seg" id="seg3"></div>
-      </div>
-    </div>
+  <!-- 進捗ミニ -->
+  <section class="card mini">
+    <div>進捗</div>
+    <div class="segmini"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
   </section>
 
   <!-- 入力 -->
   <section class="card" id="secInput">
-    <div class="label">人数</div>
-    <div class="picker-wrap">
-      <select id="selMembers">
-        <option value="2v2">2対2</option>
-        <option value="3v3">3対3</option>
-      </select>
+    <div class="field">
+      <div class="label">人数</div>
+      <select id="selMembers"><option value="2:2">2:2</option><option value="3:3">3:3</option></select>
     </div>
-
+    <div class="field">
+      <div class="label">相手の希望性別</div>
+      <select id="selGender"><option value="female">女性</option><option value="male">男性</option><option value="any">どちらでも</option></select>
+    </div>
     <div class="field">
       <div class="label">エリア</div>
-      <div class="picker-wrap">
-        <select id="selArea">
-          <option value="" disabled selected>選択してください</option>
-          <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
-          <option>名古屋</option><option>大阪</option><option>福岡</option>
-        </select>
-      </div>
+      <select id="selArea"><option>東京</option><option>横浜</option><option>千葉</option><option>埼玉</option><option>名古屋</option><option>大阪</option><option>福岡</option></select>
     </div>
-
     <div class="field">
-      <div class="label">希望年齢層</div>
-      <div class="picker-wrap">
-        <select id="selAge">
-          <option>18-19</option><option>20-24</option><option>25-29</option>
-          <option>30-34</option><option>35-39</option><option>40-49</option>
-        </select>
-      </div>
+      <div class="label">友だちの個別ID（改行で複数）</div>
+      <textarea id="friendIds" placeholder="GX-XXXXXXX&#10;GX-YYYYYYY"></textarea>
     </div>
-
-    <div class="field">
-      <div class="label">自己評価スコア（0〜100）</div>
-      <input id="inSelf" type="number" min="0" max="100" value="50" />
-    </div>
-
-    <div class="field">
-      <div class="label">友だちの個別ID（カンマ区切り）</div>
-      <input id="inFriends" type="text" placeholder="例）GX-ABC1234,GX-XYZ9KLM" />
-    </div>
-
-    <div class="row between" style="margin-top:6px">
-      <button class="btn" id="toAgree">同意へ進む</button>
-    </div>
-    <p class="sub">※ 本人確認＆プロフィール必須（ニックネーム・年齢・エリア）未入力だと進めません。</p>
+    <button id="toAgree" class="btn primary" style="width:100%">同意へ</button>
   </section>
 
   <!-- 同意 -->
   <section class="card" id="secAgree" style="display:none">
-    <div class="ghost">
-      <b>本人確認について：</b>必要に応じて身分証とセルフィー提出をお願いする場合があります（年齢・なりすまし対策）。
-    </div>
-    <a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a>
-    <div class="ghost" style="margin-top:10px;display:flex;gap:12px;align-items:center;min-height:56px">
-      <input id="chkAgree" type="checkbox" style="width:22px;height:22px">
-      <label for="chkAgree" style="font-weight:700">利用規約に同意する</label>
-    </div>
-    <div class="row between" style="margin-top:10px">
-      <button class="btn" id="backToInput">戻る</button>
-      <button class="btn primary" id="toPay" disabled>決済へ進む</button>
+    <div class="field"><label><input id="chkAgree" type="checkbox" /> 利用規約に同意する</label></div>
+    <div class="row" style="gap:8px">
+      <button id="backToInput" class="btn">戻る</button>
+      <button id="toPay" class="btn primary" disabled>決済へ</button>
     </div>
   </section>
 
   <!-- 決済 -->
   <section class="card" id="secPay" style="display:none">
-    <div class="sub">クレジット残高から差し引きます。</div>
-
-    <div class="ghost" style="display:flex;gap:12px;align-items:center;min-height:64px">
-      <input type="radio" name="pay" id="payOnce" checked style="width:20px;height:20px">
-      <label for="payOnce" style="cursor:pointer;font-weight:700">単発で支払う（−1000 pt）</label>
+    <div class="field"><label><input type="radio" name="pay" id="payOnce" checked /> 単発（男性 -1000pt / 女性 0pt）</label></div>
+    <div class="field"><label><input type="radio" name="pay" id="paySub" /> サブスク（初回 -1980pt→次回以降0pt）</label></div>
+    <div class="row" style="gap:8px">
+      <button id="backToAgree" class="btn">戻る</button>
+      <button id="confirmPay" class="btn primary">支払う</button>
     </div>
-
-    <div class="ghost" style="display:flex;gap:12px;align-items:center;min-height:64px;margin-top:8px">
-      <input type="radio" name="pay" id="paySub" style="width:20px;height:20px">
-      <label for="paySub" style="cursor:pointer;font-weight:700">サブスクに加入して支払う（−1980 pt）※ 次回以降 0 pt</label>
-    </div>
-
-    <div class="card" style="border-style:dashed;margin-top:10px">
-      <div class="row between"><div>現在の残高</div><div><b id="curCredit">0</b> pt</div></div>
-      <div class="row between"><div>今回の支払い</div><div>− <b id="payAmount">0</b> pt</div></div>
-      <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
-      <div class="row between"><div><b>決済後の残高</b></div><div><b id="afterCredit">0</b> pt</div></div>
-    </div>
-
-    <div class="row between" style="margin-top:10px">
-      <button class="btn" id="backToAgree">戻る</button>
-      <button class="btn primary" id="confirmPay">この内容で確定</button>
-    </div>
-
-    <p class="sub" id="lackMsg" style="color:#92400E;display:none;margin-top:8px">※ 残高不足です。<b>マイページ</b>でチャージしてください。</p>
   </section>
 
-  <!-- 抽選（ダミー） -->
+  <!-- 抽選 -->
   <section class="card" id="secDraw" style="display:none">
-    <p>申込みを受け付けました。結果はメッセージでお知らせします。</p>
-    <button class="btn" onclick="location.href='mypage.html'">マイページへ</button>
+    <div>抽選中…</div>
   </section>
 </main>
 
-<!-- タブ（ホーム削除 → 2タブ体制） -->
 <nav class="tabbar">
   <a class="active" href="apply.html"><span class="tabicon"></span>申込み</a>
   <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
@@ -181,103 +105,55 @@
 <script>
   const $=s=>document.querySelector(s);
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
-  const getVal=(k)=>localStorage.getItem(k);
+  const g=(k)=>localStorage.getItem(k);
 
-  // ★★★★★ あなたが提示したGAS WebアプリURL（統一） ★★★★★
-  const API_URL = "https://script.google.com/macros/s/AKfycbz6_13624N9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec";
-
-  // ---- プロフィールを "profile" と "prof.*" からマージして取得 ----
-  function getProfileMerged(){
-    const p=j('profile')||{};
-    return {
-      name: (p.name ?? getVal('prof.name') ?? '').toString().trim(),
-      age:  (p.age  ?? getVal('prof.age')  ?? '').toString().trim(),
-      area: (p.area ?? getVal('prof.area') ?? '').toString().trim(),
-    };
-  }
-  // ---- KYC もオブジェクト/個別キーをマージ ----
-  function getKycMerged(){
-    const k=j('kyc')||{};
-    const verified = (k.verified !== undefined)? k.verified : (getVal('kyc.verified')==='true');
-    const gender   = (k.gender   !== undefined)? k.gender   : (getVal('kyc.gender')||'');
-    return {verified, gender};
+  // --- 安全なLIFF初期化（ループ防止） ---
+  async function initLiffSafe(){
+    const LIFF_ID=(window.APP&&APP.LIFF_ID)||'2008178197-ELrxabO9';
+    try{ await liff.init({ liffId: LIFF_ID }); }catch(e){ console.warn(e); return false; }
+    if(liff.isInClient()){ return true; }
+    if(!liff.isLoggedIn()){
+      if(!sessionStorage.getItem('liff.login.tried')){
+        sessionStorage.setItem('liff.login.tried','1');
+        liff.login({ redirectUri: location.href });
+      }
+      return false;
+    }
+    return true;
   }
 
-  const stepLabels=['未開始','同意','決済','抽選'];
-  function setProgress(step){
-    $('#stepPill').textContent = stepLabels[step]||'未開始';
-    [1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on', i<=step));
-    localStorage.setItem('state.step', String(step));
-  }
+  function setProgress(n){ [1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on', i<=n)); localStorage.setItem('state.step', String(n)); }
+  function show(id){ ['secInput','secAgree','secPay','secDraw'].forEach(x=>document.getElementById(x).style.display = (x===id?'block':'none')); }
 
   function canProceed(){
-    const p = getProfileMerged();
-    const k = getKycMerged();
-    const requiredOK = (p.name && p.age && p.area);
-    return requiredOK && k.verified && $('#selArea').value;
+    // プロフィール必須 & KYC済み
+    const p=j('profile')||{};
+    const okProf = !!(p.name && p.age && p.area);
+    const okKyc  = (localStorage.getItem('kyc.verified')==='true');
+    return okProf && okKyc;
   }
 
   function currentPay(){
-    const credit = Number(localStorage.getItem('credit')||0);
-    const k=getKycMerged(), sub=j('sub')||{};
-    let pay=0;
-    if(k.gender==='female' || sub.active){ pay=0; }
-    else{ pay = $('#paySub').checked? 1980 : 1000; }
-    $('#curCredit').textContent=credit;
-    $('#payAmount').textContent=pay;
-    $('#afterCredit').textContent=Math.max(0, credit - pay);
-    const lack = (credit - pay) < 0;
-    $('#lackMsg').style.display = lack? 'block':'none';
-    $('#confirmPay').disabled = lack;
+    const male = (localStorage.getItem('kyc.gender')==='male');
+    const female = (localStorage.getItem('kyc.gender')==='female');
+    const sub = $('#paySub').checked;
+    let pay = 0;
+    if(female){ pay = 0; }
+    else if(male){ pay = sub?1980:1000; }
+    else { pay = 1000; } // 未設定なら男性と同等扱い（デモ）
     return pay;
   }
 
-  // ---- GAS へPOST（CORS→フォーム→no-cors の順でフォールバック）----
-  async function postToGAS(payload){
-    // 1) JSON（CORS）
-    try{
-      const r = await fetch(API_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload),
-      });
-      if(r.ok) return true;
-    }catch(e){/* fallthrough */}
-
-    // 2) フォームエンコード
-    try{
-      const body = new URLSearchParams({payload: JSON.stringify(payload)});
-      const r2 = await fetch(API_URL, { method:'POST', body });
-      if(r2.ok) return true;
-    }catch(e){/* fallthrough */}
-
-    // 3) 最終手段：no-cors（レスポンスは読めないが送信はされる）
-    try{
-      await fetch(API_URL, {
-        method:'POST', mode:'no-cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload)
-      });
-      return true;
-    }catch(e){ return false; }
-  }
-
-  // 画面遷移
-  function show(id){
-    ['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));
-    setProgress( {'secInput':0,'secAgree':1,'secPay':2,'secDraw':3}[id] ?? 0 );
-  }
-
   document.addEventListener('DOMContentLoaded', async ()=>{
-    // LIFF 初期化（api.jsでAPP設定済み想定）
-    try{
-      await liff.init({ liffId: (window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
-      if(window.SYNC && SYNC.syncOnLogin){
+    $('#siteSub').textContent = location.hostname.replace(/^www\./,'');
+
+    const ok = await initLiffSafe();
+    if(ok){
+      try{
         const prof = await liff.getProfile();
-        await SYNC.syncOnLogin(prof);
-      }
-    }catch(e){ console.warn(e); }
+        if(prof && prof.displayName){ localStorage.setItem('line.displayName', prof.displayName); }
+      }catch(e){ console.warn(e); }
+    }
 
     // 同意→決済
     $('#toAgree').addEventListener('click', ()=>{
@@ -301,42 +177,39 @@
       credit = Math.max(0, credit - pay);
       localStorage.setItem('credit', String(credit));
 
-      // サブスク加入フラグ（今回支払いが発生した上で選択している場合のみ）
+      // サブスク加入（デモ）
       if($('#paySub').checked && pay>0){
         const next = new Date(); next.setMonth(next.getMonth()+1);
-        localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
-        // お知らせへ追加
+        localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', since:new Date().toISOString().slice(0,10), nextRenewal: next.toISOString().slice(0,10)}));
+        // お知らせへ追記（デモ）
         const keyA='noti.items', keyB='notifications';
         const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
-        items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
+        items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
         localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
       }
 
-      // ★ ここで必ずGASに送る（申込み内容+支払情報）
+      // ★ ここでGASに送信（既存ロジックそのまま）
       const payload = {
-        action: 'apply',
-        timestamp: new Date().toISOString(),
-        source: location.hostname,
+        action:'apply',
+        timestamp:new Date().toISOString(),
+        source:location.hostname,
         uid: localStorage.getItem('uid')||'',
         members: $('#selMembers').value,
         area: $('#selArea').value,
-        prefAge: $('#selAge').value,
-        selfScore: Number($('#inSelf').value||0),
-        friends: ($('#inFriends').value||'').trim(),
-        profile: getProfileMerged(),
-        kyc: getKycMerged(),
-        payment: {
-          type: $('#paySub').checked ? 'subscription' : 'oneoff',
-          amount: pay,
-          afterCredit: credit
-        }
+        gender: $('#selGender').value,
+        friendIds: $('#friendIds').value,
+        pay: pay
       };
-
-      // SYNCログ（あれば）
-      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(e){}
-
-      const ok = await postToGAS(payload);
-      if(!ok){
+      try{
+        const res = await fetch((window.APP&&APP.GAS_ENDPOINT)||'https://script.google.com/macros/s/AKfycbzvAK9-fg02CJAmAO73XyuaN3HjF0k0bDncAxtWdn2MVOhTub1T9hT8bSs9XG0_4qxC/exec', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload),
+          mode:'cors'
+        });
+        if(!res.ok){ throw new Error('bad'); }
+      }catch(e){
+        console.warn(e);
         alert('サーバー送信に失敗しました。URL・GAS公開設定・CORSを確認してください。');
         return;
       }
@@ -344,7 +217,7 @@
       show('secDraw');
     });
 
-    // 初期
+    // 初期表示
     setProgress(Number(localStorage.getItem('state.step')||'0'));
     show('secInput');
   });
