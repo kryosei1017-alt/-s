@@ -6,7 +6,7 @@
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<!-- api.js がサーバにある前提。もし api-4.js なら下行を置換してください -->
+<!-- ファイル名に合わせてこちらに変更 -->
 <script src="api.js"></script>
 <style>
   :root{
@@ -140,17 +140,6 @@
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const g=(k)=>localStorage.getItem(k);
   const s=(k,val)=>localStorage.setItem(k, typeof val==='string'? val: JSON.stringify(val));
-
-  // --- LIFF ID 自動解決 ---
-  function resolveLiffId(){
-    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
-    const host = location.hostname;
-    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
-      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
-      if (seg) return seg;
-    }
-    return "2008178197-ELrxabO9";
-  }
 
   function hash36(str){
     let h=0;
@@ -299,34 +288,68 @@
     try{ await navigator.clipboard.writeText(cur.url); alert('招待URLをコピーしました'); }catch{}
   });
 
+  // --- LIFF ID 自動解決 & ログインループ対策 ---
+  function resolveLiffId(){
+    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
+    const host = location.hostname;
+    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
+      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
+      if (seg) return seg;
+    }
+    return "2008178197-ELrxabO9";
+  }
+  const LoginGuard = {
+    key: 'liff_login_once',
+    ttlMs: 180000,
+    now(){ return Date.now(); },
+    mark(){ sessionStorage.setItem(this.key, String(this.now())); },
+    clear(){ sessionStorage.removeItem(this.key); },
+    hasRecentlyTried(){
+      const t = Number(sessionStorage.getItem(this.key)||0);
+      if(!t) return false;
+      return (this.now()-t) < this.ttlMs;
+    }
+  };
+  function hasOAuthReturnParams(){
+    const q = new URLSearchParams(location.search);
+    return q.has('liff.state') || q.has('code') || q.has('state');
+  }
+
   document.addEventListener('DOMContentLoaded', async ()=>{
     $('#siteSub').textContent = location.hostname.replace(/^www\./,'');
 
-    // --- 強固な LIFF 初期化 ---
-    const LIFF_ID = resolveLiffId();
-    try{
-      await liff.init({ liffId: LIFF_ID });
-      const inClient = liff.isInClient();
-      if(!inClient && !liff.isLoggedIn()){
-        liff.login({ redirectUri: location.href });
-        return;
-      }
-    }catch(e){
-      console.warn('LIFF init error:', e);
-    }
-
-    // UID を確実に生成/反映
     await ensureUIDAsync();
     renderUID(); renderProfile(); renderKyc(); renderCredit(); renderInvites(); renderNoti();
 
+    // 強固な LIFF 初期化（外部のみ1回ログイン）
+    try{
+      const LIFF_ID = resolveLiffId();
+      await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser:true });
+      const inClient = liff.isInClient();
+
+      if(!inClient){
+        if(!liff.isLoggedIn()){
+          if(!LoginGuard.hasRecentlyTried()){
+            LoginGuard.mark();
+            const cleanUrl = location.origin + location.pathname + location.search;
+            liff.login({ redirectUri: cleanUrl });
+            return;
+          } else if(hasOAuthReturnParams()){
+            LoginGuard.clear();
+          }
+        } else {
+          LoginGuard.clear();
+        }
+      }
+    }catch(e){ console.warn('LIFF init/login error', e); }
+
+    // 同期系（ログイン状態が取れたら同期）
     try{
       if(window.SYNC && SYNC.syncOnLogin){
         const prof = await liff.getProfile().catch(()=>null);
-        if (prof) {
-          await SYNC.syncOnLogin(prof);
-          await ensureUIDAsync();
-          renderUID();
-        }
+        if(prof){ await SYNC.syncOnLogin(prof); }
+        await ensureUIDAsync();
+        renderUID();
       }
     }catch(e){ console.warn(e); }
   });
