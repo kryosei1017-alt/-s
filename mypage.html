@@ -31,8 +31,10 @@
   .label{color:var(--muted);font-size:12px}
   .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
   .ok{background:#E7F5ED;color:#065F46}.warn{background:#FEF3C7;color:#92400E}.gray{background:#F3F4F6;color:#111827}
+
   input,select,textarea{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;font-size:16px}
   textarea{min-height:90px}
+
   .urlbox{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;word-break:break-all}
   nav.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
   .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
@@ -47,7 +49,7 @@
 </header>
 
 <main class="wrap">
-  <!-- UID -->
+  <!-- UID（最上段） -->
   <section class="card">
     <div class="row between">
       <div class="row" style="gap:8px">
@@ -58,7 +60,7 @@
     </div>
   </section>
 
-  <!-- プロフィール（表示） -->
+  <!-- プロフィール（コンパクト表示＋編集ボタン） -->
   <section class="card" id="profView">
     <div class="row between">
       <div style="font-weight:700">プロフィール</div>
@@ -69,7 +71,7 @@
     <div class="kv"><div class="label">エリア</div><div id="v_area">—</div></div>
   </section>
 
-  <!-- プロフィール（編集） -->
+  <!-- プロフィール編集 -->
   <section class="card" id="profEdit" style="display:none">
     <div class="row between"><div style="font-weight:700">プロフィールを編集</div></div>
     <div class="row" style="gap:12px;flex-wrap:wrap">
@@ -98,7 +100,7 @@
     <div class="label" id="saveHint" style="display:none;margin-top:6px">保存しました。</div>
   </section>
 
-  <!-- 本人確認 -->
+  <!-- 本人確認（デモ） -->
   <section class="card" id="kycCard">
     <div class="row between">
       <div style="font-weight:700">本人確認</div>
@@ -112,7 +114,7 @@
     <div class="label" id="kycGender" style="margin-top:6px">—</div>
   </section>
 
-  <!-- クレジット残高 -->
+  <!-- ▼ クレジット残高（ホームから移設） -->
   <section class="card" id="creditCard">
     <div class="row between">
       <div style="font-weight:700">クレジット残高</div>
@@ -135,7 +137,7 @@
     </div>
   </section>
 
-  <!-- 履歴（現在の招待URL＆期限を先頭に） -->
+  <!-- ▼ 履歴（先に表示） + 現在の招待 -->
   <section class="card" id="histCard">
     <div style="font-weight:700">履歴</div>
     <div class="urlbox" id="currentInvite" style="margin-top:8px">— 現在の招待：未発行 —</div>
@@ -146,7 +148,7 @@
     <div id="histList" class="label" style="margin-top:4px">— まだ履歴がありません —</div>
   </section>
 
-  <!-- お知らせ（下） -->
+  <!-- ▼ お知らせ（順番を下に移動） -->
   <section class="card" id="notiCard">
     <div class="row between">
       <div style="font-weight:700">お知らせ</div>
@@ -155,7 +157,7 @@
     <div id="notiList" class="label" style="margin-top:8px">—</div>
   </section>
 
-  <!-- お問い合わせ（最下部） -->
+  <!-- ▼ お問い合わせ（最下部に復活） -->
   <section class="card" id="contactCard">
     <div style="font-weight:700">お問い合わせ</div>
     <p class="label" style="margin-top:6px">ご不明点は下記からご連絡ください。</p>
@@ -175,45 +177,11 @@
   const $=s=>document.querySelector(s);
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const g=(k)=>localStorage.getItem(k);
-  const sset=(k,val)=>localStorage.setItem(k, typeof val==='string'? val: JSON.stringify(val));
-
-  // --- LIFF ログインループ対策 ---
-  const LOGIN_GUARD_KEY='LIFF_LOGIN_TRIED';
-  const SYNC_SENT_KEY='SYNC_LOGIN_SENT';
-  async function initLiffSafely(){
-    try{
-      await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
-
-      const inClient = liff.isInClient();
-      const loggedIn = liff.isLoggedIn();
-
-      if(!inClient && !loggedIn){
-        if(!sessionStorage.getItem(LOGIN_GUARD_KEY)){
-          sessionStorage.setItem(LOGIN_GUARD_KEY,'1');
-          const redirect = location.origin + location.pathname;
-          liff.login({ redirectUri: redirect });
-          return false;
-        }else{
-          console.warn('Skip liff.login to avoid loop');
-          return false;
-        }
-      }
-      sessionStorage.removeItem(LOGIN_GUARD_KEY);
-
-      if(window.SYNC && SYNC.syncOnLogin && !sessionStorage.getItem(SYNC_SENT_KEY)){
-        const prof = await liff.getProfile().catch(()=>null);
-        await SYNC.syncOnLogin(prof||{});
-        sessionStorage.setItem(SYNC_SENT_KEY,'1');
-      }
-      return true;
-    }catch(e){
-      console.warn('LIFF init error', e);
-      return false;
-    }
-  }
+  const s=(k,val)=>localStorage.setItem(k, typeof val==='string'? val: JSON.stringify(val));
 
   function renderUID(){ $('#uidText').textContent = g('uid') || '—'; }
   function renderProfile(){
+    // profile と prof.* をマージして表示
     const p=j('profile')||{};
     const name = p.name ?? g('prof.name') ?? '—';
     const age  = p.age  ?? g('prof.age')  ?? '—';
@@ -240,10 +208,10 @@
     if(on) fillForm();
   }
   async function saveProfile(){
+    const name=$('#f_name').value.trim(), age=$('#f_age').value.trim(), area=$('#f_area').value.trim();
+    if(!name||!age||!area){ alert('ニックネーム・年齢・エリアは必須です。'); return; }
     const profile = {
-      name:($('#f_name').value||'').trim(),
-      age:($('#f_age').value||'').trim(),
-      area:($('#f_area').value||'').trim(),
+      name, age, area,
       hobby:($('#f_hobby').value||'').trim(),
       like:($('#f_like').value||'').trim(),
       usually:($('#f_usually').value||'').trim(),
@@ -251,11 +219,11 @@
       school:($('#f_school').value||'').trim(),
       free:($('#f_free').value||'').trim()
     };
-    if(!profile.name||!profile.age||!profile.area){ alert('ニックネーム・年齢・エリアは必須です。'); return; }
-    sset('profile', profile);
-    sset('prof.name', profile.name); sset('prof.age', profile.age); sset('prof.area', profile.area);
-    sset('prof.hobby', profile.hobby); sset('prof.like', profile.like); sset('prof.usually', profile.usually);
-    sset('prof.job', profile.job); sset('prof.school', profile.school); sset('prof.free', profile.free);
+    // 統合JSON と 個別キーの両方を保存（互換）
+    s('profile', profile);
+    s('prof.name', profile.name); s('prof.age', profile.age); s('prof.area', profile.area);
+    s('prof.hobby', profile.hobby); s('prof.like', profile.like); s('prof.usually', profile.usually);
+    s('prof.job', profile.job); s('prof.school', profile.school); s('prof.free', profile.free);
 
     try{
       if(window.SYNC && SYNC.upsertUser){
@@ -279,22 +247,25 @@
     $('#kycGender').textContent = k.verified ? (k.gender==='female'?'女性':'男性') : '—';
   }
   function setKyc(gender){
-    if(gender){ sset('kyc', {verified:true, gender}); sset('kyc.verified','true'); sset('kyc.gender',gender); }
-    else{ sset('kyc', {verified:false, gender:''}); sset('kyc.verified','false'); sset('kyc.gender',''); }
+    if(gender){ s('kyc', {verified:true, gender}); s('kyc.verified','true'); s('kyc.gender',gender); }
+    else{ s('kyc', {verified:false, gender:''}); s('kyc.verified','false'); s('kyc.gender',''); }
     renderKyc();
   }
 
+  // ▼ クレジット
   function setCredit(vl){ localStorage.setItem('credit', String(vl)); $('#credit').textContent = vl; }
   function renderCredit(){ $('#credit').textContent = Number(g('credit')||0); }
 
+  // ▼ お知らせ
   function getNoti(){ return j('noti.items') || j('notifications') || []; }
-  function setNoti(arr){ sset('noti.items', arr); sset('notifications', arr); }
+  function setNoti(arr){ s('noti.items', arr); s('notifications', arr); }
   function renderNoti(){
     const arr=getNoti();
     if(!arr.length){ $('#notiList').textContent='— まだお知らせはありません —'; return; }
     $('#notiList').innerHTML = arr.map(n=>`<div>・${(n.date||'').toString()}：${n.text||''}</div>`).join('');
   }
 
+  // ▼ 招待URL（現在＆履歴）
   function formatRemain(iso){
     if(!iso) return '—';
     const d = new Date(iso+'T00:00:00'); const today=new Date(); d.setHours(0,0,0,0); today.setHours(0,0,0,0);
@@ -310,14 +281,16 @@
                                            : '— まだ履歴がありません —';
   }
 
-  // クリック
+  // クリック類
   $('#copyUid').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText($('#uidText').textContent||''); alert('UIDをコピーしました'); }catch{} });
   $('#editBtn').addEventListener('click',()=>toggleEdit(true));
   $('#cancelBtn').addEventListener('click',()=>toggleEdit(false));
   $('#saveBtn').addEventListener('click',saveProfile);
+
   $('#asFemale').addEventListener('click',()=>setKyc('female'));
   $('#asMale').addEventListener('click',()=>setKyc('male'));
   $('#kycReset').addEventListener('click',()=>setKyc(''));
+
   $('#chargeBtn').addEventListener('click',()=>$('#chargePanel').style.display = $('#chargePanel').style.display==='none'?'block':'none');
   $('#chargeDo').addEventListener('click',()=>{
     const add = Number($('#chargeAmount').value||0);
@@ -326,6 +299,7 @@
     const arr=getNoti(); arr.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), text:`${add} pt をチャージしました（残高：${next} pt）`});
     setNoti(arr); renderNoti();
   });
+
   $('#clearNoti').addEventListener('click',()=>{ setNoti([]); renderNoti(); });
   $('#copyInvite').addEventListener('click',async()=>{
     const cur = j('invite.current') || {};
@@ -335,10 +309,17 @@
 
   document.addEventListener('DOMContentLoaded', async ()=>{
     $('#siteSub').textContent = location.hostname.replace(/^www\./,'');
-    const ok = await initLiffSafely();
-    if(!ok) return;
-
     renderUID(); renderProfile(); renderKyc(); renderCredit(); renderInvites(); renderNoti();
+
+    try{
+      await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
+      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
+      if(window.SYNC && SYNC.syncOnLogin){
+        const prof = await liff.getProfile();
+        await SYNC.syncOnLogin(prof);
+        renderUID(); // UID が付与された場合に反映
+      }
+    }catch(e){ console.warn(e); }
   });
 </script>
 </body>
