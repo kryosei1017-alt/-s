@@ -6,6 +6,7 @@
 <title>LIFF Minimal｜申込み</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<!-- api.js がサーバにある前提。もし api-4.js なら下行を置換してください -->
 <script src="api.js"></script>
 <style>
   :root{
@@ -27,11 +28,9 @@
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}
   .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  /* ミニ進捗 */
   .mini{display:flex;align-items:center;gap:10px}
   .segmini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-left:auto;min-width:120px}
   .seg{height:8px;border-radius:999px;background:#DFE6DF}.seg.on{background:var(--accent)}
-  /* 入力 */
   .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
   .label{font-weight:700}
   .picker-wrap{position:relative}
@@ -57,8 +56,6 @@
 </header>
 
 <main class="wrap">
-
-  <!-- ホームの「進捗」をミニ化して統合 -->
   <section class="card" id="progressMini">
     <div class="mini">
       <div class="row" style="gap:6px">
@@ -73,7 +70,6 @@
     </div>
   </section>
 
-  <!-- 入力 -->
   <section class="card" id="secInput">
     <div class="label">人数</div>
     <div class="picker-wrap">
@@ -120,7 +116,6 @@
     <p class="sub">※ 本人確認＆プロフィール必須（ニックネーム・年齢・エリア）未入力だと進めません。</p>
   </section>
 
-  <!-- 同意 -->
   <section class="card" id="secAgree" style="display:none">
     <div class="ghost">
       <b>本人確認について：</b>必要に応じて身分証とセルフィー提出をお願いする場合があります（年齢・なりすまし対策）。
@@ -136,7 +131,6 @@
     </div>
   </section>
 
-  <!-- 決済 -->
   <section class="card" id="secPay" style="display:none">
     <div class="sub">クレジット残高から差し引きます。</div>
 
@@ -165,14 +159,12 @@
     <p class="sub" id="lackMsg" style="color:#92400E;display:none;margin-top:8px">※ 残高不足です。<b>マイページ</b>でチャージしてください。</p>
   </section>
 
-  <!-- 抽選（ダミー） -->
   <section class="card" id="secDraw" style="display:none">
     <p>申込みを受け付けました。結果はメッセージでお知らせします。</p>
     <button class="btn" onclick="location.href='mypage.html'">マイページへ</button>
   </section>
 </main>
 
-<!-- タブ（ホーム削除 → 2タブ体制） -->
 <nav class="tabbar">
   <a class="active" href="apply.html"><span class="tabicon"></span>申込み</a>
   <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
@@ -183,10 +175,24 @@
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const getVal=(k)=>localStorage.getItem(k);
 
-  // ★★★★★ あなたが提示したGAS WebアプリURL（統一） ★★★★★
+  // ★ GAS WebアプリURL（現行のまま）
   const API_URL = "https://script.google.com/macros/s/AKfycbz6_13624N9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec";
 
-  // ---- プロフィールを "profile" と "prof.*" からマージして取得 ----
+  // --- LIFF ID 自動解決 ---
+  function resolveLiffId(){
+    // 1) api.js 等で提供される定義を最優先
+    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
+    // 2) miniapp / liff ドメインから抽出
+    const host = location.hostname;
+    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
+      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
+      if (seg) return seg;
+    }
+    // 3) 既知の本番IDをフォールバック
+    return "2008178197-ELrxabO9";
+  }
+
+  // ---- プロフィール & KYC マージ（既存）----
   function getProfileMerged(){
     const p=j('profile')||{};
     return {
@@ -195,7 +201,6 @@
       area: (p.area ?? getVal('prof.area') ?? '').toString().trim(),
     };
   }
-  // ---- KYC もオブジェクト/個別キーをマージ ----
   function getKycMerged(){
     const k=j('kyc')||{};
     const verified = (k.verified !== undefined)? k.verified : (getVal('kyc.verified')==='true');
@@ -232,9 +237,7 @@
     return pay;
   }
 
-  // ---- GAS へPOST（CORS→フォーム→no-cors の順でフォールバック）----
   async function postToGAS(payload){
-    // 1) JSON（CORS）
     try{
       const r = await fetch(API_URL, {
         method:'POST',
@@ -242,16 +245,12 @@
         body: JSON.stringify(payload),
       });
       if(r.ok) return true;
-    }catch(e){/* fallthrough */}
-
-    // 2) フォームエンコード
+    }catch(e){}
     try{
       const body = new URLSearchParams({payload: JSON.stringify(payload)});
       const r2 = await fetch(API_URL, { method:'POST', body });
       if(r2.ok) return true;
-    }catch(e){/* fallthrough */}
-
-    // 3) 最終手段：no-cors（レスポンスは読めないが送信はされる）
+    }catch(e){}
     try{
       await fetch(API_URL, {
         method:'POST', mode:'no-cors',
@@ -262,22 +261,29 @@
     }catch(e){ return false; }
   }
 
-  // 画面遷移
   function show(id){
     ['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));
     setProgress( {'secInput':0,'secAgree':1,'secPay':2,'secDraw':3}[id] ?? 0 );
   }
 
   document.addEventListener('DOMContentLoaded', async ()=>{
-    // LIFF 初期化（api.jsでAPP設定済み想定）
+    // --- 強固な LIFF 初期化 ---
+    const LIFF_ID = resolveLiffId();
     try{
-      await liff.init({ liffId: (window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
-      if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile();
-        await SYNC.syncOnLogin(prof);
+      await liff.init({ liffId: LIFF_ID });
+      const inClient = liff.isInClient();
+      if(!inClient && !liff.isLoggedIn()){
+        liff.login({ redirectUri: location.href });
+        return;
       }
-    }catch(e){ console.warn(e); }
+      if(window.SYNC && SYNC.syncOnLogin){
+        const prof = await liff.getProfile().catch(()=>null);
+        if (prof) { await SYNC.syncOnLogin(prof); }
+      }
+    }catch(e){
+      console.warn('LIFF init error:', e);
+      // 失敗しても画面は使えるように継続
+    }
 
     // 同意→決済
     $('#toAgree').addEventListener('click', ()=>{
@@ -301,18 +307,15 @@
       credit = Math.max(0, credit - pay);
       localStorage.setItem('credit', String(credit));
 
-      // サブスク加入フラグ（今回支払いが発生した上で選択している場合のみ）
       if($('#paySub').checked && pay>0){
         const next = new Date(); next.setMonth(next.getMonth()+1);
         localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
-        // お知らせへ追加
         const keyA='noti.items', keyB='notifications';
         const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
         items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
         localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
       }
 
-      // ★ ここで必ずGASに送る（申込み内容+支払情報）
       const payload = {
         action: 'apply',
         timestamp: new Date().toISOString(),
@@ -332,7 +335,6 @@
         }
       };
 
-      // SYNCログ（あれば）
       try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(e){}
 
       const ok = await postToGAS(payload);
@@ -340,7 +342,6 @@
         alert('サーバー送信に失敗しました。URL・GAS公開設定・CORSを確認してください。');
         return;
       }
-
       show('secDraw');
     });
 
