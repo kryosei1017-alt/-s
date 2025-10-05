@@ -114,7 +114,7 @@
     <div class="label" id="kycGender" style="margin-top:6px">—</div>
   </section>
 
-  <!-- ▼ ホームの「クレジット残高」を移設 -->
+  <!-- ▼ クレジット残高（ホームから移設） -->
   <section class="card" id="creditCard">
     <div class="row between">
       <div style="font-weight:700">クレジット残高</div>
@@ -137,16 +137,7 @@
     </div>
   </section>
 
-  <!-- ▼ ホームの「お知らせ」を移設 -->
-  <section class="card" id="notiCard">
-    <div class="row between">
-      <div style="font-weight:700">お知らせ</div>
-      <button class="btn small" id="clearNoti">クリア</button>
-    </div>
-    <div id="notiList" class="label" style="margin-top:8px">—</div>
-  </section>
-
-  <!-- 履歴（現在の招待URL＆期限を先頭に表示） -->
+  <!-- ▼ 履歴（先に表示） + 現在の招待 -->
   <section class="card" id="histCard">
     <div style="font-weight:700">履歴</div>
     <div class="urlbox" id="currentInvite" style="margin-top:8px">— 現在の招待：未発行 —</div>
@@ -155,6 +146,25 @@
     </div>
     <div class="label" style="margin-top:10px">過去の発行履歴</div>
     <div id="histList" class="label" style="margin-top:4px">— まだ履歴がありません —</div>
+  </section>
+
+  <!-- ▼ お知らせ（順番を下に移動） -->
+  <section class="card" id="notiCard">
+    <div class="row between">
+      <div style="font-weight:700">お知らせ</div>
+      <button class="btn small" id="clearNoti">クリア</button>
+    </div>
+    <div id="notiList" class="label" style="margin-top:8px">—</div>
+  </section>
+
+  <!-- ▼ お問い合わせ（最下部に復活） -->
+  <section class="card" id="contactCard">
+    <div style="font-weight:700">お問い合わせ</div>
+    <p class="label" style="margin-top:6px">ご不明点は下記からご連絡ください。</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <a class="btn" href="mailto:support@example.com">メールで問い合わせ</a>
+      <a class="btn" href="https://line.me/R/ti/p/@your_official" target="_blank" rel="noopener">LINE公式を開く</a>
+    </div>
   </section>
 </main>
 
@@ -165,28 +175,32 @@
 
 <script>
   const $=s=>document.querySelector(s);
-  const v=(k)=>localStorage.getItem(k);
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
+  const g=(k)=>localStorage.getItem(k);
   const s=(k,val)=>localStorage.setItem(k, typeof val==='string'? val: JSON.stringify(val));
 
-  function renderUID(){
-    $('#uidText').textContent = v('uid') || '—';
-  }
+  function renderUID(){ $('#uidText').textContent = g('uid') || '—'; }
   function renderProfile(){
-    $('#v_name').textContent = v('prof.name')||'—';
-    $('#v_age').textContent  = v('prof.age') ||'—';
-    $('#v_area').textContent = v('prof.area')||'—';
+    // profile と prof.* をマージして表示
+    const p=j('profile')||{};
+    const name = p.name ?? g('prof.name') ?? '—';
+    const age  = p.age  ?? g('prof.age')  ?? '—';
+    const area = p.area ?? g('prof.area') ?? '—';
+    $('#v_name').textContent = name || '—';
+    $('#v_age').textContent  = age  || '—';
+    $('#v_area').textContent = area || '—';
   }
   function fillForm(){
-    $('#f_name').value = v('prof.name')||'';
-    $('#f_age').value  = v('prof.age') ||'';
-    $('#f_area').value = v('prof.area')||'';
-    $('#f_hobby').value   = v('prof.hobby')||'';
-    $('#f_like').value    = v('prof.like')||'';
-    $('#f_usually').value = v('prof.usually')||'';
-    $('#f_job').value     = v('prof.job')||'';
-    $('#f_school').value  = v('prof.school')||'';
-    $('#f_free').value    = v('prof.free')||'';
+    const p=j('profile')||{};
+    $('#f_name').value = (p.name ?? g('prof.name') ?? '');
+    $('#f_age').value  = (p.age  ?? g('prof.age')  ?? '');
+    $('#f_area').value = (p.area ?? g('prof.area') ?? '');
+    $('#f_hobby').value   = p.hobby   ?? g('prof.hobby')   ?? '';
+    $('#f_like').value    = p.like    ?? g('prof.like')    ?? '';
+    $('#f_usually').value = p.usually ?? g('prof.usually') ?? '';
+    $('#f_job').value     = p.job     ?? g('prof.job')     ?? '';
+    $('#f_school').value  = p.school  ?? g('prof.school')  ?? '';
+    $('#f_free').value    = p.free    ?? g('prof.free')    ?? '';
   }
   function toggleEdit(on){
     $('#profView').style.display = on?'none':'block';
@@ -196,18 +210,28 @@
   async function saveProfile(){
     const name=$('#f_name').value.trim(), age=$('#f_age').value.trim(), area=$('#f_area').value.trim();
     if(!name||!age||!area){ alert('ニックネーム・年齢・エリアは必須です。'); return; }
-    s('prof.name',name); s('prof.age',age); s('prof.area',area);
-    s('prof.hobby',$('#f_hobby').value.trim()); s('prof.like',$('#f_like').value.trim());
-    s('prof.usually',$('#f_usually').value.trim()); s('prof.job',$('#f_job').value.trim());
-    s('prof.school',$('#f_school').value.trim()); s('prof.free',$('#f_free').value.trim());
-    // SYNC（存在すれば）
+    const profile = {
+      name, age, area,
+      hobby:($('#f_hobby').value||'').trim(),
+      like:($('#f_like').value||'').trim(),
+      usually:($('#f_usually').value||'').trim(),
+      job:($('#f_job').value||'').trim(),
+      school:($('#f_school').value||'').trim(),
+      free:($('#f_free').value||'').trim()
+    };
+    // 統合JSON と 個別キーの両方を保存（互換）
+    s('profile', profile);
+    s('prof.name', profile.name); s('prof.age', profile.age); s('prof.area', profile.area);
+    s('prof.hobby', profile.hobby); s('prof.like', profile.like); s('prof.usually', profile.usually);
+    s('prof.job', profile.job); s('prof.school', profile.school); s('prof.free', profile.free);
+
     try{
       if(window.SYNC && SYNC.upsertUser){
         await SYNC.upsertUser({
-          uid: v('uid')||'',
-          profile:{name,age,area,hobby:v('prof.hobby')||'',like:v('prof.like')||'',usually:v('prof.usually')||'',job:v('prof.job')||'',school:v('prof.school')||'',free:v('prof.free')||''},
-          credit: Number(v('credit')||0),
-          kyc: {verified: v('kyc.verified')==='true', gender: v('kyc.gender')||''}
+          uid: g('uid')||'',
+          profile,
+          credit: Number(g('credit')||0),
+          kyc: {verified: g('kyc.verified')==='true', gender: g('kyc.gender')||''}
         });
       }
     }catch(e){ console.warn(e); }
@@ -217,22 +241,22 @@
   }
 
   function renderKyc(){
-    const verified = v('kyc.verified')==='true';
-    const gender   = v('kyc.gender')||'';
-    $('#kycPill').textContent = verified?'完了':'未完了';
-    $('#kycPill').className = 'pill ' + (verified?'ok':'warn');
-    $('#kycGender').textContent = verified ? (gender==='female'?'女性':'男性') : '—';
+    const k = j('kyc') || {verified: g('kyc.verified')==='true', gender: g('kyc.gender')||''};
+    $('#kycPill').textContent = k.verified?'完了':'未完了';
+    $('#kycPill').className = 'pill ' + (k.verified?'ok':'warn');
+    $('#kycGender').textContent = k.verified ? (k.gender==='female'?'女性':'男性') : '—';
   }
-  function setKyc(g){
-    if(g){ s('kyc.gender', g); s('kyc.verified','true'); } else { s('kyc.gender',''); s('kyc.verified','false'); }
+  function setKyc(gender){
+    if(gender){ s('kyc', {verified:true, gender}); s('kyc.verified','true'); s('kyc.gender',gender); }
+    else{ s('kyc', {verified:false, gender:''}); s('kyc.verified','false'); s('kyc.gender',''); }
     renderKyc();
   }
 
   // ▼ クレジット
   function setCredit(vl){ localStorage.setItem('credit', String(vl)); $('#credit').textContent = vl; }
-  function renderCredit(){ $('#credit').textContent = Number(v('credit')||0); }
+  function renderCredit(){ $('#credit').textContent = Number(g('credit')||0); }
 
-  // ▼ お知らせ（noti.items / notifications を相互に読み書き）
+  // ▼ お知らせ
   function getNoti(){ return j('noti.items') || j('notifications') || []; }
   function setNoti(arr){ s('noti.items', arr); s('notifications', arr); }
   function renderNoti(){
@@ -270,9 +294,8 @@
   $('#chargeBtn').addEventListener('click',()=>$('#chargePanel').style.display = $('#chargePanel').style.display==='none'?'block':'none');
   $('#chargeDo').addEventListener('click',()=>{
     const add = Number($('#chargeAmount').value||0);
-    const cur = Number(v('credit')||0);
+    const cur = Number(g('credit')||0);
     const next = cur + add; setCredit(next);
-    // お知らせへ
     const arr=getNoti(); arr.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), text:`${add} pt をチャージしました（残高：${next} pt）`});
     setNoti(arr); renderNoti();
   });
@@ -286,17 +309,15 @@
 
   document.addEventListener('DOMContentLoaded', async ()=>{
     $('#siteSub').textContent = location.hostname.replace(/^www\./,'');
-    renderUID(); renderProfile(); renderKyc(); renderCredit(); renderNoti(); renderInvites();
+    renderUID(); renderProfile(); renderKyc(); renderCredit(); renderInvites(); renderNoti();
 
-    // LIFF & 同期
     try{
       await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
       if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
       if(window.SYNC && SYNC.syncOnLogin){
         const prof = await liff.getProfile();
         await SYNC.syncOnLogin(prof);
-        // UID & 反映
-        renderUID();
+        renderUID(); // UID が付与された場合に反映
       }
     }catch(e){ console.warn(e); }
   });
