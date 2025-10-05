@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-<!-- ★ ここで確実に注入：LIFF/Channel/API -->
+<!-- ★ LIFF/Channel/API をここで必ず注入 -->
 <script>
 window.APP = {
   LIFF_ID: '2008178197-ELrxabO9',
@@ -20,37 +20,28 @@ window.APP = {
 <script src="api-4.js"></script>
 
 <style>
-  :root{
-    --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59;
-    --border:#E5E7EB; --radius:16px; --tabbarH:88px; --fs:14px;
-  }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
-    line-height:1.6;font-size:var(--fs);overflow-x:hidden;touch-action:manipulation
-  }
+  :root{--bg:#F6F3EE;--card:#FFF;--ink:#1F2937;--muted:#6B7280;--accent:#0C7C59;--border:#E5E7EB;--r:16px;--tab:88px}
+  *{box-sizing:border-box}html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans JP",sans-serif;line-height:1.6;overflow-x:hidden}
   header{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 16px 8px}
   .ttl{font-weight:800;font-size:18px}.sub{color:var(--muted);font-size:12px}
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 20px)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tab) + 20px)}
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;border-radius:14px;font-size:16px;padding:14px 16px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}
-  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  .mini{display:flex;align-items:center;gap:10px}
+  .mini{display:flex;align-items:center;gap:10px}.pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
   .segmini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-left:auto;min-width:120px}
   .seg{height:8px;border-radius:999px;background:#DFE6DF}.seg.on{background:var(--accent)}
   .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
-  .label{font-weight:700}
-  .picker-wrap{position:relative}
+  .label{font-weight:700;color:#111827}
+  .picker{position:relative}
   select,input[type="number"],input[type="text"]{width:100%;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px;padding:14px;height:56px;appearance:none}
-  .picker-wrap:after{content:"";position:absolute;right:14px;top:50%;width:10px;height:10px;border-right:2px solid #9AA29A;border-bottom:2px solid #9AA29A;transform:translateY(-60%) rotate(45deg)}
+  .picker:after{content:"";position:absolute;right:14px;top:50%;width:10px;height:10px;border-right:2px solid #9AA29A;border-bottom:2px solid #9AA29A;transform:translateY(-60%) rotate(45deg)}
   .ghost{border:1px dashed var(--border);border-radius:12px;background:#FAFAF7;padding:12px}
-  nav.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
-  .tabicon{width:22px;height:22px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  nav.tab{position:fixed;left:0;right:0;bottom:0;height:var(--tab);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tab a{flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+  .i{width:22px;height:22px;border-radius:6px;background:#CBD5CB}.tab .active{color:#0d3a23;font-weight:800}.tab .active .i{background:var(--accent)}
 </style>
 </head>
 <body>
@@ -60,36 +51,27 @@ window.APP = {
 </header>
 
 <main class="wrap">
-
-  <section class="card" id="progressMini">
+  <section class="card">
     <div class="mini">
-      <div class="row" style="gap:6px"><div style="font-weight:700">進捗</div><span class="pill" id="stepPill">未開始</span></div>
+      <div class="row" style="gap:6px"><div class="label">進捗</div><span class="pill" id="stepPill">未開始</span></div>
       <div class="segmini"><div class="seg" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div></div>
     </div>
   </section>
 
   <section class="card" id="secInput">
     <div class="label">人数</div>
-    <div class="picker-wrap"><select id="selMembers"><option value="2v2">2対2</option><option value="3v3">3対3</option></select></div>
+    <div class="picker"><select id="selMembers"><option value="2v2">2対2</option><option value="3v3">3対3</option></select></div>
 
-    <div class="field">
-      <div class="label">エリア</div>
-      <div class="picker-wrap">
-        <select id="selArea">
-          <option value="" disabled selected>選択してください</option>
-          <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
-          <option>名古屋</option><option>大阪</option><option>福岡</option>
-        </select>
-      </div>
+    <div class="field"><div class="label">エリア</div>
+      <div class="picker"><select id="selArea"><option value="" disabled selected>選択してください</option><option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option><option>名古屋</option><option>大阪</option><option>福岡</option></select></div>
     </div>
 
-    <div class="field">
-      <div class="label">希望年齢層</div>
-      <div class="picker-wrap"><select id="selAge"><option>18-19</option><option>20-24</option><option>25-29</option><option>30-34</option><option>35-39</option><option>40-49</option></select></div>
+    <div class="field"><div class="label">希望年齢層</div>
+      <div class="picker"><select id="selAge"><option>18-19</option><option>20-24</option><option>25-29</option><option>30-34</option><option>35-39</option><option>40-49</option></select></div>
     </div>
 
-    <div class="field"><div class="label">自己評価スコア（0〜100）</div><input id="inSelf" type="number" min="0" max="100" value="50" /></div>
-    <div class="field"><div class="label">友だちの個別ID（カンマ区切り）</div><input id="inFriends" type="text" placeholder="例）GX-ABC1234,GX-XYZ9KLM" /></div>
+    <div class="field"><div class="label">自己評価スコア（0〜100）</div><input id="inSelf" type="number" min="0" max="100" value="50"/></div>
+    <div class="field"><div class="label">友だちの個別ID（カンマ区切り）</div><input id="inFriends" type="text" placeholder="例）GX-ABC1234,GX-XYZ9KLM"/></div>
 
     <div class="row between" style="margin-top:6px"><button class="btn" id="toAgree">同意へ進む</button></div>
     <p class="sub">※ 本人確認＆プロフィール必須（ニックネーム・年齢・エリア）。未入力は進めません。</p>
@@ -113,7 +95,7 @@ window.APP = {
       <input type="radio" name="pay" id="payOnce" checked style="width:20px;height:20px"><label for="payOnce" style="cursor:pointer;font-weight:700">単発で支払う（−1000 pt）</label>
     </div>
     <div class="ghost" style="display:flex;gap:12px;align-items:center;min-height:64px;margin-top:8px">
-      <input type="radio" name="pay" id="paySub" style="width:20px;height:20px"><label for="paySub" style="cursor:pointer;font-weight:700">サブスクに加入して支払う（−1980 pt）※ 次回以降 0 pt</label>
+      <input type="radio" name="pay" id="paySub" style="width:20px;height:20px"><label for="paySub" style="cursor:pointer;font-weight:700">サブスクで支払う（−1980 pt）※ 次回以降 0 pt</label>
     </div>
     <div class="card" style="border-style:dashed;margin-top:10px">
       <div class="row between"><div>現在の残高</div><div><b id="curCredit">0</b> pt</div></div>
@@ -134,152 +116,59 @@ window.APP = {
   </section>
 </main>
 
-<nav class="tabbar">
-  <a class="active" href="apply-4.html"><span class="tabicon"></span>申込み</a>
-  <a href="mypage-4.html"><span class="tabicon"></span>マイページ</a>
+<nav class="tab">
+  <a class="active" href="apply-4.html"><span class="i"></span>申込み</a>
+  <a href="mypage-4.html"><span class="i"></span>マイページ</a>
 </nav>
 
 <script>
   const $=s=>document.querySelector(s);
-  const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
-  const getVal=(k)=>localStorage.getItem(k);
+  const j=k=>JSON.parse(localStorage.getItem(k)||'null');
+  const gv=k=>localStorage.getItem(k);
+  const API_URL=(window.APP&&APP.API_URL)||'';
 
-  const API_URL = (window.APP&&APP.API_URL) || '';
-
-  function getProfileMerged(){
-    const p=j('profile')||{};
-    return {
-      name: (p.name ?? getVal('prof.name') ?? '').toString().trim(),
-      age:  (p.age  ?? getVal('prof.age')  ?? '').toString().trim(),
-      area: (p.area ?? getVal('prof.area') ?? '').toString().trim(),
-    };
-  }
-  function getKycMerged(){
-    const k=j('kyc')||{};
-    const verified = (k.verified !== undefined)? k.verified : (getVal('kyc.verified')==='true');
-    const gender   = (k.gender   !== undefined)? k.gender   : (getVal('kyc.gender')||'');
-    return {verified, gender};
-  }
-
+  function profileMerged(){const p=j('profile')||{};return{ name:p.name??gv('prof.name')??'', age:p.age??gv('prof.age')??'', area:p.area??gv('prof.area')??'' };}
+  function kycMerged(){const k=j('kyc')||{};return{ verified:(k.verified!==undefined)?k.verified:(gv('kyc.verified')==='true'), gender:(k.gender!==undefined)?k.gender:(gv('kyc.gender')||'') };}
   const stepLabels=['未開始','同意','決済','抽選'];
-  function setProgress(step){
-    $('#stepPill').textContent = stepLabels[step]||'未開始';
-    [1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on', i<=step));
-    localStorage.setItem('state.step', String(step));
-  }
-  function canProceed(){
-    const p = getProfileMerged(), k = getKycMerged();
-    return (p.name && p.age && p.area) && k.verified && $('#selArea').value;
-  }
-  function currentPay(){
-    const credit = Number(localStorage.getItem('credit')||0);
-    const k=getKycMerged(), sub=j('sub')||{}; let pay=0;
-    if(k.gender==='female' || sub.active){ pay=0; } else { pay = $('#paySub').checked? 1980 : 1000; }
-    $('#curCredit').textContent=credit; $('#payAmount').textContent=pay; $('#afterCredit').textContent=Math.max(0, credit - pay);
-    const lack=(credit-pay)<0; $('#lackMsg').style.display= lack?'block':'none'; $('#confirmPay').disabled=lack; return pay;
-  }
+  function setProgress(s){$('#stepPill').textContent=stepLabels[s]||'未開始';[1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on',i<=s));localStorage.setItem('state.step',String(s));}
+  function canProceed(){const p=profileMerged(),k=kycMerged();return (p.name&&p.age&&p.area)&&k.verified&&$('#selArea').value;}
+  function currentPay(){const c=Number(localStorage.getItem('credit')||0);const k=kycMerged(),sub=j('sub')||{};let pay=0;if(k.gender==='female'||sub.active){pay=0}else{pay=$('#paySub').checked?1980:1000}$('#curCredit').textContent=c;$('#payAmount').textContent=pay;$('#afterCredit').textContent=Math.max(0,c-pay);const lack=(c-pay)<0;$('#lackMsg').style.display=lack?'block':'none';$('#confirmPay').disabled=lack;return pay;}
 
-  // ★ LIFF内でも落ちにくい送信：text/plain + (liff.fetch || fetch) → form → sendBeacon → no-cors
+  // CORSに強い送信
   async function postToGAS(payload){
-    const f = (window.liff && typeof liff.fetch==='function') ? liff.fetch : fetch;
-
-    // 1) text/plain（プリフライト回避）
-    try{
-      const r = await f(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)});
-      if(r.ok) return true;
-    }catch(e){}
-
-    // 2) フォーム
-    try{
-      const body = new URLSearchParams({payload: JSON.stringify(payload)});
-      const r2 = await f(API_URL, { method:'POST', body });
-      if(r2.ok) return true;
-    }catch(e){}
-
-    // 3) sendBeacon
-    try{
-      if(navigator.sendBeacon){
-        const blob = new Blob([JSON.stringify(payload)], {type:'text/plain'});
-        if(navigator.sendBeacon(API_URL, blob)) return true;
-      }
-    }catch(e){}
-
-    // 4) no-cors（最終）
-    try{
-      await fetch(API_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload)});
-      return true;
-    }catch(e){ return false; }
+    const f=(window.liff&&typeof liff.fetch==='function')?liff.fetch:fetch;
+    try{const r=await f(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});if(r.ok)return true;}catch(e){}
+    try{const body=new URLSearchParams({payload:JSON.stringify(payload)});const r2=await f(API_URL,{method:'POST',body});if(r2.ok)return true;}catch(e){}
+    try{if(navigator.sendBeacon){const blob=new Blob([JSON.stringify(payload)],{type:'text/plain'});if(navigator.sendBeacon(API_URL,blob))return true;}}catch(e){}
+    try{await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});return true;}catch(e){return false;}
   }
+  function show(id){['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));setProgress({'secInput':0,'secAgree':1,'secPay':2,'secDraw':3}[id]??0);}
 
-  function show(id){
-    ['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));
-    setProgress({'secInput':0,'secAgree':1,'secPay':2,'secDraw':3}[id] ?? 0);
-  }
-
-  document.addEventListener('DOMContentLoaded', async ()=>{
+  document.addEventListener('DOMContentLoaded',async()=>{
     try{
-      await liff.init({ liffId: (window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
-      if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile(); await SYNC.syncOnLogin(prof);
-      }
-    }catch(e){ console.warn(e); }
+      await liff.init({liffId:(window.APP&&APP.LIFF_ID)||'',withLoginOnExternalBrowser:true});
+      if(!liff.isLoggedIn()){liff.login({redirectUri:location.href});return;}
+      if(window.SYNC&&SYNC.syncOnLogin){const prof=await liff.getProfile();await SYNC.syncOnLogin(prof);}
+    }catch(e){console.warn(e);}
 
-    $('#toAgree').addEventListener('click', ()=>{
-      if(!canProceed()){
-        alert('本人確認の完了と、プロフィール（ニックネーム・年齢・エリア）の入力が必要です。マイページで設定してください。');
-        location.href='mypage-4.html';
-        return;
-      }
-      show('secAgree');
-    });
+    $('#toAgree').addEventListener('click',()=>{if(!canProceed()){alert('本人確認の完了と、プロフィール（ニックネーム・年齢・エリア）の入力が必要です。マイページで設定してください。');location.href='mypage-4.html';return;}show('secAgree');});
     $('#chkAgree').addEventListener('change',()=>$('#toPay').disabled=!$('#chkAgree').checked);
     $('#backToInput').addEventListener('click',()=>show('secInput'));
-    $('#toPay').addEventListener('click',()=>{ show('secPay'); currentPay(); });
-
-    ['payOnce','paySub'].forEach(id=>$('#'+id).addEventListener('change', currentPay));
+    $('#toPay').addEventListener('click',()=>{show('secPay');currentPay();});
+    ['payOnce','paySub'].forEach(id=>$('#'+id).addEventListener('change',currentPay));
     $('#backToAgree').addEventListener('click',()=>show('secAgree'));
 
-    $('#confirmPay').addEventListener('click', async ()=>{
-      const pay = currentPay();
-      let credit = Number(localStorage.getItem('credit')||0);
-      credit = Math.max(0, credit - pay);
-      localStorage.setItem('credit', String(credit));
-
-      if($('#paySub').checked && pay>0){
-        const next = new Date(); next.setMonth(next.getMonth()+1);
-        localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
-        const keyA='noti.items', keyB='notifications';
-        const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
-        items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
-        localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
-      }
-
-      const payload = {
-        action: 'apply',
-        timestamp: new Date().toISOString(),
-        source: location.hostname,
-        uid: localStorage.getItem('appUID') || localStorage.getItem('uid') || '',
-        members: $('#selMembers').value,
-        area: $('#selArea').value,
-        prefAge: $('#selAge').value,
-        selfScore: Number($('#inSelf').value||0),
-        friends: ($('#inFriends').value||'').trim(),
-        profile: getProfileMerged(),
-        kyc: getKycMerged(),
-        payment: { type: $('#paySub').checked ? 'subscription' : 'oneoff', amount: pay, afterCredit: credit },
-        ua: navigator.userAgent
-      };
-
-      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(e){}
-
-      const ok = await postToGAS(payload);
-      if(!ok){ alert('サーバー送信に失敗しました。GAS公開設定/URL/CORSを確認してください。'); return; }
+    $('#confirmPay').addEventListener('click',async()=>{
+      const pay=currentPay();
+      let credit=Number(localStorage.getItem('credit')||0);credit=Math.max(0,credit-pay);localStorage.setItem('credit',String(credit));
+      if($('#paySub').checked&&pay>0){const next=new Date();next.setMonth(next.getMonth()+1);localStorage.setItem('sub',JSON.stringify({active:true,plan:'basic',nextRenewal:next.toISOString().slice(0,10)}));}
+      const payload={action:'apply',timestamp:new Date().toISOString(),origin:location.origin,path:location.pathname,uid:localStorage.getItem('appUID')||localStorage.getItem('uid')||'',members:$('#selMembers').value,area:$('#selArea').value,prefAge:$('#selAge').value,selfScore:Number($('#inSelf').value||0),friends:($('#inFriends').value||'').trim(),profile:profileMerged(),kyc:kycMerged(),payment:{type:$('#paySub').checked?'subscription':'oneoff',amount:pay,afterCredit:credit},ua:navigator.userAgent};
+      try{if(window.SYNC&&SYNC.logEvent){await SYNC.logEvent('apply_submitted',{pay});}}catch(e){}
+      const ok=await postToGAS(payload);if(!ok){alert('サーバー送信に失敗しました。GAS公開設定/URL/CORSを確認してください。');return;}
       show('secDraw');
     });
 
-    setProgress(Number(localStorage.getItem('state.step')||'0'));
-    show('secInput');
+    setProgress(Number(localStorage.getItem('state.step')||'0'));show('secInput');
   });
 </script>
 </body>
