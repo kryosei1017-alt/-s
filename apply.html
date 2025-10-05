@@ -183,6 +183,9 @@
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const getVal=(k)=>localStorage.getItem(k);
 
+  // ★★★★★ あなたが提示したGAS WebアプリURL（統一） ★★★★★
+  const API_URL = "https://script.google.com/macros/s/AKfycbz6_13624N9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec";
+
   // ---- プロフィールを "profile" と "prof.*" からマージして取得 ----
   function getProfileMerged(){
     const p=j('profile')||{};
@@ -229,6 +232,36 @@
     return pay;
   }
 
+  // ---- GAS へPOST（CORS→フォーム→no-cors の順でフォールバック）----
+  async function postToGAS(payload){
+    // 1) JSON（CORS）
+    try{
+      const r = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      if(r.ok) return true;
+    }catch(e){/* fallthrough */}
+
+    // 2) フォームエンコード
+    try{
+      const body = new URLSearchParams({payload: JSON.stringify(payload)});
+      const r2 = await fetch(API_URL, { method:'POST', body });
+      if(r2.ok) return true;
+    }catch(e){/* fallthrough */}
+
+    // 3) 最終手段：no-cors（レスポンスは読めないが送信はされる）
+    try{
+      await fetch(API_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+      return true;
+    }catch(e){ return false; }
+  }
+
   // 画面遷移
   function show(id){
     ['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));
@@ -268,17 +301,46 @@
       credit = Math.max(0, credit - pay);
       localStorage.setItem('credit', String(credit));
 
+      // サブスク加入フラグ（今回支払いが発生した上で選択している場合のみ）
       if($('#paySub').checked && pay>0){
         const next = new Date(); next.setMonth(next.getMonth()+1);
         localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
-        // お知らせ（マイページに移動済み）へ追加
+        // お知らせへ追加
         const keyA='noti.items', keyB='notifications';
         const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
         items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
         localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
       }
 
-      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted',{pay}); } }catch(e){}
+      // ★ ここで必ずGASに送る（申込み内容+支払情報）
+      const payload = {
+        action: 'apply',
+        timestamp: new Date().toISOString(),
+        source: location.hostname,
+        uid: localStorage.getItem('uid')||'',
+        members: $('#selMembers').value,
+        area: $('#selArea').value,
+        prefAge: $('#selAge').value,
+        selfScore: Number($('#inSelf').value||0),
+        friends: ($('#inFriends').value||'').trim(),
+        profile: getProfileMerged(),
+        kyc: getKycMerged(),
+        payment: {
+          type: $('#paySub').checked ? 'subscription' : 'oneoff',
+          amount: pay,
+          afterCredit: credit
+        }
+      };
+
+      // SYNCログ（あれば）
+      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(e){}
+
+      const ok = await postToGAS(payload);
+      if(!ok){
+        alert('サーバー送信に失敗しました。URL・GAS公開設定・CORSを確認してください。');
+        return;
+      }
+
       show('secDraw');
     });
 
