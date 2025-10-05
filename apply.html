@@ -2,8 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜申込み</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -11,81 +10,71 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59;
-    --border:#E5E7EB; --radius:16px; --fs:14px; --tabbarH:96px;
+    --border:#E5E7EB; --radius:16px; --tabbarH:96px; --fs:13.5px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
-    line-height:1.6; font-size:var(--fs); overflow-x:hidden;
-    /* 強制 横書き固定（iOS 縦組誤判定対策） */
-    writing-mode:horizontal-tb !important;
-    -webkit-writing-mode:horizontal-tb !important;
-    text-orientation:mixed !important;
+    line-height:1.6; overflow-x:hidden; -webkit-text-size-adjust:100%;
+    writing-mode:horizontal-tb !important; text-orientation:mixed !important;
     touch-action:manipulation;
   }
-  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
-  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 16px 8px}
   .ttl{font-weight:800;font-size:18px}
-  .sub{color:var(--muted);font-size:12px}
-  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 24px)}
-  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);
-        padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
-  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;
-       padding:14px 16px;border-radius:14px;font-size:16px;cursor:pointer}
+  .sub{font-size:12px;color:var(--muted)}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 20px)}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;border-radius:14px;font-size:16px;padding:14px 16px;min-height:48px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .btn:disabled{opacity:.45;cursor:not-allowed}
-  .stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 10px}
-  .seg{height:10px;border-radius:999px;background:#E0E7E0}
-  .seg.on{background:var(--accent)}
-  .dash{border:1px dashed var(--border);border-radius:12px;background:#FAFAF7}
-  .row{display:flex;align-items:center;gap:12px}
-  .row.spread{justify-content:space-between}
-  .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
-  label{font-weight:700}
-  input,select,textarea{
-    width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff
+  .row{display:flex;gap:12px;align-items:center}
+  .row.between{justify-content:space-between}
+
+  /* ステッパー */
+  .stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 14px}
+  .seg{height:10px;border-radius:999px;background:#DFE6DF}.seg.on{background:var(--accent)}
+
+  /* 入力フィールド（指で押しやすい拡大版） */
+  .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+  .label{font-weight:700}
+  /* ここが拡大のコア（高さ・フォント・パディングUP、タッチターゲット56px） */
+  select.picker{
+    width:100%; border:1px solid var(--border); border-radius:12px; background:#fff;
+    font-size:16px; padding:14px 14px; height:56px; /* ←拡大 */
+    -webkit-appearance:none; appearance:none;
   }
-  textarea{min-height:96px}
-  /* 同意／決済の“横並び”用 */
-  .choice{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px}
-  .choice input{width:22px;height:22px}
-  .choice label{font-weight:700}
-  .choice .hint{font-size:12px;color:var(--muted);font-weight:400}
-  /* 2段ボックス（単発／サブスク） */
-  .paybox{padding:8px;border-radius:12px}
-  .paybox + .paybox{margin-top:10px}
-  .right{display:flex;gap:12px;justify-content:flex-end}
-  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;
-        padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
-  nav.tabbar{
-    position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);
-    backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;
-    padding-bottom:calc(env(safe-area-inset-bottom) + 8px)
+  .picker-wrap{position:relative}
+  .picker-wrap:after{ /* 矢印 */
+    content:""; position:absolute; right:14px; top:50%; width:10px; height:10px;
+    border-right:2px solid #9AA29A; border-bottom:2px solid #9AA29A; transform:translateY(-60%) rotate(45deg);
+    pointer-events:none;
   }
-  nav.tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  input[type="number"], input[type="text"]{
+    width:100%; border:1px solid var(--border); border-radius:12px; padding:14px;
+    font-size:16px; height:56px;
+  }
+
+  /* 同意・決済の白枠（縦書き対策で横書き固定） */
+  .ghost{border:1px dashed var(--border); border-radius:12px; padding:10px; background:#FAFAF7}
+  .horiz{writing-mode:horizontal-tb !important; text-orientation:mixed !important}
+
+  /* タブバー */
+  nav.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
   .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
-  nav.tabbar .active{color:#0d3a23;font-weight:800} nav.tabbar .active .tabicon{background:var(--accent)}
-  /* 注意バナー */
-  .note{background:#FFF9DB;border:1px solid #FDE68A;padding:12px;border-radius:12px}
+  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
 </style>
 </head>
 <body>
 <header>
-  <div class="hrow">
-    <div class="ttl">申込み</div>
-    <div class="sub">入力 → 同意 → 決済 → 抽選</div>
-  </div>
+  <div class="ttl">申込み</div>
+  <div class="sub">入力 → 同意 → 決済 → 抽選</div>
 </header>
 
 <main class="wrap">
-  <!-- ステップ表示 -->
   <div class="stepper" aria-hidden="true">
-    <div class="seg on" id="seg1"></div>
-    <div class="seg" id="seg2"></div>
-    <div class="seg" id="seg3"></div>
-    <div class="seg" id="seg4"></div>
+    <div class="seg on" id="seg1"></div><div class="seg" id="seg2"></div><div class="seg" id="seg3"></div><div class="seg" id="seg4"></div>
   </div>
 
   <!-- 入力 -->
@@ -93,42 +82,49 @@
     <div class="ttl" style="font-size:17px">入力</div>
 
     <div class="field">
-      <label for="inMembers">人数</label>
-      <select id="inMembers">
-        <option value="2">2対2</option>
-        <option value="3">3対3</option>
-      </select>
+      <div class="label">人数</div>
+      <div class="picker-wrap">
+        <select id="selMembers" class="picker" autocomplete="off">
+          <option value="2v2">2対2</option>
+          <option value="3v3">3対3</option>
+          <option value="4v4">4対4</option>
+        </select>
+      </div>
     </div>
 
     <div class="field">
-      <label for="inArea">エリア</label>
-      <select id="inArea">
-        <option value="" selected>選択してください</option>
-        <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
-        <option>名古屋</option><option>大阪</option><option>福岡</option>
-      </select>
+      <div class="label">エリア</div>
+      <div class="picker-wrap">
+        <select id="selArea" class="picker" autocomplete="off">
+          <option value="" disabled selected>選択してください</option>
+          <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
+          <option>名古屋</option><option>大阪</option><option>福岡</option>
+        </select>
+      </div>
     </div>
 
     <div class="field">
-      <label for="inAge">希望年齢層</label>
-      <select id="inAge">
-        <option>20-24</option><option>25-29</option><option>30-34</option><option>35-39</option>
-        <option>40-49</option>
-      </select>
+      <div class="label">希望年齢層</div>
+      <div class="picker-wrap">
+        <select id="selAge" class="picker" autocomplete="off">
+          <option>18-19</option><option>20-24</option><option>25-29</option>
+          <option>30-34</option><option>35-39</option><option>40+</option>
+        </select>
+      </div>
     </div>
 
     <div class="field">
-      <label for="inSelf">自己評価スコア（0〜100）</label>
+      <div class="label">自己評価スコア（0〜100）</div>
       <input id="inSelf" type="number" min="0" max="100" value="50" />
     </div>
 
     <div class="field">
-      <label for="inFriends">友だちの個別ID（カンマ区切り）</label>
-      <input id="inFriends" placeholder="例）GX-ABC1234,GX-XYZ9KLM" />
+      <div class="label">友だちの個別ID（カンマ区切り）</div>
+      <input id="inFriends" type="text" placeholder="例）GX-ABC1234,GX-XYZ9KLM" />
     </div>
 
-    <div class="row spread" style="margin-top:12px">
-      <button class="btn" onclick="location.href='index.html'">戻る</button>
+    <div class="row between" style="margin-top:12px">
+      <button class="btn" id="toBack1" onclick="location.href='index.html'">戻る</button>
       <button class="btn primary" id="toAgree">同意へ進む</button>
     </div>
     <p class="sub">※ 本人確認が未完了／プロフィール必須項目未入力だと先へ進めません。</p>
@@ -137,21 +133,18 @@
   <!-- 同意 -->
   <section class="card" id="secAgree" style="display:none">
     <div class="ttl" style="font-size:17px">同意</div>
-
-    <div class="note" style="margin:10px 0 12px">
-      <b>本人確認について：</b>必要に応じて身分証とセルフィーの提出をお願いする場合があります。年齢・なりすまし対策のためです。
+    <div class="ghost">
+      <div class="sub"><b>本人確認について：</b>必要に応じて身分証とセルフィーの提出をお願いする場合があります。年齢・なりすまし対策のためです。</div>
     </div>
 
     <a class="btn" href="terms.html" target="_blank" rel="noopener">利用規約を開く</a>
 
-    <div class="dash" style="padding:12px;margin-top:10px">
-      <div class="choice">
-        <input id="chkAgree" type="checkbox" />
-        <label for="chkAgree">利用規約に同意する</label>
-      </div>
+    <div class="ghost horiz" style="margin-top:10px;display:flex;gap:12px;align-items:center;min-height:64px">
+      <input id="chkAgree" type="checkbox" style="width:26px;height:26px">
+      <span>利用規約に同意する</span>
     </div>
 
-    <div class="row spread" style="margin-top:12px">
+    <div class="row between" style="margin-top:12px">
       <button class="btn" id="backToInput">戻る</button>
       <button class="btn primary" id="toPay" disabled>決済へ進む</button>
     </div>
@@ -160,46 +153,40 @@
   <!-- 決済 -->
   <section class="card" id="secPay" style="display:none">
     <div class="ttl" style="font-size:17px">決済</div>
-    <p class="sub">クレジット残高から差し引きます。</p>
+    <div class="sub">クレジット残高から差し引きます。</div>
 
     <!-- 単発 -->
-    <div class="dash paybox">
-      <div class="choice">
-        <input id="payOnce" name="pay" type="radio" value="once" checked />
-        <label for="payOnce">
-          単発で支払う <span class="hint">（- 1000 pt）</span>
-        </label>
-      </div>
+    <div class="ghost horiz" style="margin-top:10px;display:flex;gap:12px;align-items:center;min-height:72px">
+      <input type="radio" name="pay" id="payOnce" checked style="width:22px;height:22px">
+      <label for="payOnce" style="cursor:pointer">単発で支払う（−1000 pt）</label>
     </div>
 
     <!-- サブスク -->
-    <div class="dash paybox">
-      <div class="choice">
-        <input id="paySub" name="pay" type="radio" value="sub" />
-        <label for="paySub">
-          サブスクに加入して支払う <span class="hint">（- 1980 pt）※ 次回以降 0 pt</span>
-        </label>
-      </div>
+    <div class="ghost horiz" style="margin-top:10px;display:flex;gap:12px;align-items:center;min-height:72px">
+      <input type="radio" name="pay" id="paySub" style="width:22px;height:22px">
+      <label for="paySub" style="cursor:pointer">サブスクに加入して支払う（−1980 pt）※ 次回以降は 0 pt</label>
     </div>
 
-    <div class="card dash" style="margin-top:12px">
-      <div class="row spread"><div>現在の残高</div><div><b id="cur">0</b> pt</div></div>
-      <div class="row spread"><div>今回の支払い</div><div>– <b id="pay">0</b> pt</div></div>
-      <hr style="border:none;border-top:1px solid var(--border);margin:10px 0" />
-      <div class="row spread"><div><b>決済後の残高</b></div><div><b id="after">0</b> pt</div></div>
+    <div class="card" style="border-style:dashed;margin-top:12px">
+      <div class="row between"><div>現在の残高</div><div><b id="curCredit">0</b> pt</div></div>
+      <div class="row between"><div>今回の支払い</div><div>− <b id="payAmount">0</b> pt</div></div>
+      <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
+      <div class="row between"><div><b>決済後の残高</b></div><div><b id="afterCredit">0</b> pt</div></div>
     </div>
 
-    <div class="row spread" style="margin-top:12px">
-      <button class="btn" id="toAgreeBack">戻る</button>
+    <div class="row between" style="margin-top:12px">
+      <button class="btn" id="backToAgree">戻る</button>
       <button class="btn primary" id="confirmPay">この内容で確定</button>
     </div>
   </section>
 
   <!-- 抽選（ダミー） -->
-  <section class="card" id="secDone" style="display:none">
+  <section class="card" id="secDraw" style="display:none">
     <div class="ttl" style="font-size:17px">抽選</div>
-    <p>申込みが完了しました。結果は通知でお知らせします。</p>
-    <div class="right"><a class="btn" href="index.html">ホームへ戻る</a></div>
+    <p class="sub">デモ表示：抽選処理を行いました。</p>
+    <div class="row between" style="margin-top:12px">
+      <button class="btn" onclick="location.href='index.html'">ホームに戻る</button>
+    </div>
   </section>
 </main>
 
@@ -210,146 +197,137 @@
 </nav>
 
 <script>
-  // ------- 状態（ローカル保存と連携） -------
-  const LS = k => localStorage.getItem(k);
-  const SS = (k,v) => localStorage.setItem(k, typeof v==='string'? v: JSON.stringify(v));
+  // ===== 共通状態 =====
+  const APP={ LIFF_ID:"2008178197-ELrxabO9" };
+  const $=s=>document.querySelector(s);
+  const seg=(n,on)=>$("#seg"+n).classList.toggle("on",!!on);
+  const ls=(k,v)=>v===undefined? JSON.parse(localStorage.getItem(k)||"null") : localStorage.setItem(k, JSON.stringify(v));
 
-  const STATE = {
-    credit: Number(LS('credit')||0),
-    kycGender: LS('kyc.gender')||'',                  // 'male' | 'female' | ''
-    sub: JSON.parse(LS('sub')||'{"active":false,"plan":"","next":""}')
-  };
-
-  const $ = s => document.querySelector(s);
-  const stepOn = n => [1,2,3,4].forEach(i=>$("#seg"+i).classList.toggle('on', i<=n));
-
-  function renderPay(){
-    const cur = STATE.credit;
-    let pay = 0;
-
-    // 女性 or サブスク中 は 0 円
-    if(STATE.kycGender==='female' || STATE.sub.active){
-      pay = 0;
-      $("#payOnce").disabled = true;
-      $("#paySub").disabled  = true;
-    }else{
-      const sel = document.querySelector('input[name="pay"]:checked')?.value || 'once';
-      pay = (sel==='once') ? 1000 : 1980;
-    }
-    $("#cur").textContent = cur;
-    $("#pay").textContent = pay;
-    $("#after").textContent = Math.max(cur - pay, 0);
+  // ===== 入力の初期値を復元 =====
+  function loadInput(){
+    const a=ls("apply.input")||{};
+    if(a.members) $("#selMembers").value=a.members;
+    if(a.area)    $("#selArea").value=a.area;
+    if(a.age)     $("#selAge").value=a.age;
+    if(a.self!==undefined) $("#inSelf").value=a.self;
+    if(a.friends) $("#inFriends").value=a.friends;
+  }
+  function saveInput(){
+    ls("apply.input",{
+      members:$("#selMembers").value,
+      area:$("#selArea").value,
+      age:$("#selAge").value,
+      self:Number($("#inSelf").value||0),
+      friends:$("#inFriends").value
+    });
   }
 
-  // ------- 画面遷移 -------
-  const secInput = $("#secInput");
-  const secAgree = $("#secAgree");
-  const secPay   = $("#secPay");
-  const secDone  = $("#secDone");
+  // ===== 進行表示 =====
+  function setStep(n){ seg(1,n>=1); seg(2,n>=2); seg(3,n>=3); seg(4,n>=4); }
 
-  $("#toAgree").addEventListener('click', ()=>{
-    // 必須チェック：プロフィール必須/本人確認
-    const nick = LS('prof.name')||'';           // ニックネーム
-    const age  = LS('prof.age') || '';
-    const area = LS('prof.area')||'';
-    const kyc  = LS('kyc.verified')==='true';
+  // ===== バリデーション（本人確認＆プロフィール必須）=====
+  function canProceedFromInput(){
+    const prof=ls("profile")||{};
+    const kyc =ls("kyc")||{};
+    const requiredOK = prof?.name && prof?.age && prof?.area;
+    const kycOK = kyc?.verified===true;
+    return requiredOK && kycOK && $("#selArea").value;
+  }
 
-    if(!nick || !age || !area){
-      alert('プロフィール必須項目（ニックネーム・年齢・エリア）が未入力です。マイページで編集してください。');
-      location.href = 'mypage.html';
-      return;
+  // ===== 決済額の算出 =====
+  function genderPay(){
+    const kyc = ls("kyc")||{};
+    const sub = ls("sub")||{};
+    if(kyc.gender==="female") return 0;         // 女性無料
+    if(sub?.active)           return 0;         // サブスク中は0
+    return $("#paySub").checked ? 1980 : 1000;  // 男性：単発/サブスク
+  }
+  function calcPayUI(){
+    const credit = Number(ls("credit")||0);
+    $("#curCredit").textContent = credit;
+    const amt = genderPay();
+    $("#payAmount").textContent = amt;
+    $("#afterCredit").textContent = Math.max(0, credit-amt);
+  }
+
+  // ===== 画面遷移 =====
+  function show(idOn){
+    for(const id of ["secInput","secAgree","secPay","secDraw"]){
+      $( "#"+id ).style.display = (id===idOn?"block":"none");
     }
-    if(!kyc){
-      alert('本人確認が未完了です。マイページの「本人確認」から実施してください。');
-      location.href = 'mypage.html';
-      return;
-    }
+    setStep( {secInput:1, secAgree:2, secPay:3, secDraw:4}[idOn] || 1 );
+  }
 
-    secInput.style.display='none';
-    secAgree.style.display='block';
-    stepOn(2);
-  });
-
-  $("#backToInput").addEventListener('click', ()=>{
-    secAgree.style.display='none';
-    secInput.style.display='block';
-    stepOn(1);
-  });
-
-  $("#chkAgree").addEventListener('change', e=>{
-    $("#toPay").disabled = !e.target.checked;
-  });
-
-  $("#toPay").addEventListener('click', ()=>{
-    secAgree.style.display='none';
-    secPay.style.display='block';
-    renderPay();
-    stepOn(3);
-  });
-
-  $("#toAgreeBack").addEventListener('click', ()=>{
-    secPay.style.display='none';
-    secAgree.style.display='block';
-    stepOn(2);
-  });
-
-  // 支払い方式の選択で即計算
-  ["payOnce","paySub"].forEach(id=>{
-    $("#"+id).addEventListener('change', renderPay);
-  });
-
-  // ------- 決済確定（デモ） -------
-  $("#confirmPay").addEventListener('click', ()=>{
-    let pay = Number($("#pay").textContent||0);
-
-    // サブスク選択時は加入処理（デモ）
-    const selected = document.querySelector('input[name="pay"]:checked')?.value;
-    if(selected==='sub' && !(STATE.kycGender==='female') && !STATE.sub.active){
-      const next = new Date();
-      next.setMonth(next.getMonth()+1);
-      STATE.sub={active:true,plan:'basic',next:next.toISOString().slice(0,10)};
-      SS('sub', STATE.sub);
-      // 通知（ホームのお知らせに載せるデモ）
-      const msg = {type:'system', text:`サブスクに加入しました（ベーシック）。次回更新日：${STATE.sub.next}`, ts:Date.now()};
-      const items = JSON.parse(LS('noti.items')||'[]'); items.unshift(msg); SS('noti.items', items);
-    }
-
-    // 女性 or サブスク中 の場合は 0
-    if(STATE.kycGender==='female' || STATE.sub.active) pay = 0;
-
-    // 残高反映
-    STATE.credit = Math.max(STATE.credit - pay, 0);
-    SS('credit', STATE.credit);
-
-    // 申込完了（ダミー通知）
-    SS('state.step', '3');
-    if(window.SYNC && SYNC.logEvent){
-      SYNC.logEvent('apply_submitted', {pay, credit:STATE.credit});
-    }
-
-    secPay.style.display='none';
-    secDone.style.display='block';
-    stepOn(4);
-  });
-
-  // ------- 初期化 -------
-  document.addEventListener('DOMContentLoaded', async ()=>{
-    stepOn(1);
-
+  // ===== イベント =====
+  document.addEventListener("DOMContentLoaded", async ()=>{
+    // LIFF
     try{
-      await liff.init({ liffId: APP?.LIFF_ID || "" , withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
-      // ログイン連携（UID発行などは api.js 側で実施）
-      if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile();
-        await SYNC.syncOnLogin(prof.userId||'');
-      }
+      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
+      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
     }catch(e){ console.warn(e); }
 
-    // 現在の状態を読んで描画
-    STATE.credit    = Number(LS('credit')||0);
-    STATE.sub       = JSON.parse(LS('sub')||'{"active":false,"plan":"","next":""}');
-    STATE.kycGender = LS('kyc.gender')||'';
+    // 入力復元
+    loadInput();
+    // 入力変更で保存
+    ["selMembers","selArea","selAge","inSelf","inFriends"].forEach(id=>{
+      $("#"+id).addEventListener("change", saveInput);
+      $("#"+id).addEventListener("input", saveInput);
+    });
+
+    // 入力→同意
+    $("#toAgree").addEventListener("click", ()=>{
+      if(!canProceedFromInput()){ alert("本人確認の完了と、プロフィール（ニックネーム／年齢／エリア）の入力が必要です。"); return;}
+      show("secAgree");
+    });
+
+    // 同意チェック
+    $("#chkAgree").addEventListener("change", ()=>{ $("#toPay").disabled = !$("#chkAgree").checked; });
+
+    // 同意→決済
+    $("#toPay").addEventListener("click", ()=>{ show("secPay"); calcPayUI(); });
+
+    // 決済オプション変更
+    ["payOnce","paySub"].forEach(id=>$("#"+id).addEventListener("change", calcPayUI));
+
+    // 決済確定
+    $("#confirmPay").addEventListener("click", async ()=>{
+      const amt = genderPay();
+      // クレジット・サブスク状態を更新
+      let credit = Number(ls("credit")||0);
+      credit = Math.max(0, credit-amt);
+      ls("credit", credit);
+
+      const sub = ls("sub")||{active:false};
+      if($("#paySub").checked && amt>0){
+        const next = new Date(); next.setMonth(next.getMonth()+1);
+        ls("sub", {active:true, plan:"basic", nextRenewal: next.toISOString().slice(0,10)});
+        // お知らせへ自動追加（ホーム側で表示）
+        const notes = ls("notifications")||[];
+        notes.unshift({type:"subscribed", text:"サブスクに加入しました（ベーシック）。", ts:Date.now(), next: next.toISOString().slice(0,10)});
+        ls("notifications", notes.slice(0,50));
+      }
+
+      // サーバ同期（非必須：失敗しても進む）
+      try{
+        await SYNC.syncOnApply({
+          input: ls("apply.input"),
+          pay:{amount:amt, method: $("#paySub").checked?"sub":"once"},
+          kyc: ls("kyc")||{},
+          credit
+        });
+      }catch(e){ console.warn(e); }
+
+      // 進捗保存
+      localStorage.setItem("state.step","3");
+      show("secDraw");
+    });
+
+    // 戻る系
+    $("#backToInput").addEventListener("click", ()=>show("secInput"));
+    $("#backToAgree").addEventListener("click", ()=>show("secAgree"));
+
+    // 初期表示
+    show("secInput");
   });
 </script>
 </body>
