@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1, minimum-scale=1" />
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -11,180 +11,170 @@
 <style>
   :root{
     --bg:#F6F3EE; --card:#FFF; --ink:#1F2937; --muted:#6B7280; --accent:#0C7C59;
-    --border:#E5E7EB; --radius:16px; --fs:14px; --fs-sm:12.5px; --fs-lg:18px;
+    --border:#E5E7EB; --radius:16px; --fs:14px; --tabbarH:96px;
   }
-  *{ box-sizing:border-box; }
-  html,body{ height:100%; }
+  *{box-sizing:border-box}
+  html,body{height:100%}
   body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans JP",sans-serif;
-    line-height:1.6; font-size:var(--fs); overflow-x:hidden;
-    -webkit-text-size-adjust:100%;
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,'Noto Sans JP',sans-serif;
+    line-height:1.6;font-size:var(--fs);overflow-x:hidden;
+    writing-mode:horizontal-tb!important;-webkit-writing-mode:horizontal-tb!important;text-orientation:mixed!important;
+    touch-action:manipulation;
   }
-  /* 横書き固定＋ピンチ無効 */
-  html{ writing-mode:horizontal-tb !important; -webkit-writing-mode:horizontal-tb !important; text-orientation:mixed !important; }
-  *{ touch-action:manipulation; }
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 16px}
+  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ttl{font-weight:800;font-size:18px}
+  .sub{color:var(--muted);font-size:12px}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 16px calc(var(--tabbarH) + 24px)}
+  .card{background:#FFF;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;padding:12px 14px;border-radius:12px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.small{padding:8px 10px;font-size:12px}
+  .row{display:flex;align-items:center;gap:12px}
+  .row.spread{justify-content:space-between}
+  .pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:6px 10px;border-radius:999px;background:#E7EFE7;color:#10381F;font-weight:700}
+  .kv{display:grid;grid-template-columns:100px 1fr;gap:8px;align-items:center}
+  .kv .k{color:#6B7280}
+  .divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+  .hint{font-size:12px;color:var(--muted)}
+  .ok{background:#E6FAEA;color:#065F46}
+  .warn{background:#FFF9DB;color:#854D0E}
+  .danger{background:#FEE2E2;color:#991B1B}
 
-  .wrap{ max-width:720px; margin:0 auto; padding:12px 16px 112px; }
-  header{ position:sticky; top:0; z-index:20; background:var(--bg); padding:10px 16px; }
-  .hrow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .ttl{ font-weight:800; font-size:var(--fs-lg); }
-  .sub{ color:var(--muted); font-size:var(--fs-sm); }
+  /* 編集フォーム */
+  input,select,textarea{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:var(--fs)}
+  textarea{min-height:90px}
 
-  .uid{ display:flex; align-items:center; gap:8px; font-size:var(--fs-sm); }
-  .uid .copy{ padding:8px 12px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; }
-
-  .card{ background:#FFF; border:1px solid var(--border); border-radius:var(--radius);
-         padding:16px; box-shadow:0 4px 12px rgba(0,0,0,.04); margin-bottom:12px; }
-  .row{ display:flex; align-items:center; gap:10px; }
-  .row.spread{ justify-content:space-between; }
-  .btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#111827;
-        padding:12px 14px; border-radius:12px; cursor:pointer; font-size:var(--fs); }
-  .btn.primary{ background:var(--accent); color:#fff; border-color:transparent; }
-  .btn.ghost{ background:#fff; }
-  .btn.small{ padding:8px 10px; font-size:var(--fs-sm); }
-
-  .field{ padding:10px 0; border-bottom:1px solid var(--border); }
-  .field:last-child{ border-bottom:none; }
-  .label{ color:var(--muted); font-size:var(--fs-sm); }
-  .value{ font-weight:600; }
-
-  .editArea input, .editArea select, .editArea textarea{
-    width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff; font-size:var(--fs);
+  /* タブバー */
+  nav.tabbar{
+    position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);
+    background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;z-index:30;
+    padding-bottom:calc(env(safe-area-inset-bottom) + 8px)
   }
-  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-  .pill{ display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px;
-         background:#E7EFE7; color:#10381F; font-weight:700; font-size:var(--fs-sm); }
-  .pill.ok{ background:#E7F5ED; color:#065F46; }
-  .pill.warn{ background:#FEF3C7; color:#92400E; }
-  .pill.gray{ background:#F3F4F6; color:#111827; }
-
-  .tabbar{ position:fixed; left:0; right:0; bottom:0; height:96px; background:rgba(255,255,255,.96);
-           backdrop-filter:blur(10px); border-top:1px solid var(--border); display:flex; z-index:30;
-           padding-bottom:calc(env(safe-area-inset-bottom) + 8px) }
-  .tabbar a{ flex:1; text-decoration:none; color:#6B7280; padding:18px 6px; display:flex; flex-direction:column; gap:6px; align-items:center; min-height:76px; text-align:center }
-  .tabicon{ width:24px; height:24px; border-radius:6px; background:#CBD5CB }
-  .tabbar .active{ color:#0d3a23; font-weight:800 } .tabbar .active .tabicon{ background:var(--accent) }
+  nav.tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:18px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px;text-align:center}
+  .tabicon{width:24px;height:24px;border-radius:6px;background:#CBD5CB}
+  nav.tabbar .active{color:#0d3a23;font-weight:800}
+  nav.tabbar .active .tabicon{background:var(--accent)}
 </style>
 </head>
 <body>
 <header>
-  <div class="hrow" style="justify-content:space-between;">
+  <div class="hrow">
     <div class="ttl">マイページ</div>
-    <div class="uid">UID: <span id="uidTxt">—</span>
-      <button class="copy btn small" id="uidCopy">コピー</button>
-    </div>
+    <div class="sub" id="siteSub"></div>
   </div>
 </header>
 
 <main class="wrap">
-
-  <!-- プロフィール -->
-  <section class="card" id="cardProfile">
+  <!-- UID表示（最上段） -->
+  <section class="card">
     <div class="row spread">
-      <div class="ttl" style="font-size:16px">プロフィール</div>
-      <button class="btn small" id="btnEdit">編集</button>
-    </div>
-
-    <!-- 表示 -->
-    <div id="profView">
-      <div class="field"><div class="label">ニックネーム</div><div class="value" id="vName">—</div></div>
-      <div class="field"><div class="label">年齢</div><div class="value" id="vAge">—</div></div>
-      <div class="field"><div class="label">エリア</div><div class="value" id="vArea">—</div></div>
-      <div class="field"><div class="label">趣味</div><div class="value" id="vHobby">—</div></div>
-      <div class="field"><div class="label">好きなこと</div><div class="value" id="vLike">—</div></div>
-      <div class="field"><div class="label">普段何してる</div><div class="value" id="vDaily">—</div></div>
-      <div class="field"><div class="label">仕事</div><div class="value" id="vJob">—</div></div>
-      <div class="field"><div class="label">学校</div><div class="value" id="vSchool">—</div></div>
-      <div class="field"><div class="label">自由記入</div><div class="value" id="vFree">—</div></div>
-    </div>
-
-    <!-- 編集 -->
-    <div id="profEdit" class="editArea" style="display:none; margin-top:8px;">
-      <div class="grid2">
-        <div>
-          <div class="label">ニックネーム（必須）</div>
-          <input id="eName" placeholder="ニックネーム" />
-        </div>
-        <div>
-          <div class="label">年齢（必須）</div>
-          <input id="eAge" type="number" min="18" max="80" placeholder="年齢" />
-        </div>
+      <div class="row" style="gap:8px">
+        <div class="sub">UID</div>
+        <div id="uidText" style="font-weight:700">—</div>
       </div>
-      <div style="margin-top:8px">
-        <div class="label">エリア（必須）</div>
-        <select id="eArea">
+      <button id="copyUid" class="btn small">コピー</button>
+    </div>
+  </section>
+
+  <!-- プロフィール（閲覧時はコンパクト） -->
+  <section class="card" id="profView">
+    <div class="row spread">
+      <div class="ttl" style="font-size:17px">プロフィール</div>
+      <button id="editBtn" class="btn small">編集</button>
+    </div>
+    <div class="kv"><div class="k">ニックネーム</div><div id="v_name">—</div></div>
+    <div class="kv"><div class="k">年齢</div><div id="v_age">—</div></div>
+    <div class="kv"><div class="k">エリア</div><div id="v_area">—</div></div>
+    <div class="divider"></div>
+    <div class="kv"><div class="k">趣味</div><div id="v_hobby">—</div></div>
+    <div class="kv"><div class="k">好きなこと</div><div id="v_like">—</div></div>
+    <div class="kv"><div class="k">普段何してる</div><div id="v_usually">—</div></div>
+    <div class="kv"><div class="k">仕事</div><div id="v_job">—</div></div>
+    <div class="kv"><div class="k">学校</div><div id="v_school">—</div></div>
+    <div class="kv"><div class="k">自由記入</div><div id="v_free">—</div></div>
+  </section>
+
+  <!-- プロフィール編集 -->
+  <section class="card" id="profEdit" style="display:none">
+    <div class="row spread">
+      <div class="ttl" style="font-size:17px">プロフィールを編集</div>
+    </div>
+    <div class="row" style="gap:12px;flex-wrap:wrap">
+      <div style="flex:1 1 220px">
+        <label>ニックネーム（必須）</label>
+        <input id="f_name" placeholder="ニックネーム" required />
+      </div>
+      <div style="width:120px">
+        <label>年齢（必須）</label>
+        <input id="f_age" type="number" min="18" max="80" placeholder="年齢" required />
+      </div>
+      <div style="flex:1 1 200px">
+        <label>エリア（必須）</label>
+        <select id="f_area" required>
           <option value="">選択してください</option>
           <option>東京</option><option>神奈川</option><option>千葉</option><option>埼玉</option>
           <option>名古屋</option><option>大阪</option><option>福岡</option>
         </select>
       </div>
+    </div>
 
-      <div class="grid2" style="margin-top:8px">
-        <div><div class="label">趣味</div><input id="eHobby"/></div>
-        <div><div class="label">好きなこと</div><input id="eLike"/></div>
+    <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:8px">
+      <div style="flex:1 1 240px">
+        <label>趣味</label><input id="f_hobby" />
       </div>
-      <div class="grid2" style="margin-top:8px">
-        <div><div class="label">普段何してる</div><input id="eDaily"/></div>
-        <div><div class="label">仕事</div><input id="eJob"/></div>
-      </div>
-      <div style="margin-top:8px">
-        <div class="label">学校</div><input id="eSchool"/>
-      </div>
-      <div style="margin-top:8px">
-        <div class="label">自由記入</div><textarea id="eFree" rows="3"></textarea>
-      </div>
-
-      <div class="row" style="gap:8px; justify-content:flex-end; margin-top:10px;">
-        <button class="btn" id="btnEditCancel">キャンセル</button>
-        <button class="btn primary" id="btnEditSave">保存</button>
+      <div style="flex:1 1 240px">
+        <label>好きなこと</label><input id="f_like" />
       </div>
     </div>
+
+    <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:8px">
+      <div style="flex:1 1 240px">
+        <label>普段何してる</label><input id="f_usually" />
+      </div>
+      <div style="flex:1 1 240px">
+        <label>仕事</label><input id="f_job" />
+      </div>
+      <div style="flex:1 1 240px">
+        <label>学校</label><input id="f_school" />
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>自由記入</label><textarea id="f_free" placeholder="自己紹介など"></textarea>
+    </div>
+
+    <div class="row spread" style="margin-top:12px">
+      <button id="cancelBtn" class="btn">キャンセル</button>
+      <button id="saveBtn" class="btn primary">保存する</button>
+    </div>
+    <div class="hint" id="saveHint" style="margin-top:6px;display:none">保存しました。</div>
   </section>
 
-  <!-- サブスク 状態 -->
-  <section class="card" id="cardSub">
-    <div class="row spread">
-      <div class="ttl" style="font-size:16px">サブスク</div>
-      <div id="subPill" class="pill gray">未加入</div>
+  <!-- 本人確認（デモ連動） -->
+  <section class="card" id="kycCard">
+    <div class="ttl" style="font-size:17px">本人確認</div>
+    <div class="row" style="gap:8px;margin:8px 0">
+      <span class="pill" id="kycStatus">未完了</span>
+      <span class="hint">※ デモ：性別を選ぶと完了扱い</span>
     </div>
-    <div class="sub" id="subDesc" style="margin-top:6px;">—</div>
-    <div class="row" style="gap:8px; margin-top:10px;">
-      <!-- デモ操作（本番は申込みで加入） -->
-      <button class="btn" id="btnSubJoin">加入（デモ）</button>
-      <button class="btn" id="btnSubCancel">解約（デモ）</button>
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <button id="asFemale" class="btn">女性として確認</button>
+      <button id="asMale" class="btn">男性として確認</button>
+      <button id="kycReset" class="btn">再撮影（やり直し）</button>
     </div>
+    <p class="hint">※ 本番では外部 eKYC を起動します。</p>
   </section>
 
-  <!-- 本人確認 -->
-  <section class="card" id="cardKyc">
-    <div class="ttl" style="font-size:16px">本人確認</div>
-    <div class="row" style="gap:8px; margin:8px 0;">
-      <div id="kycPill" class="pill warn">未完了</div>
-      <div id="kycGenderPill" class="pill gray" style="display:none;">—</div>
-    </div>
-    <div class="sub">※ デモ：性別を選ぶと完了扱い</div>
-    <div class="row" style="gap:8px; margin-top:8px;">
-      <button class="btn" id="btnKycFemale">女性として確認</button>
-      <button class="btn" id="btnKycMale">男性として確認</button>
-      <button class="btn ghost" id="btnKycReset">再撮影（やり直し）</button>
-    </div>
-  </section>
-
-  <!-- 履歴（招待URL） -->
+  <!-- 連絡先 -->
   <section class="card">
-    <div class="ttl" style="font-size:16px">履歴</div>
-    <div id="hist">まだ履歴がありません。</div>
-  </section>
-
-  <!-- お問い合わせ -->
-  <section class="card">
-    <div class="ttl" style="font-size:16px">お問い合わせ</div>
-    <div class="sub">ご不明点は下記からご連絡ください。</div>
-    <div class="row" style="gap:8px; margin-top:8px;">
+    <div class="ttl" style="font-size:17px">お問い合わせ</div>
+    <p class="hint">ご不明点は下記からご連絡ください。</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap">
       <a class="btn" href="mailto:support@example.com">メールで問い合わせ</a>
-      <a class="btn" href="#" onclick="liff.openWindow({url:'https://line.me/R/ti/p/@YOUR_OFFICIAL', external:true}); return false;">LINE公式を開く</a>
+      <a class="btn" href="https://line.me/R/ti/p/@your_official" target="_blank" rel="noopener">LINE公式を開く</a>
     </div>
   </section>
 </main>
@@ -197,175 +187,144 @@
 
 <script>
   const $ = s => document.querySelector(s);
-  const get = k => JSON.parse(localStorage.getItem(k) || "null");
-  const put = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
-  const uidKey = 'app.uid';
+  const LS = k => localStorage.getItem(k);
+  const SS = (k,v)=>localStorage.setItem(k, typeof v==='string'? v: JSON.stringify(v));
 
-  function isSubActive(sub){
-    if(!sub || !sub.active) return false;
-    if(!sub.nextRenewal) return false;
-    const today = new Date().toISOString().slice(0,10);
-    return sub.nextRenewal >= today;
+  function renderView(){
+    $("#siteSub").textContent = location.hostname.replace(/^www\./,'') || '';
+    const v = (k, d='—') => (LS(k) && LS(k)!=='""' ? LS(k) : d);
+
+    $("#v_name").textContent    = v('prof.name');
+    $("#v_age").textContent     = v('prof.age');
+    $("#v_area").textContent    = v('prof.area');
+    $("#v_hobby").textContent   = v('prof.hobby');
+    $("#v_like").textContent    = v('prof.like');
+    $("#v_usually").textContent = v('prof.usually');
+    $("#v_job").textContent     = v('prof.job');
+    $("#v_school").textContent  = v('prof.school');
+    $("#v_free").textContent    = v('prof.free');
+
+    const uid = LS('uid') || '—';
+    $("#uidText").textContent = uid;
+
+    const verified = LS('kyc.verified')==='true';
+    const gender   = LS('kyc.gender')||'';
+    const pill = $("#kycStatus");
+    pill.textContent = verified ? `完了（${gender==='female'?'女性':'男性'}）` : '未完了';
+    pill.className = 'pill ' + (verified ? 'ok' : 'danger');
   }
 
-  function enforceSubValidity(){
-    const sub = get('sub');
-    if(!sub) return;
-    if(!isSubActive(sub)){
-      put('sub', {active:false, plan: sub?.plan||'basic', nextRenewal: sub?.nextRenewal||null});
+  function fillForm(){
+    $("#f_name").value    = LS('prof.name')    || '';
+    $("#f_age").value     = LS('prof.age')     || '';
+    $("#f_area").value    = LS('prof.area')    || '';
+    $("#f_hobby").value   = LS('prof.hobby')   || '';
+    $("#f_like").value    = LS('prof.like')    || '';
+    $("#f_usually").value = LS('prof.usually') || '';
+    $("#f_job").value     = LS('prof.job')     || '';
+    $("#f_school").value  = LS('prof.school')  || '';
+    $("#f_free").value    = LS('prof.free')    || '';
+  }
+
+  function toggleEdit(on){
+    $("#profView").style.display = on ? 'none' : 'block';
+    $("#profEdit").style.display = on ? 'block' : 'none';
+    if(on) fillForm();
+  }
+
+  async function saveProfile(){
+    const name = $("#f_name").value.trim();
+    const age  = $("#f_age").value.trim();
+    const area = $("#f_area").value.trim();
+
+    if(!name || !age || !area){
+      alert("ニックネーム・年齢・エリアは必須です。");
+      return;
     }
+    // ローカル保存
+    SS('prof.name', name);
+    SS('prof.age',  age);
+    SS('prof.area', area);
+    SS('prof.hobby',   $("#f_hobby").value.trim());
+    SS('prof.like',    $("#f_like").value.trim());
+    SS('prof.usually', $("#f_usually").value.trim());
+    SS('prof.job',     $("#f_job").value.trim());
+    SS('prof.school',  $("#f_school").value.trim());
+    SS('prof.free',    $("#f_free").value.trim());
+
+    // GAS に同期（api.js の SYNC を想定）
+    try{
+      const payload = {
+        uid: LS('uid') || '',
+        profile:{
+          name, age, area,
+          hobby:LS('prof.hobby')||'',
+          like:LS('prof.like')||'',
+          usually:LS('prof.usually')||'',
+          job:LS('prof.job')||'',
+          school:LS('prof.school')||'',
+          free:LS('prof.free')||''
+        },
+        credit: Number(LS('credit')||0),
+        kyc:{ verified: LS('kyc.verified')==='true', gender: LS('kyc.gender')||'' }
+      };
+      if(window.SYNC && SYNC.upsertUser){
+        await SYNC.upsertUser(payload);
+      }else if(window.APP && APP.API){
+        await fetch(APP.API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'upsert_user',payload})});
+      }
+      $("#saveHint").style.display='block';
+      setTimeout(()=>$("#saveHint").style.display='none', 1600);
+    }catch(e){ console.warn(e); }
+
+    renderView();
+    toggleEdit(false);
   }
 
-  // --- UI 更新 ---
-  function renderUID(){
-    const uid = localStorage.getItem(uidKey) || '—';
-    $('#uidTxt').textContent = uid;
-  }
+  // クリック系
+  $("#editBtn").addEventListener('click', ()=>toggleEdit(true));
+  $("#cancelBtn").addEventListener('click', ()=>toggleEdit(false));
+  $("#saveBtn").addEventListener('click', saveProfile);
 
-  function renderProfile(){
-    const p = get('profile') || {};
-    $('#vName').textContent   = p.name || '—';
-    $('#vAge').textContent    = p.age  || '—';
-    $('#vArea').textContent   = p.area || '—';
-    $('#vHobby').textContent  = p.hobby|| '—';
-    $('#vLike').textContent   = p.like || '—';
-    $('#vDaily').textContent  = p.daily|| '—';
-    $('#vJob').textContent    = p.job  || '—';
-    $('#vSchool').textContent = p.school|| '—';
-    $('#vFree').textContent   = p.free || '—';
-
-    // 編集側にも反映
-    $('#eName').value = p.name||'';
-    $('#eAge').value  = p.age ||'';
-    $('#eArea').value = p.area||'';
-    $('#eHobby').value= p.hobby||'';
-    $('#eLike').value = p.like||'';
-    $('#eDaily').value= p.daily||'';
-    $('#eJob').value  = p.job||'';
-    $('#eSchool').value = p.school||'';
-    $('#eFree').value = p.free||'';
-  }
-
-  function renderSub(){
-    enforceSubValidity();
-    const sub = get('sub') || {active:false};
-    const active = isSubActive(sub);
-    const pill = $('#subPill');
-    const desc = $('#subDesc');
-
-    if(active){
-      pill.className = 'pill ok';
-      pill.textContent = '加入中';
-      desc.textContent = `プラン：${sub.plan||'ベーシック'}　次回更新日：${sub.nextRenewal||'-'}`;
-    }else{
-      pill.className = 'pill gray';
-      pill.textContent = '未加入';
-      desc.textContent = '申込み時に「サブスク加入して支払う」を選ぶと加入（デモボタンでも切替可）。';
-    }
-  }
-
-  function renderKyc(){
-    const kyc = get('kyc') || {};
-    const pill = $('#kycPill');
-    const gp = $('#kycGenderPill');
-
-    if(kyc.verified){
-      pill.className = 'pill ok';
-      pill.textContent = '完了';
-      gp.style.display = 'inline-flex';
-      gp.textContent = kyc.gender==='female' ? '女性' : (kyc.gender==='male' ? '男性' : '—');
-    }else{
-      pill.className = 'pill warn';
-      pill.textContent = '未完了';
-      gp.style.display = 'none';
-    }
-  }
-
-  function renderHistory(){
-    const list = get('invite.list') || [];
-    const el = $('#hist');
-    if(!list.length){ el.textContent = 'まだ履歴がありません。'; return; }
-    el.innerHTML = list.map(x => `<div class="field"><div class="label">${x.date}</div><div class="value" style="word-break:break-all">${x.url}</div></div>`).join('');
-  }
-
-  // --- イベント ---
-  $('#uidCopy').addEventListener('click', async ()=>{
-    const t = $('#uidTxt').textContent;
-    try { await navigator.clipboard.writeText(t); alert('UIDをコピーしました'); }
+  $("#copyUid").addEventListener('click', async ()=>{
+    const text = $("#uidText").textContent || '';
+    try{ await navigator.clipboard.writeText(text); alert('UIDをコピーしました'); }
     catch{ alert('コピーできませんでした'); }
   });
 
-  $('#btnEdit').addEventListener('click', ()=>{
-    $('#profView').style.display='none';
-    $('#profEdit').style.display='block';
-  });
-  $('#btnEditCancel').addEventListener('click', ()=>{
-    $('#profEdit').style.display='none';
-    $('#profView').style.display='block';
-  });
-  $('#btnEditSave').addEventListener('click', async ()=>{
-    const p = {
-      name: $('#eName').value.trim(),
-      age:  Number($('#eAge').value||0),
-      area: $('#eArea').value,
-      hobby:$('#eHobby').value, like:$('#eLike').value, daily:$('#eDaily').value,
-      job: $('#eJob').value, school:$('#eSchool').value, free:$('#eFree').value
-    };
-    if(!p.name || !p.age || !p.area){ alert('ニックネーム・年齢・エリアは必須です'); return; }
-    put('profile', p);
-    renderProfile();
-    $('#profEdit').style.display='none';
-    $('#profView').style.display='block';
-
-    // シートへ同期
+  // KYC（デモ）
+  async function setKyc(gender){
+    if(gender){ SS('kyc.gender', gender); SS('kyc.verified','true'); }
+    else{ SS('kyc.gender',''); SS('kyc.verified','false'); }
+    renderView();
+    // 同期
     try{
-      const prof = await liff.getProfile().catch(()=>({displayName:'', userId:''}));
-      await SYNC.upsertUser({
-        uid: localStorage.getItem(uidKey)||'',
-        lineUserId: prof.userId || '',
-        displayName: prof.displayName || '',
-        profile: p,
-        credit: Number(localStorage.getItem('credit')||'0'),
-        kyc: get('kyc')||{},
-        sub: get('sub')||{}
-      });
-    }catch(e){ console.warn(e); }
-  });
+      const payload = {
+        uid: LS('uid')||'',
+        profile:{ name:LS('prof.name')||'', age:LS('prof.age')||'', area:LS('prof.area')||'' },
+        credit:Number(LS('credit')||0),
+        kyc:{ verified: LS('kyc.verified')==='true', gender: LS('kyc.gender')||'' }
+      };
+      if(window.SYNC && SYNC.upsertUser){ await SYNC.upsertUser(payload); }
+    }catch(e){console.warn(e);}
+  }
+  $("#asFemale").addEventListener('click', ()=>setKyc('female'));
+  $("#asMale").addEventListener('click',   ()=>setKyc('male'));
+  $("#kycReset").addEventListener('click', ()=>setKyc(''));
 
-  // KYC デモ
-  $('#btnKycFemale').addEventListener('click', ()=>{ put('kyc',{verified:true, gender:'female'}); renderKyc(); });
-  $('#btnKycMale').addEventListener('click', ()=>{ put('kyc',{verified:true, gender:'male'}); renderKyc(); });
-  $('#btnKycReset').addEventListener('click', ()=>{ put('kyc',{verified:false}); renderKyc(); });
-
-  // サブスク（デモ操作）
-  $('#btnSubJoin').addEventListener('click', ()=>{
-    const next = new Date(Date.now()+30*24*60*60*1000).toISOString().slice(0,10);
-    put('sub',{active:true, plan:'basic', nextRenewal: next});
-    renderSub();
-  });
-  $('#btnSubCancel').addEventListener('click', ()=>{
-    put('sub',{active:false, plan:'basic', nextRenewal:null});
-    renderSub();
-  });
-
-  // --- 初期化 ---
+  // 初期化
   document.addEventListener('DOMContentLoaded', async ()=>{
-    try{
-      await liff.init({ liffId: APP.LIFF_ID, withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({redirectUri: location.href}); return; }
-      const prof = await liff.getProfile();
-      ensureAppUID(prof.userId);
-      await SYNC.syncOnLogin(prof);
-    }catch(e){
-      console.warn(e);
-      ensureAppUID('LOCAL-'+Date.now());
-    }
+    $("#siteSub").textContent = location.hostname.replace(/^www\./,'');
+    renderView();
 
-    renderUID();
-    renderProfile();
-    renderSub();
-    renderKyc();
-    renderHistory();
+    try{
+      await liff.init({ liffId: APP?.LIFF_ID || "", withLoginOnExternalBrowser:true });
+      if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
+      const prof = await liff.getProfile();
+      if(window.SYNC && SYNC.syncOnLogin){ await SYNC.syncOnLogin(prof.userId||''); }
+      // UID 再描画（同期で付与された場合に更新）
+      $("#uidText").textContent = LS('uid') || $("#uidText").textContent;
+    }catch(e){ console.warn(e); }
   });
 </script>
 </body>
