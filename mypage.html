@@ -55,7 +55,7 @@
       </div>
       <button id="copyUid" class="btn small">コピー</button>
     </div>
-    <!-- ▼ 追加：LINEの名前を控えめに表示（取得できた場合のみ表示） -->
+    <!-- ▼ 追加：LINE名（取得できたときだけ表示） -->
     <div id="lineNameRow" class="label" style="margin-top:6px;display:none">
       LINE名：<span id="lineName">—</span>
     </div>
@@ -183,8 +183,6 @@
           localStorage.setItem('appUID', uid);
           localStorage.setItem('uid', uid);
         }
-        // displayName も保存（取得できたとき）
-        if(prof && prof.displayName){ localStorage.setItem('line.displayName', prof.displayName); }
       }catch(e){ /* ignore */ }
     }
     if(!uid) uid = ensureUIDSync();
@@ -327,31 +325,22 @@
     // UID を確実に生成/反映
     await ensureUIDAsync();
     renderUID();
-    renderLineName(); // 既に保存済みの表示名があれば先に反映
+    renderLineName();
     renderProfile(); renderKyc(); renderCredit(); renderInvites(); renderNoti();
 
     try{
-      await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
+      const LIFF_ID = (window.APP&&APP.LIFF_ID) || '2008178197-ELrxabO9';
+      await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser:true });
       if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
       if(window.SYNC && SYNC.syncOnLogin){
         const prof = await liff.getProfile();
         await SYNC.syncOnLogin(prof);
-        // ▼ LINEの表示名を保存して即反映
-        if(prof && prof.displayName){
-          localStorage.setItem('line.displayName', prof.displayName);
-          renderLineName();
-        }
+        if(prof && prof.displayName){ localStorage.setItem('line.displayName', prof.displayName); renderLineName(); }
         await ensureUIDAsync();
         renderUID(); // UID が付与/更新された場合に反映
-      }else{
-        // SYNCが無い環境でも displayName を直接取得して表示
-        try{
-          const prof = await liff.getProfile();
-          if(prof && prof.displayName){
-            localStorage.setItem('line.displayName', prof.displayName);
-            renderLineName();
-          }
-        }catch(e){}
+        renderLineName(); // LINE名があれば表示
+      } else {
+        try{ const prof = await liff.getProfile(); if(prof && prof.displayName){ localStorage.setItem('line.displayName', prof.displayName); renderLineName(); } }catch(_){ }
       }
     }catch(e){ console.warn(e); }
   });
