@@ -6,7 +6,7 @@
 <title>LIFF Minimal｜申込み</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<!-- api.js がサーバにある前提。もし api-4.js なら下行を置換してください -->
+<!-- ファイル名に合わせてこちらに変更 -->
 <script src="api.js"></script>
 <style>
   :root{
@@ -113,7 +113,7 @@
     <div class="row between" style="margin-top:6px">
       <button class="btn" id="toAgree">同意へ進む</button>
     </div>
-    <p class="sub">※ 本人確認＆プロフィール必須（ニックネーム・年齢・エリア）未入力だと進めません。</p>
+    <p class="sub">※ 本人確認＆プロフィール必須（ニックネーム・年齢・エリア）未完了だと進めません。</p>
   </section>
 
   <section class="card" id="secAgree" style="display:none">
@@ -175,24 +175,8 @@
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const getVal=(k)=>localStorage.getItem(k);
 
-  // ★ GAS WebアプリURL（現行のまま）
-  const API_URL = "https://script.google.com/macros/s/AKfycbz6_13624N9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbz6_1...9r9R4FR0T0LnS1OB3mZ3uTTr1XV0o5AmU3yWHl7JLSwn3Guh7fHyPgK35/exec";
 
-  // --- LIFF ID 自動解決 ---
-  function resolveLiffId(){
-    // 1) api.js 等で提供される定義を最優先
-    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
-    // 2) miniapp / liff ドメインから抽出
-    const host = location.hostname;
-    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
-      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
-      if (seg) return seg;
-    }
-    // 3) 既知の本番IDをフォールバック
-    return "2008178197-ELrxabO9";
-  }
-
-  // ---- プロフィール & KYC マージ（既存）----
   function getProfileMerged(){
     const p=j('profile')||{};
     return {
@@ -214,14 +198,12 @@
     [1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on', i<=step));
     localStorage.setItem('state.step', String(step));
   }
-
   function canProceed(){
     const p = getProfileMerged();
     const k = getKycMerged();
     const requiredOK = (p.name && p.age && p.area);
     return requiredOK && k.verified && $('#selArea').value;
   }
-
   function currentPay(){
     const credit = Number(localStorage.getItem('credit')||0);
     const k=getKycMerged(), sub=j('sub')||{};
@@ -237,28 +219,48 @@
     return pay;
   }
 
+  // ---- GAS 送信（CORS→URLエンコード→no-cors の順にフォールバック）----
   async function postToGAS(payload){
     try{
-      const r = await fetch(API_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload),
-      });
+      const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       if(r.ok) return true;
-    }catch(e){}
+    }catch(_){}
     try{
       const body = new URLSearchParams({payload: JSON.stringify(payload)});
       const r2 = await fetch(API_URL, { method:'POST', body });
       if(r2.ok) return true;
-    }catch(e){}
+    }catch(_){}
     try{
-      await fetch(API_URL, {
-        method:'POST', mode:'no-cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload)
-      });
+      await fetch(API_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
       return true;
-    }catch(e){ return false; }
+    }catch(_){ return false; }
+  }
+
+  // --- LIFF ID 自動解決 & ログインループ対策 ---
+  function resolveLiffId(){
+    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
+    const host = location.hostname;
+    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
+      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
+      if (seg) return seg;
+    }
+    return "2008178197-ELrxabO9";
+  }
+  const LoginGuard = {
+    key: 'liff_login_once',
+    ttlMs: 180000,
+    now(){ return Date.now(); },
+    mark(){ sessionStorage.setItem(this.key, String(this.now())); },
+    clear(){ sessionStorage.removeItem(this.key); },
+    hasRecentlyTried(){
+      const t = Number(sessionStorage.getItem(this.key)||0);
+      if(!t) return false;
+      return (this.now()-t) < this.ttlMs;
+    }
+  };
+  function hasOAuthReturnParams(){
+    const q = new URLSearchParams(location.search);
+    return q.has('liff.state') || q.has('code') || q.has('state');
   }
 
   function show(id){
@@ -267,23 +269,36 @@
   }
 
   document.addEventListener('DOMContentLoaded', async ()=>{
-    // --- 強固な LIFF 初期化 ---
-    const LIFF_ID = resolveLiffId();
+    // LIFF 初期化（APP.LIFF_ID 未設定でも自動解決）
     try{
-      await liff.init({ liffId: LIFF_ID });
+      const LIFF_ID = resolveLiffId();
+      if(!LIFF_ID){ console.warn('LIFF_ID not resolved'); }
+      await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser:true });
       const inClient = liff.isInClient();
-      if(!inClient && !liff.isLoggedIn()){
-        liff.login({ redirectUri: location.href });
-        return;
+
+      // 外部ブラウザのみログイン誘導（ループ防止）
+      if(!inClient){
+        if(!liff.isLoggedIn()){
+          if(!LoginGuard.hasRecentlyTried()){
+            LoginGuard.mark();
+            const cleanUrl = location.origin + location.pathname + location.search;
+            liff.login({ redirectUri: cleanUrl });
+            return;
+          } else if(hasOAuthReturnParams()){
+            LoginGuard.clear();
+          }
+        } else {
+          LoginGuard.clear();
+        }
       }
+
       if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile().catch(()=>null);
-        if (prof) { await SYNC.syncOnLogin(prof); }
+        try{
+          const prof = await liff.getProfile();
+          if(prof) await SYNC.syncOnLogin(prof);
+        }catch(_){}
       }
-    }catch(e){
-      console.warn('LIFF init error:', e);
-      // 失敗しても画面は使えるように継続
-    }
+    }catch(e){ console.warn('LIFF init/login error', e); }
 
     // 同意→決済
     $('#toAgree').addEventListener('click', ()=>{
@@ -335,17 +350,17 @@
         }
       };
 
-      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(e){}
+      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted', {pay}); } }catch(_){}
 
       const ok = await postToGAS(payload);
       if(!ok){
         alert('サーバー送信に失敗しました。URL・GAS公開設定・CORSを確認してください。');
         return;
       }
+
       show('secDraw');
     });
 
-    // 初期
     setProgress(Number(localStorage.getItem('state.step')||'0'));
     show('secInput');
   });
