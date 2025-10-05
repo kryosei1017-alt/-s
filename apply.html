@@ -26,29 +26,40 @@
   .crumbs{color:#6B7280;font-size:12px;margin-top:6px}
   .crumbs b{color:#111827}
   .wrap{max-width:720px;margin:0 auto;padding:10px 16px calc(var(--tabbarH) + 20px)}
-  /* プログレス（4本） */
+
+  /* 進捗（4本） */
   .progress{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 12px}
   .bar{height:10px;border-radius:999px;background:var(--progress)}
-  /* カード・フィールド */
+
+  /* カード・フォーム */
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
   .sec-title{font-weight:800;margin-bottom:6px}
   .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
   .label{font-weight:700}
-  select,input,textarea{
-    width:100%;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;font-size:16px;
-  }
+  select,input,textarea{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;font-size:16px}
   textarea{min-height:84px}
+
   /* ボタン */
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:#111827;border-radius:18px;font-size:16px;padding:12px 16px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .btn.ghost{background:#fff;color:#111827;border-color:var(--border)}
   .note{color:#6B7280;font-size:12px;margin-top:10px}
-  /* 下タブ */
-  nav.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:30;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
-  .tabbar a{flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+
+  /* —— 下タブ（マイページと同一デザイン／2タブ） —— */
+  nav.tabbar{
+    position:fixed;left:0;right:0;bottom:0;height:var(--tabbarH);
+    background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;z-index:30;
+    padding-bottom:calc(env(safe-area-inset-bottom) + 8px)
+  }
+  .tabbar a{
+    flex:1;text-decoration:none;color:#6B7280;padding:16px 6px;
+    display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center
+  }
   .tabicon{width:22px;height:22px;border-radius:6px;background:#CBD5CB}
-  .tabbar .active{color:#0d3a23;font-weight:800}.tabbar .active .tabicon{background:var(--accent)}
+  .tabbar .active{color:#0d3a23;font-weight:800}
+  .tabbar .active .tabicon{background:var(--accent)}
 </style>
 </head>
 <body>
@@ -143,9 +154,8 @@
   </section>
 </main>
 
-<!-- 下部タブ -->
+<!-- 下部タブ（マイページと同じ2タブ） -->
 <nav class="tabbar">
-  <a href="index.html"><span class="tabicon"></span>ホーム</a>
   <a class="active" href="apply.html"><span class="tabicon"></span>申込み</a>
   <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
 </nav>
