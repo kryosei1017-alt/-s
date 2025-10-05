@@ -6,7 +6,6 @@
 <title>LIFF Minimal｜マイページ</title>
 <meta name="theme-color" content="#F6F3EE" />
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<!-- ファイル名に合わせてこちらに変更 -->
 <script src="api.js"></script>
 <style>
   :root{
@@ -47,6 +46,7 @@
 </header>
 
 <main class="wrap">
+  <!-- 個別ID（最上段） -->
   <section class="card">
     <div class="row between">
       <div class="row" style="gap:8px">
@@ -57,6 +57,7 @@
     </div>
   </section>
 
+  <!-- プロフィール（コンパクト表示＋編集ボタン） -->
   <section class="card" id="profView">
     <div class="row between">
       <div style="font-weight:700">プロフィール</div>
@@ -67,6 +68,7 @@
     <div class="kv"><div class="label">エリア</div><div id="v_area">—</div></div>
   </section>
 
+  <!-- プロフィール編集 -->
   <section class="card" id="profEdit" style="display:none">
     <div class="row between"><div style="font-weight:700">プロフィールを編集</div></div>
     <div class="row" style="gap:12px;flex-wrap:wrap">
@@ -91,6 +93,7 @@
     </div>
   </section>
 
+  <!-- 本人確認（デモ） -->
   <section class="card">
     <div class="row between">
       <div style="font-weight:700">本人確認</div>
@@ -103,6 +106,7 @@
     <p class="note">※ 本番では外部eKYC連携を想定。ここではデモ切替のみ。</p>
   </section>
 
+  <!-- クレジット -->
   <section class="card">
     <div class="row between"><div style="font-weight:700">クレジット残高</div><div><b id="credit">0</b> pt</div></div>
     <div class="row" style="gap:8px;margin-top:8px">
@@ -111,6 +115,7 @@
     </div>
   </section>
 
+  <!-- 招待URL（現在＆履歴） -->
   <section class="card">
     <div style="font-weight:700">招待URL</div>
     <div class="urlbox" id="currentInvite">— 現在の招待：未発行 —</div>
@@ -121,6 +126,7 @@
     <div id="histList" class="urlbox">— まだ履歴がありません —</div>
   </section>
 
+  <!-- お知らせ -->
   <section class="card">
     <div class="row between">
       <div style="font-weight:700">お知らせ</div>
@@ -141,6 +147,7 @@
   const g=(k)=>localStorage.getItem(k);
   const s=(k,val)=>localStorage.setItem(k, typeof val==='string'? val: JSON.stringify(val));
 
+  // --- 個別ID（UID） ---
   function hash36(str){
     let h=0;
     for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i))>>>0; }
@@ -150,10 +157,12 @@
   function ensureUIDSync(){
     let uid = g('appUID') || g('uid');
     if(!uid){
+      // Fallback: ランダム（初回のみ）
       uid = 'GX-' + Math.random().toString(36).slice(-7).toUpperCase();
       localStorage.setItem('appUID', uid);
       localStorage.setItem('uid', uid);
     }else{
+      // 正規化＆両方保存（互換）
       localStorage.setItem('appUID', uid);
       localStorage.setItem('uid', uid);
     }
@@ -164,13 +173,13 @@
     if(!uid && typeof liff!=='undefined' && liff && liff.getProfile){
       try{
         const prof = await liff.getProfile();
-        const userId = prof && prof.userId;
+        const userId = prof && (prof.userId || prof.userId);
         if(userId){
           uid = 'GX-' + hash36(userId + '|' + (location.hostname||''));
           localStorage.setItem('appUID', uid);
           localStorage.setItem('uid', uid);
         }
-      }catch(e){}
+      }catch(e){ /* ignore */ }
     }
     if(!uid) uid = ensureUIDSync();
     return uid;
@@ -178,6 +187,7 @@
   function renderUID(){ $('#uidText').textContent = g('appUID') || g('uid') || '—'; }
 
   function renderProfile(){
+    // profile と prof.* をマージして表示
     const p=j('profile')||{};
     const name = p.name ?? g('prof.name') ?? '—';
     const age  = p.age  ?? g('prof.age')  ?? '—';
@@ -216,6 +226,7 @@
       school:($('#f_school').value||'').trim(),
       free:($('#f_free').value||'').trim()
     };
+    // 統合JSON と 個別キーの両方を保存（互換）
     s('profile', profile);
     s('prof.name', profile.name); s('prof.age', profile.age); s('prof.area', profile.area);
     s('prof.hobby', profile.hobby); s('prof.like', profile.like); s('prof.usually', profile.usually);
@@ -236,6 +247,7 @@
     toggleEdit(false);
   }
 
+  // ▼ KYC（デモ）
   function setKyc(gender){ localStorage.setItem('kyc.verified','true'); localStorage.setItem('kyc.gender',gender); renderKyc(); }
   function renderKyc(){
     const v = g('kyc.verified')==='true'; const gender=g('kyc.gender')||'';
@@ -243,9 +255,11 @@
     $('#kycBadge').className = 'pill '+(v?'ok':'warn');
   }
 
+  // ▼ クレジット
   function setCredit(vl){ localStorage.setItem('credit', String(vl)); $('#credit').textContent = vl; }
   function renderCredit(){ $('#credit').textContent = Number(g('credit')||0); }
 
+  // ▼ お知らせ
   function getNoti(){ return j('noti.items') || j('notifications') || []; }
   function setNoti(arr){ s('noti.items', arr); s('notifications', arr); }
   function renderNoti(){
@@ -254,6 +268,7 @@
     $('#notiList').innerHTML = arr.map(n=>`<div>・${(n.date||'').toString()}：${n.text||''}</div>`).join('');
   }
 
+  // ▼ 招待URL（現在＆履歴）
   function formatRemain(iso){
     if(!iso) return '—';
     const d = new Date(iso+'T00:00:00'); const today=new Date(); d.setHours(0,0,0,0); today.setHours(0,0,0,0);
@@ -269,6 +284,7 @@
                                            : '— まだ履歴がありません —';
   }
 
+  // クリック類
   $('#copyUid').addEventListener('click',async()=>{
     try{ await navigator.clipboard.writeText($('#uidText').textContent||''); alert('個別IDをコピーしました'); }catch{}
   });
@@ -288,68 +304,21 @@
     try{ await navigator.clipboard.writeText(cur.url); alert('招待URLをコピーしました'); }catch{}
   });
 
-  // --- LIFF ID 自動解決 & ログインループ対策 ---
-  function resolveLiffId(){
-    if (window.APP && APP.LIFF_ID) return APP.LIFF_ID;
-    const host = location.hostname;
-    if (/^(miniapp\.line\.me|liff\.line\.me|liff\.line-apps\.com)$/i.test(host)) {
-      const seg = location.pathname.split('?')[0].split('/').filter(Boolean)[0];
-      if (seg) return seg;
-    }
-    return "2008178197-ELrxabO9";
-  }
-  const LoginGuard = {
-    key: 'liff_login_once',
-    ttlMs: 180000,
-    now(){ return Date.now(); },
-    mark(){ sessionStorage.setItem(this.key, String(this.now())); },
-    clear(){ sessionStorage.removeItem(this.key); },
-    hasRecentlyTried(){
-      const t = Number(sessionStorage.getItem(this.key)||0);
-      if(!t) return false;
-      return (this.now()-t) < this.ttlMs;
-    }
-  };
-  function hasOAuthReturnParams(){
-    const q = new URLSearchParams(location.search);
-    return q.has('liff.state') || q.has('code') || q.has('state');
-  }
-
   document.addEventListener('DOMContentLoaded', async ()=>{
     $('#siteSub').textContent = location.hostname.replace(/^www\./,'');
 
+    // UID を確実に生成/反映
     await ensureUIDAsync();
     renderUID(); renderProfile(); renderKyc(); renderCredit(); renderInvites(); renderNoti();
 
-    // 強固な LIFF 初期化（外部のみ1回ログイン）
     try{
-      const LIFF_ID = resolveLiffId();
-      await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser:true });
-      const inClient = liff.isInClient();
-
-      if(!inClient){
-        if(!liff.isLoggedIn()){
-          if(!LoginGuard.hasRecentlyTried()){
-            LoginGuard.mark();
-            const cleanUrl = location.origin + location.pathname + location.search;
-            liff.login({ redirectUri: cleanUrl });
-            return;
-          } else if(hasOAuthReturnParams()){
-            LoginGuard.clear();
-          }
-        } else {
-          LoginGuard.clear();
-        }
-      }
-    }catch(e){ console.warn('LIFF init/login error', e); }
-
-    // 同期系（ログイン状態が取れたら同期）
-    try{
+      await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
+      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
       if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile().catch(()=>null);
-        if(prof){ await SYNC.syncOnLogin(prof); }
+        const prof = await liff.getProfile();
+        await SYNC.syncOnLogin(prof);
         await ensureUIDAsync();
-        renderUID();
+        renderUID(); // UID が付与/更新された場合に反映
       }
     }catch(e){ console.warn(e); }
   });
