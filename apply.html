@@ -58,7 +58,7 @@
 
 <main class="wrap">
 
-  <!-- ホームの「進捗」をミニ化して統合 -->
+  <!-- 進捗ミニ -->
   <section class="card" id="progressMini">
     <div class="mini">
       <div class="row" style="gap:6px">
@@ -172,7 +172,6 @@
   </section>
 </main>
 
-<!-- タブ（ホーム削除 → 2タブ体制） -->
 <nav class="tabbar">
   <a class="active" href="apply.html"><span class="tabicon"></span>申込み</a>
   <a href="mypage.html"><span class="tabicon"></span>マイページ</a>
@@ -183,7 +182,45 @@
   const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
   const getVal=(k)=>localStorage.getItem(k);
 
-  // ---- プロフィールを "profile" と "prof.*" からマージして取得 ----
+  // --- LIFF ログインループ対策 ---
+  const LOGIN_GUARD_KEY='LIFF_LOGIN_TRIED';
+  const SYNC_SENT_KEY='SYNC_LOGIN_SENT';
+  async function initLiffSafely(){
+    try{
+      await liff.init({ liffId:(window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
+
+      const inClient = liff.isInClient();
+      const loggedIn = liff.isLoggedIn();
+
+      if(!inClient && !loggedIn){
+        if(!sessionStorage.getItem(LOGIN_GUARD_KEY)){
+          sessionStorage.setItem(LOGIN_GUARD_KEY,'1');
+          const redirect = location.origin + location.pathname; // クエリを落として固定
+          liff.login({ redirectUri: redirect });
+          return false; // ここで制御終了（リダイレクト）
+        }else{
+          // 2周目以降は無限ループ回避のためログイン要求しない
+          console.warn('Skip liff.login to avoid loop');
+          return false;
+        }
+      }
+      // ログインできている場合はガード解除
+      sessionStorage.removeItem(LOGIN_GUARD_KEY);
+
+      // SYNCは1セッション1回のみ
+      if(window.SYNC && SYNC.syncOnLogin && !sessionStorage.getItem(SYNC_SENT_KEY)){
+        const prof = await liff.getProfile().catch(()=>null);
+        await SYNC.syncOnLogin(prof||{});
+        sessionStorage.setItem(SYNC_SENT_KEY,'1');
+      }
+      return true;
+    }catch(e){
+      console.warn('LIFF init error', e);
+      return false;
+    }
+  }
+
+  // ---- プロフィール/KYC取得（マージ版）----
   function getProfileMerged(){
     const p=j('profile')||{};
     return {
@@ -192,7 +229,6 @@
       area: (p.area ?? getVal('prof.area') ?? '').toString().trim(),
     };
   }
-  // ---- KYC もオブジェクト/個別キーをマージ ----
   function getKycMerged(){
     const k=j('kyc')||{};
     const verified = (k.verified !== undefined)? k.verified : (getVal('kyc.verified')==='true');
@@ -229,22 +265,14 @@
     return pay;
   }
 
-  // 画面遷移
   function show(id){
     ['secInput','secAgree','secPay','secDraw'].forEach(x=>$('#'+x).style.display=(x===id?'block':'none'));
     setProgress( {'secInput':0,'secAgree':1,'secPay':2,'secDraw':3}[id] ?? 0 );
   }
 
   document.addEventListener('DOMContentLoaded', async ()=>{
-    // LIFF 初期化（api.jsでAPP設定済み想定）
-    try{
-      await liff.init({ liffId: (window.APP&&APP.LIFF_ID)||'', withLoginOnExternalBrowser:true });
-      if(!liff.isLoggedIn()){ liff.login({redirectUri:location.href}); return; }
-      if(window.SYNC && SYNC.syncOnLogin){
-        const prof = await liff.getProfile();
-        await SYNC.syncOnLogin(prof);
-      }
-    }catch(e){ console.warn(e); }
+    const ok = await initLiffSafely();
+    if(!ok) return; // ループ防止のため処理を止める
 
     // 同意→決済
     $('#toAgree').addEventListener('click', ()=>{
@@ -271,18 +299,16 @@
       if($('#paySub').checked && pay>0){
         const next = new Date(); next.setMonth(next.getMonth()+1);
         localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
-        // お知らせ（マイページに移動済み）へ追加
         const keyA='noti.items', keyB='notifications';
         const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
         items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
         localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
       }
 
-      try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted',{pay}); } }catch(e){}
+      try{ if(window.SYNC && SYNC.syncOnApply){ await SYNC.syncOnApply({pay:{amount:pay, method: $('#paySub').checked?'sub':'once'}}); } }catch(e){}
       show('secDraw');
     });
 
-    // 初期
     setProgress(Number(localStorage.getItem('state.step')||'0'));
     show('secInput');
   });
