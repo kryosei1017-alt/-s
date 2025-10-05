@@ -180,12 +180,27 @@
 
 <script>
   const $=s=>document.querySelector(s);
-  const ls=(k)=>JSON.parse(localStorage.getItem(k)||'null');
-  const ss=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
-  const getProf=()=>ls('profile')||{name:localStorage.getItem('prof.name')||'',age:localStorage.getItem('prof.age')||'',area:localStorage.getItem('prof.area')||''};
-  const getKyc =()=>ls('kyc')||{verified:localStorage.getItem('kyc.verified')==='true',gender:localStorage.getItem('kyc.gender')||''};
-  const stepLabels=['未開始','同意','決済','抽選'];
+  const j=(k)=>JSON.parse(localStorage.getItem(k)||'null');
+  const getVal=(k)=>localStorage.getItem(k);
 
+  // ---- プロフィールを "profile" と "prof.*" からマージして取得 ----
+  function getProfileMerged(){
+    const p=j('profile')||{};
+    return {
+      name: (p.name ?? getVal('prof.name') ?? '').toString().trim(),
+      age:  (p.age  ?? getVal('prof.age')  ?? '').toString().trim(),
+      area: (p.area ?? getVal('prof.area') ?? '').toString().trim(),
+    };
+  }
+  // ---- KYC もオブジェクト/個別キーをマージ ----
+  function getKycMerged(){
+    const k=j('kyc')||{};
+    const verified = (k.verified !== undefined)? k.verified : (getVal('kyc.verified')==='true');
+    const gender   = (k.gender   !== undefined)? k.gender   : (getVal('kyc.gender')||'');
+    return {verified, gender};
+  }
+
+  const stepLabels=['未開始','同意','決済','抽選'];
   function setProgress(step){
     $('#stepPill').textContent = stepLabels[step]||'未開始';
     [1,2,3].forEach(i=>$('#seg'+i).classList.toggle('on', i<=step));
@@ -193,14 +208,15 @@
   }
 
   function canProceed(){
-    const p=getProf(), k=getKyc();
+    const p = getProfileMerged();
+    const k = getKycMerged();
     const requiredOK = (p.name && p.age && p.area);
     return requiredOK && k.verified && $('#selArea').value;
   }
 
   function currentPay(){
     const credit = Number(localStorage.getItem('credit')||0);
-    const k=getKyc(), sub=ls('sub')||{};
+    const k=getKycMerged(), sub=j('sub')||{};
     let pay=0;
     if(k.gender==='female' || sub.active){ pay=0; }
     else{ pay = $('#paySub').checked? 1980 : 1000; }
@@ -254,17 +270,15 @@
 
       if($('#paySub').checked && pay>0){
         const next = new Date(); next.setMonth(next.getMonth()+1);
-        ss('sub', {active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)});
+        localStorage.setItem('sub', JSON.stringify({active:true, plan:'basic', nextRenewal: next.toISOString().slice(0,10)}));
         // お知らせ（マイページに移動済み）へ追加
         const keyA='noti.items', keyB='notifications';
-        const items = ls(keyA) || ls(keyB) || [];
+        const items = JSON.parse(localStorage.getItem(keyA)||localStorage.getItem(keyB)||'[]');
         items.unshift({date:new Date().toISOString().slice(0,19).replace('T',' '), type:'sub_join', text:`サブスク加入：次回更新 ${next.toISOString().slice(0,10)}`});
-        ss(keyA, items); ss(keyB, items);
+        localStorage.setItem(keyA, JSON.stringify(items)); localStorage.setItem(keyB, JSON.stringify(items));
       }
 
-      // ログ送信（任意）
       try{ if(window.SYNC && SYNC.logEvent){ await SYNC.logEvent('apply_submitted',{pay}); } }catch(e){}
-
       show('secDraw');
     });
 
