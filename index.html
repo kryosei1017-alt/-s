@@ -3,8 +3,107 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta http-equiv="refresh" content="0; URL=apply.html" />
-<title>Redirect</title>
+<title>GX-LIFF v4｜Index</title>
+<meta name="theme-color" content="#F6F3EE" />
+<!-- LIFF SDK -->
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<!-- （必要なら）他ファイル：<script src="api.js"></script> -->
+<style>
+  :root{ --bg:#F6F3EE; --ink:#111827; --muted:#6B7280; }
+  *{ box-sizing:border-box }
+  html,body{ height:100%; margin:0; background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans JP",sans-serif;
+    writing-mode:horizontal-tb!important; -webkit-writing-mode:horizontal-tb!important; text-orientation:mixed!important;
+    overflow:hidden;
+  }
+  .wrap{ height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
+  .muted{ color:var(--muted); font-size:12px }
+  .spinner{ width:28px; height:28px; border-radius:50%; border:3px solid #ddd; border-top-color:#0C7C59; animation:sp 0.8s linear infinite }
+  @keyframes sp{ to{ transform:rotate(360deg) } }
+</style>
 </head>
-<body></body>
+<body>
+<div class="wrap">
+  <div class="spinner"></div>
+  <div>読み込み中…</div>
+  <div class="muted" id="hint"></div>
+</div>
+
+<script>
+  // ===== 共通ユーティリティ =====
+  const HINT = (t)=>{ const el=document.getElementById('hint'); if(el) el.textContent=t||''; };
+
+  // UIDは index でも作っておく（初回直アクセス時の保険）
+  function hash36(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h*31+str.charCodeAt(i))>>>0; } return ('0000000'+h.toString(36).toUpperCase()).slice(-7); }
+  async function ensureUIDAsync(){
+    let uid = localStorage.getItem('appUID') || localStorage.getItem('uid');
+    if(!uid && typeof liff!=='undefined' && liff && liff.getProfile){
+      try{
+        const prof = await liff.getProfile();
+        if(prof && prof.userId){
+          uid = 'GX-' + hash36(prof.userId + '|' + (location.hostname||''));
+          localStorage.setItem('appUID', uid);
+          localStorage.setItem('uid', uid);
+        }
+        if(prof && prof.displayName){
+          localStorage.setItem('line.displayName', prof.displayName);
+        }
+      }catch(e){}
+    }
+    if(!uid){
+      uid = 'GX-' + Math.random().toString(36).slice(-7).toUpperCase(); // 最終保険（デモ）
+      localStorage.setItem('appUID', uid);
+      localStorage.setItem('uid', uid);
+    }
+    return uid;
+  }
+
+  // ===== 無限ログイン防止つき LIFF 初期化 =====
+  async function initLiffSafe(){
+    const LIFF_ID = (window.APP&&APP.LIFF_ID) || '2008178197-ELrxabO9'; // フォールバック：本番ID
+    try{
+      await liff.init({ liffId: LIFF_ID });
+    }catch(e){
+      console.warn('liff.init エラー', e);
+      HINT('LIFF初期化に失敗しました。ネットワークやID設定を確認してください。');
+      // LIFFが初期化できなくても index は apply に進ませる
+      setTimeout(()=>location.replace('apply.html'), 300);
+      return false;
+    }
+
+    // LINEアプリ内は isInClient() が true → そのまま使える（login()不要）
+    if(liff.isInClient()){
+      return true;
+    }
+
+    // 外部ブラウザの場合のみログイン誘導（1回だけ）
+    if(!liff.isLoggedIn()){
+      if(!sessionStorage.getItem('liff.login.tried')){
+        sessionStorage.setItem('liff.login.tried','1');
+        HINT('LINEへログイン中…');
+        liff.login({ redirectUri: location.href });
+      }else{
+        // 何らかの理由で戻ってきて未ログインなら、そのまま進める（デモ想定）
+        console.warn('未ログインだがループ回避のため継続');
+      }
+      return false;
+    }
+    return true;
+  }
+
+  (async () => {
+    HINT(location.hostname.replace(/^www\./,''));
+    const ok = await initLiffSafe();
+    if(ok){
+      try{
+        const prof = await liff.getProfile().catch(()=>null);
+        if(prof && prof.displayName){ localStorage.setItem('line.displayName', prof.displayName); }
+      }catch(e){ /* non fatal */ }
+      await ensureUIDAsync();
+    }
+    // index は UIを持たず、最終的に apply.html へ集約
+    location.replace('apply.html');
+  })();
+</script>
+</body>
 </html>
